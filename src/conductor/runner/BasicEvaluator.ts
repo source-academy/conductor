@@ -1,0 +1,39 @@
+import { Identifier, PairIdentifier, ExternValue, DataType, ArrayIdentifier, IFunctionSignature, ExternCallable, ClosureIdentifier } from "../types";
+import { IEvaluator, IRunnerPlugin } from "./types";
+
+export default abstract class BasicEvaluator implements IEvaluator {
+    conductor: IRunnerPlugin;
+    init(conductor: IRunnerPlugin): void {
+        this.conductor = conductor;
+    }
+
+    async runEvaluator(entryPoint: string): Promise<any> {
+        const initialFragment = await this.conductor.requestFile(entryPoint);
+        await this.evaluateFragment(initialFragment);
+        while (true) {
+            const fragment = await this.conductor.requestFragment();
+            await this.evaluateFragment(fragment);
+        }
+    }
+
+    abstract evaluateFragment(fragment: string): Promise<void>;
+
+    abstract pair_make(): Identifier;
+    abstract pair_gethead(p: PairIdentifier): ExternValue;
+    abstract pair_typehead(p: PairIdentifier): DataType;
+    abstract pair_sethead(p: PairIdentifier, t: DataType, v: ExternValue): void;
+    abstract pair_gettail(p: PairIdentifier): ExternValue;
+    abstract pair_typetail(p: PairIdentifier): DataType;
+    abstract pair_settail(p: PairIdentifier, t: DataType, v: ExternValue): void;
+
+    abstract array_make(t: DataType, len: number, init?: ExternValue): Identifier;
+    abstract array_get(a: ArrayIdentifier, idx: number): ExternValue;
+    abstract array_type(a: ArrayIdentifier): DataType;
+    abstract array_set(a: ArrayIdentifier, idx: number, v: ExternValue): void;
+
+    abstract closure_make(sig: IFunctionSignature, func: ExternCallable): Identifier;
+    abstract closure_call(c: ClosureIdentifier, args: ExternValue[]): ExternValue;
+
+    abstract type(i: Identifier): DataType;
+    abstract free(i: Identifier): void;
+}
