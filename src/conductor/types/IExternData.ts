@@ -1,4 +1,4 @@
-import type { ArrayIdentifier, ClosureIdentifier, DataType, ExternCallable, ExternValue, Identifier, IFunctionSignature, PairIdentifier } from ".";
+import type { ArrayIdentifier, ClosureIdentifier, DataType, ExternCallable, ExternValue, Identifier, IFunctionSignature, OpaqueIdentifier, PairIdentifier } from ".";
 
 interface IExternData {
     pair_make(): Identifier; // not PairIdentifier so evaluators do not need to cast
@@ -16,6 +16,9 @@ interface IExternData {
 
     closure_make(sig: IFunctionSignature, func: ExternCallable): Identifier; // not ClosureIdentifier
     closure_call(c: ClosureIdentifier, args: ExternValue[]): ExternValue;
+
+    opaque_make(v: any): Identifier; // not OpaqueIdentifier
+    opaque_get(o: OpaqueIdentifier): any;
 
     type(i: Identifier): DataType;
     free(i: Identifier): void;

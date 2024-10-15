@@ -21,7 +21,10 @@ const enum DataType {
     ARRAY = 6,
 
     /** A value that can be called with fixed arity. Reference type. */
-    CLOSURE = 7
+    CLOSURE = 7,
+
+    /** An opaque value that cannot be manipulated from user code. */
+    OPAQUE = 8
 };
 
 export default DataType;

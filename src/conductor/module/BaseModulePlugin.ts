@@ -1,12 +1,13 @@
 import { IConduit, IChannel } from "../../conduit";
 import InternalChannelName from "../strings/InternalChannelName";
-import { IExternData, PairIdentifier, ExternValue, DataType, ArrayIdentifier, IFunctionSignature, ExternCallable, ClosureIdentifier, Identifier } from "../types";
+import { IExternData, PairIdentifier, ExternValue, DataType, ArrayIdentifier, IFunctionSignature, ExternCallable, ClosureIdentifier, Identifier, OpaqueIdentifier } from "../types";
 import { IModulePlugin, IModuleExport } from "./types";
 
 const methods = [
     "pair_make", "pair_gethead", "pair_typehead", "pair_sethead", "pair_gettail", "pair_typetail", "pair_settail",
     "array_make", "array_get", "array_type", "array_set",
     "closure_make", "closure_call",
+    "opaque_make", "opaque_get",
     "type", "free"
 ];
 
@@ -48,6 +49,9 @@ export default abstract class BaseModulePlugin implements IModulePlugin {
 
     closure_make: (sig: IFunctionSignature, func: ExternCallable) => ClosureIdentifier;
     closure_call: (c: ClosureIdentifier, args: ExternValue[]) => ExternValue;
+
+    opaque_make: (v: any) => OpaqueIdentifier;
+    opaque_get: (o: OpaqueIdentifier) => any;
 
     type: (i: Identifier) => DataType;
     free: (i: Identifier) => void;

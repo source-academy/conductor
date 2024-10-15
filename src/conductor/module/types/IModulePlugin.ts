@@ -1,5 +1,5 @@
 import type { IPlugin } from "../../../conduit";
-import type { ArrayIdentifier, ClosureIdentifier, DataType, ExternCallable, ExternValue, Identifier, IExternData, IFunctionSignature, PairIdentifier } from "../../types";
+import type { ArrayIdentifier, ClosureIdentifier, DataType, ExternCallable, ExternValue, Identifier, IExternData, IFunctionSignature, OpaqueIdentifier, PairIdentifier } from "../../types";
 import type IModuleExport from "./IModuleExport";
 
 interface IModulePlugin extends IPlugin {
@@ -40,6 +40,9 @@ interface IModulePlugin extends IPlugin {
 
     closure_make(sig: IFunctionSignature, func: ExternCallable): ClosureIdentifier;
     closure_call(c: ClosureIdentifier, args: ExternValue[]): ExternValue;
+
+    opaque_make(v: any): OpaqueIdentifier;
+    opaque_get(o: OpaqueIdentifier): any;
 
     type(i: Identifier): DataType;
     free(i: Identifier): void;

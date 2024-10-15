@@ -11,6 +11,7 @@ export type { default as IExternData } from "./IExternData";
 export type { default as IFunctionSignature } from "./IFunctionSignature";
 export type { default as IOMessage } from "./IOMessage";
 export type { default as NativeValue } from "./NativeValue";
+export type { default as OpaqueIdentifier } from "./OpaqueIdentifier";
 export type { default as PairIdentifier } from "./PairIdentifier";
 export { default as RunnerStatus } from "./RunnerStatus";
 export type { default as ServiceMessage } from "./ServiceMessage";

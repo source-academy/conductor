@@ -1,4 +1,4 @@
-import { Identifier, PairIdentifier, ExternValue, DataType, ArrayIdentifier, IFunctionSignature, ExternCallable, ClosureIdentifier } from "../types";
+import { Identifier, PairIdentifier, ExternValue, DataType, ArrayIdentifier, IFunctionSignature, ExternCallable, ClosureIdentifier, OpaqueIdentifier } from "../types";
 import { IEvaluator, IRunnerPlugin } from "./types";
 
 export default abstract class BasicEvaluator implements IEvaluator {
@@ -33,6 +33,9 @@ export default abstract class BasicEvaluator implements IEvaluator {
 
     abstract closure_make(sig: IFunctionSignature, func: ExternCallable): Identifier;
     abstract closure_call(c: ClosureIdentifier, args: ExternValue[]): ExternValue;
+
+    abstract opaque_make(v: any): Identifier;
+    abstract opaque_get(o: OpaqueIdentifier): any;
 
     abstract type(i: Identifier): DataType;
     abstract free(i: Identifier): void;
