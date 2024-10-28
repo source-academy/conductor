@@ -1,4 +1,4 @@
-interface FileMessage {
+interface IFileMessage {
     /** The name of the file. */
     fileName: string;
 
@@ -6,4 +6,4 @@ interface FileMessage {
     content?: string;
 }
 
-export type { FileMessage as default };
+export type { IFileMessage as default };

@@ -1,8 +1,8 @@
 import type Fragment from "./Fragment";
 
-interface FragmentMessage {
+interface IFragmentMessage {
     id: number;
     fragment: Fragment;
 }
 
-export type { FragmentMessage as default };
+export type { IFragmentMessage as default };

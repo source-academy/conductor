@@ -1,8 +1,8 @@
 import type RunnerStatus from "./RunnerStatus";
 
-interface StatusMessage {
+interface IStatusMessage {
     status: RunnerStatus;
     isActive: boolean;
 }
 
-export type { StatusMessage as default };
+export type { IStatusMessage as default };
