@@ -18,6 +18,11 @@ interface IConduit {
      * @param pluginName The name of the plugin to be searched for.
      */
     lookupPlugin(pluginName: string): IPlugin;
+
+    /**
+     * Shuts down the conduit.
+     */
+    terminate(): void;
 }
 
 export type { IConduit as default };

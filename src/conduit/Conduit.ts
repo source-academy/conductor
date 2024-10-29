@@ -2,10 +2,12 @@ import Channel from "./Channel";
 import { IConduit, ILink, IPlugin, IChannel } from "./types";
 
 export default class Conduit implements IConduit {
+    private alive: boolean = true;
     private readonly link: ILink;
     private readonly parent: boolean;
     private readonly channels: Map<string, Channel<any>>;
-    private readonly plugins: Map<string, IPlugin>;
+    private readonly pluginMap: Map<string, IPlugin>;
+    private readonly plugins: IPlugin[];
     private negotiateChannel(channelName: string): void {
         const { port1, port2 } = new MessageChannel();
         const channel = new Channel(channelName, port1);
@@ -13,10 +15,12 @@ export default class Conduit implements IConduit {
         this.channels.set(channelName, channel);
     }
     registerPlugin(plugin: IPlugin): void {
+        if (!this.alive) return;
         if (plugin.name !== undefined) {
-            if (this.plugins.has(plugin.name)) throw Error(`plugin ${plugin.name} already registered`); // TODO: custom error?
-            this.plugins.set(plugin.name, plugin);
+            if (this.pluginMap.has(plugin.name)) throw Error(`plugin ${plugin.name} already registered`); // TODO: custom error?
+            this.pluginMap.set(plugin.name, plugin);
         }
+        this.plugins.push(plugin);
         const attachedChannels: IChannel<any>[] = [];
         for (const channelName of plugin.channelAttach) {
             if (!this.channels.has(channelName)) this.negotiateChannel(channelName);
@@ -29,8 +33,15 @@ export default class Conduit implements IConduit {
         plugin.destroy?.();
     }
     lookupPlugin(pluginName: string): IPlugin {
-        if (!this.plugins.has(pluginName)) throw Error(`plugin ${pluginName} not registered`); // TODO: custom error?
-        return this.plugins.get(pluginName);
+        if (!this.pluginMap.has(pluginName)) throw Error(`plugin ${pluginName} not registered`); // TODO: custom error?
+        return this.pluginMap.get(pluginName);
+    }
+    terminate(): void {
+        for (const plugin of this.plugins) {
+            this.unregisterPlugin(plugin);
+        }
+        this.link.terminate?.();
+        this.alive = false;
     }
     private handlePort(data: [string, MessagePort]) { // TODO: update communication protocol?
         const [channelName, port] = data;
@@ -51,6 +62,7 @@ export default class Conduit implements IConduit {
         link.addEventListener("message", e => this.handlePort(e.data));
         this.parent = parent;
         this.channels = new Map();
-        this.plugins = new Map();
+        this.pluginMap = new Map();
+        this.plugins = [];
     }
 }
