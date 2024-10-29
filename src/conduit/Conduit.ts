@@ -5,9 +5,9 @@ export default class Conduit implements IConduit {
     private alive: boolean = true;
     private readonly link: ILink;
     private readonly parent: boolean;
-    private readonly channels: Map<string, Channel<any>>;
-    private readonly pluginMap: Map<string, IPlugin>;
-    private readonly plugins: IPlugin[];
+    private readonly channels: Map<string, Channel<any>> = new Map();
+    private readonly pluginMap: Map<string, IPlugin> = new Map();
+    private readonly plugins: IPlugin[] = [];
     private negotiateChannel(channelName: string): void {
         const { port1, port2 } = new MessageChannel();
         const channel = new Channel(channelName, port1);
@@ -61,8 +61,5 @@ export default class Conduit implements IConduit {
         this.link = link;
         link.addEventListener("message", e => this.handlePort(e.data));
         this.parent = parent;
-        this.channels = new Map();
-        this.pluginMap = new Map();
-        this.plugins = [];
     }
 }

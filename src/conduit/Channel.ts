@@ -7,7 +7,7 @@ export default class Channel<T> implements IChannel<T> {
     private port: MessagePort;
 
     /** The callbacks subscribed to this Channel. */
-    private readonly subscribers: Set<Subscriber<T>>; // TODO: use WeakRef? but callbacks tend to be thrown away and leaking is better than incorrect behaviour
+    private readonly subscribers: Set<Subscriber<T>> = new Set(); // TODO: use WeakRef? but callbacks tend to be thrown away and leaking is better than incorrect behaviour
 
     /** Is the Channel allowed to be used? */
     private isAlive: boolean = true;
@@ -71,7 +71,6 @@ export default class Channel<T> implements IChannel<T> {
 
     constructor(name: string, port: MessagePort) {
         this.name = name;
-        this.subscribers = new Set();
         this.replacePort(port);
     }
 }

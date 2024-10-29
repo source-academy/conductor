@@ -5,8 +5,8 @@ export default class MessageQueue<T> implements IMessageQueue<T> {
     readonly name: string;
     private channel: IChannel<T>;
     private subscriber: Subscriber<T>;
-    private readonly inputQueue: Queue<T>;
-    private readonly inputWaitQueue: Queue<Function>;
+    private readonly inputQueue: Queue<T> = new Queue();
+    private readonly inputWaitQueue: Queue<Function> = new Queue();
     async receive(): Promise<T> {
         if (this.inputQueue.length !== 0) return this.inputQueue.pop();
         return new Promise((resolve, reject) => {
@@ -32,7 +32,5 @@ export default class MessageQueue<T> implements IMessageQueue<T> {
         this.channel = channel;
         this.subscriber = data => this.handleMessage(data);
         this.channel.subscribe(this.subscriber);
-        this.inputQueue = new Queue();
-        this.inputWaitQueue = new Queue();
     }
 }

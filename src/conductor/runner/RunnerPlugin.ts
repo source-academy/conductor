@@ -25,7 +25,7 @@ export default class RunnerPlugin implements IRunnerPlugin {
     private ioQueue: IMessageQueue<IIOMessage>;
     private statusChannel: IChannel<IStatusMessage>;
 
-    readonly serviceHandlers: Map<ServiceMessageType, (message: IServiceMessage) => void>;
+    readonly serviceHandlers: Map<ServiceMessageType, (message: IServiceMessage) => void> = new Map();
 
     readonly channelAttach = [InternalChannelName.FILE, InternalChannelName.FRAGMENT, InternalChannelName.SERVICE, InternalChannelName.STANDARD_IO, InternalChannelName.STATUS];
     init(conduit: IConduit, [fileChannel, fragmentChannel, serviceChannel, ioChannel, statusChannel]): void {
@@ -102,7 +102,5 @@ export default class RunnerPlugin implements IRunnerPlugin {
 
     constructor(evaluator: IEvaluator) {
         this.evaluator = evaluator;
-        this.serviceHandlers = new Map();
     }
 }
-
