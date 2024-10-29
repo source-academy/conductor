@@ -51,6 +51,10 @@ export default class RunnerPlugin implements IRunnerPlugin {
         return out?.message;
     }
 
+    sendOutput(stream: number, message: string) {
+        this.ioQueue.send({ stream, message });
+    }
+
     updateStatus(status: RunnerStatus, isActive: boolean): void {
         this.statusChannel.send({ status, isActive });
     }
