@@ -29,6 +29,18 @@ interface IRunnerPlugin extends IPlugin {
     tryRequestInput(): string | undefined;
 
     /**
+     * Sends a message on standard-output.
+     * @param message The output message to send.
+     */
+    sendOutput(message: string): void;
+
+    /**
+     * Sends a message on standard-error.
+     * @param message The error message to send.
+     */
+    sendError(message: string): void;
+
+    /**
      * Provide a status update of the runner.
      * @param status The status to update.
      * @param isActive Is the specified status currently active?
