@@ -3,7 +3,16 @@ import { IModulePlugin } from "../module";
 import InternalChannelName from "../strings/InternalChannelName";
 import InternalPluginName from "../strings/InternalPluginName";
 import { IFileMessage, Fragment, IServiceMessage, IIOMessage, IStatusMessage, RunnerStatus, IFragmentMessage, serviceMessages } from "../types";
+import ServiceMessageType from "../types/ServiceMessageType";
 import { IRunnerPlugin, IEvaluator } from "./types";
+
+function serviceHandler(type: ServiceMessageType) {
+    return function (originalMethod: (data: IServiceMessage) => void, context: ClassMethodDecoratorContext) {
+        context.addInitializer(function () {
+            (this as RunnerPlugin).serviceHandlers.set(type, originalMethod.bind(this));
+        });
+    }
+}
 
 export default class RunnerPlugin implements IRunnerPlugin {
     name = InternalPluginName.MAIN;
@@ -16,6 +25,8 @@ export default class RunnerPlugin implements IRunnerPlugin {
     private ioQueue: IMessageQueue<IIOMessage>;
     private statusChannel: IChannel<IStatusMessage>;
 
+    readonly serviceHandlers: Map<ServiceMessageType, (message: IServiceMessage) => void>;
+
     readonly channelAttach = [InternalChannelName.FILE, InternalChannelName.FRAGMENT, InternalChannelName.SERVICE, InternalChannelName.STANDARD_IO, InternalChannelName.STATUS];
     init(conduit: IConduit, [fileChannel, fragmentChannel, serviceChannel, ioChannel, statusChannel]): void {
         this.conduit = conduit;
@@ -27,6 +38,16 @@ export default class RunnerPlugin implements IRunnerPlugin {
 
         this.serviceChannel.send(new serviceMessages.Hello());
         this.evaluator.init(this);
+    }
+
+    @serviceHandler(ServiceMessageType.HELLO)
+    helloServiceHandler(message: serviceMessages.Hello): void {
+        console.log(`host is using api version ${message.data.version}`);
+    }
+
+    @serviceHandler(ServiceMessageType.ENTRY)
+    entryServiceHandler(message: serviceMessages.Entry): void {
+        this.evaluator.runEvaluator(message.data);
     }
 
     async requestFile(fileName: string): Promise<string> {
@@ -81,6 +102,7 @@ export default class RunnerPlugin implements IRunnerPlugin {
 
     constructor(evaluator: IEvaluator) {
         this.evaluator = evaluator;
+        this.serviceHandlers = new Map();
     }
 }
 
