@@ -71,6 +71,7 @@ export default class Channel<T> implements IChannel<T> {
 
     constructor(name: string, port: MessagePort) {
         this.name = name;
+        this.subscribers = new Set();
         this.replacePort(port);
     }
 }
