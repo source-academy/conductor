@@ -9,7 +9,9 @@ import { IRunnerPlugin, IEvaluator } from "./types";
 function serviceHandler(type: ServiceMessageType) {
     return function (originalMethod: (data: IServiceMessage) => void, context: ClassMethodDecoratorContext) {
         context.addInitializer(function () {
-            (this as RunnerPlugin).serviceHandlers.set(type, originalMethod.bind(this));
+            const _this = this as RunnerPlugin;
+            if (!_this.serviceHandlers) _this.serviceHandlers = new Map();
+            (_this as RunnerPlugin).serviceHandlers.set(type, originalMethod.bind(_this));
         });
     }
 }
@@ -25,7 +27,7 @@ export default class RunnerPlugin implements IRunnerPlugin {
     private ioQueue: IMessageQueue<IIOMessage>;
     private statusChannel: IChannel<IStatusMessage>;
 
-    readonly serviceHandlers: Map<ServiceMessageType, (message: IServiceMessage) => void> = new Map();
+    serviceHandlers: Map<ServiceMessageType, (message: IServiceMessage) => void>;
 
     readonly channelAttach = [InternalChannelName.FILE, InternalChannelName.FRAGMENT, InternalChannelName.SERVICE, InternalChannelName.STANDARD_IO, InternalChannelName.STATUS];
     init(conduit: IConduit, [fileChannel, fragmentChannel, serviceChannel, ioChannel, statusChannel]): void {
@@ -102,5 +104,6 @@ export default class RunnerPlugin implements IRunnerPlugin {
 
     constructor(evaluator: IEvaluator) {
         this.evaluator = evaluator;
+        if (!this.serviceHandlers) this.serviceHandlers = new Map();
     }
 }
