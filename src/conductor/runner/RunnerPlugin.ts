@@ -39,6 +39,9 @@ export default class RunnerPlugin implements IRunnerPlugin {
         this.statusChannel = statusChannel;
 
         this.serviceChannel.send(new serviceMessages.Hello());
+        this.serviceChannel.subscribe(message => {
+            if (this.serviceHandlers.has(message.type)) this.serviceHandlers.get(message.type)(message);
+        });
         this.evaluator.init(this);
     }
 
