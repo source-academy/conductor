@@ -1,5 +1,5 @@
 import type { IPlugin } from "../../../conduit";
-import type { ArrayIdentifier, ClosureIdentifier, DataType, ExternCallable, ExternValue, Identifier, IExternData, IFunctionSignature, OpaqueIdentifier, PairIdentifier } from "../../types";
+import type { ArrayIdentifier, ClosureIdentifier, DataType, ExternCallable, ExternValue, Identifier, IDataHandler, IFunctionSignature, OpaqueIdentifier, PairIdentifier } from "../../types";
 import type IModuleExport from "./IModuleExport";
 
 interface IModulePlugin extends IPlugin {
@@ -9,7 +9,7 @@ interface IModulePlugin extends IPlugin {
      * Hooks an evaluator up to this module.
      * @param evaluator The evaluator we are interacting with.
      */
-    hook(evaluator: IExternData): void;
+    hook(evaluator: IDataHandler): void;
 
     /** 
      * Checks if the module has been hooked up.

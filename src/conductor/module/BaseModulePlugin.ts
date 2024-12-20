@@ -1,6 +1,6 @@
 import { IConduit, IChannel } from "../../conduit";
 import InternalChannelName from "../strings/InternalChannelName";
-import { IExternData, PairIdentifier, ExternValue, DataType, ArrayIdentifier, IFunctionSignature, ExternCallable, ClosureIdentifier, Identifier, OpaqueIdentifier } from "../types";
+import { IDataHandler, PairIdentifier, ExternValue, DataType, ArrayIdentifier, IFunctionSignature, ExternCallable, ClosureIdentifier, Identifier, OpaqueIdentifier } from "../types";
 import { IModulePlugin, IModuleExport } from "./types";
 
 const methods = [
@@ -20,7 +20,7 @@ export default abstract class BaseModulePlugin implements IModulePlugin {
     /** Is this module ready for use? */
     private hooked: boolean = false;
 
-    hook(evaluator: IExternData): void {
+    hook(evaluator: IDataHandler): void {
         if (this.hooked) throw Error("already hooked!"); // TODO: custom error?
         this.hooked = true;
         for (const methodName of methods) {

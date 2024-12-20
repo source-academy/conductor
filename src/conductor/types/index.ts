@@ -5,7 +5,7 @@ export type { default as ExternCallable } from "./ExternCallable";
 export type { default as ExternValue } from "./ExternValue";
 export type { default as Fragment } from "./Fragment";
 export type { default as Identifier } from "./Identifier";
-export type { default as IExternData } from "./IExternData";
+export type { default as IDataHandler } from "./IDataHandler";
 export type { default as IFileMessage } from "./IFileMessage";
 export type { default as IFragmentMessage } from "./IFragmentMessage";
 export type { default as IFunctionSignature } from "./IFunctionSignature";

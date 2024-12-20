@@ -1,6 +1,6 @@
 import type { ArrayIdentifier, ClosureIdentifier, DataType, ExternCallable, ExternValue, Identifier, IFunctionSignature, OpaqueIdentifier, PairIdentifier } from ".";
 
-interface IExternData {
+interface IDataHandler {
     pair_make(): Identifier; // not PairIdentifier so evaluators do not need to cast
     pair_gethead(p: PairIdentifier): ExternValue;
     pair_typehead(p: PairIdentifier): DataType;
@@ -24,4 +24,4 @@ interface IExternData {
     free(i: Identifier): void;
 }
 
-export type { IExternData as default };
+export type { IDataHandler as default };
