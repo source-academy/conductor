@@ -89,16 +89,24 @@ export default class RunnerPlugin implements IRunnerPlugin {
         this.statusChannel.send({ status, isActive });
     }
 
+    registerPlugin(plugin: IPlugin): void {
+        this.conduit.registerPlugin(plugin);
+    }
+
+    unregisterPlugin(plugin: IPlugin): void {
+        this.conduit.unregisterPlugin(plugin);
+    }
+
     async loadPlugin(location: string): Promise<IPlugin> {
         const plugin = await import(location) as IPlugin;
-        this.conduit.registerPlugin(plugin);
+        this.registerPlugin(plugin);
         return plugin;
     }
 
     async loadModule(location: string) {
         const module = await this.loadPlugin(location) as IModulePlugin;
         if (!module.hook) {
-            this.conduit.unregisterPlugin(module);
+            this.unregisterPlugin(module);
             throw Error("plugin is not module!");
         }
         module.hook(this.evaluator);

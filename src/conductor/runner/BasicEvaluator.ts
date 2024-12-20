@@ -9,13 +9,16 @@ export default abstract class BasicEvaluator implements IEvaluator {
 
     async runEvaluator(entryPoint: string): Promise<any> {
         const initialFragment = await this.conductor.requestFile(entryPoint);
-        await this.evaluateFragment(initialFragment);
+        await this.evaluateFile(entryPoint, initialFragment);
         while (true) {
             const fragment = await this.conductor.requestFragment();
             await this.evaluateFragment(fragment);
         }
     }
 
+    async evaluateFile(fileName: string, fileContent: string): Promise<void> {
+        return await this.evaluateFragment(fileContent);
+    }
     abstract evaluateFragment(fragment: string): Promise<void>;
 
     abstract pair_make(): Identifier;

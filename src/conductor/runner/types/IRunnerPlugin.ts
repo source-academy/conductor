@@ -48,6 +48,18 @@ interface IRunnerPlugin extends IPlugin {
     updateStatus(status: RunnerStatus, isActive: boolean): void;
 
     /**
+     * Registers a plugin with the conduit.
+     * @param plugin The plugin to be registered.
+     */
+    registerPlugin(plugin: IPlugin): void;
+
+    /**
+     * Unregister a plugin from the conduit.
+     * @param plugin The plugin to be unregistered.
+     */
+    unregisterPlugin(plugin: IPlugin): void;
+
+    /**
      * Imports a plugin and registers it with the conduit.
      * @param location The path to the plugin file.
      */
