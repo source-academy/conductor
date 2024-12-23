@@ -41,5 +41,7 @@ export default abstract class BasicEvaluator implements IEvaluator {
     abstract opaque_get(o: OpaqueIdentifier): any;
 
     abstract type(i: Identifier): DataType;
-    abstract free(i: Identifier): void;
+    abstract tie(dependent: Identifier, dependee: Identifier): void;
+    abstract untie(dependent: Identifier, dependee: Identifier): void;
+    // abstract free(i: Identifier): void;
 }

@@ -8,7 +8,7 @@ const methods = [
     "array_make", "array_get", "array_type", "array_set",
     "closure_make", "closure_call",
     "opaque_make", "opaque_get",
-    "type", "free"
+    "type", "tie", "untie"// , "free"
 ];
 
 export default abstract class BaseModulePlugin implements IModulePlugin {
@@ -54,5 +54,7 @@ export default abstract class BaseModulePlugin implements IModulePlugin {
     opaque_get: (o: OpaqueIdentifier) => any;
 
     type: (i: Identifier) => DataType;
-    free: (i: Identifier) => void;
+    tie: (dependent: Identifier, dependee: Identifier) => void;
+    untie: (dependent: Identifier, dependee: Identifier) => void;
+    // free: (i: Identifier) => void;
 }

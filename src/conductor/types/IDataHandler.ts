@@ -21,7 +21,9 @@ interface IDataHandler {
     opaque_get(o: OpaqueIdentifier): any;
 
     type(i: Identifier): DataType;
-    free(i: Identifier): void;
+    tie(dependent: Identifier, dependee: Identifier): void;
+    untie(dependent: Identifier, dependee: Identifier): void;
+    // free(i: Identifier): void;
 }
 
 export type { IDataHandler as default };
