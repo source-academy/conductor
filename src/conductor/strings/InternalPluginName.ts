@@ -1,5 +1,5 @@
 const enum InternalPluginName {
-    MAIN = "__main"
+    RUNNER_MAIN = "__runner_main"
 };
 
 export default InternalPluginName;

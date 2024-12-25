@@ -17,7 +17,7 @@ function serviceHandler(type: ServiceMessageType) {
 }
 
 export default class RunnerPlugin implements IRunnerPlugin {
-    name = InternalPluginName.MAIN;
+    name = InternalPluginName.RUNNER_MAIN;
 
     private readonly evaluator: IEvaluator;
     private conduit: IConduit;
