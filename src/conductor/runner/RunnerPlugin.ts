@@ -11,7 +11,7 @@ function serviceHandler(type: ServiceMessageType) {
         context.addInitializer(function () {
             const _this = this as RunnerPlugin;
             if (!_this.serviceHandlers) _this.serviceHandlers = new Map();
-            (_this as RunnerPlugin).serviceHandlers.set(type, originalMethod.bind(_this));
+            _this.serviceHandlers.set(type, originalMethod.bind(_this));
         });
     }
 }
