@@ -1,4 +1,4 @@
-interface IMessageQueue<T> {
+interface IChannelQueue<T> {
     /** The name of the message queue. */
     readonly name: string;
 
@@ -28,4 +28,4 @@ interface IMessageQueue<T> {
     close(): void;
 }
 
-export type { IMessageQueue as default };
+export type { IChannelQueue as default };

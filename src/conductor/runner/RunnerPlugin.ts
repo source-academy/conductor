@@ -1,4 +1,4 @@
-import { IConduit, IMessageQueue, IChannel, MessageQueue, IPlugin } from "../../conduit";
+import { IConduit, IChannelQueue, IChannel, ChannelQueue, IPlugin } from "../../conduit";
 import { IModulePlugin } from "../module";
 import InternalChannelName from "../strings/InternalChannelName";
 import InternalPluginName from "../strings/InternalPluginName";
@@ -21,10 +21,10 @@ export default class RunnerPlugin implements IRunnerPlugin {
 
     private readonly evaluator: IEvaluator;
     private conduit: IConduit;
-    private fileQueue: IMessageQueue<IFileMessage>;
-    private fragmentQueue: IMessageQueue<IFragmentMessage>;
+    private fileQueue: IChannelQueue<IFileMessage>;
+    private fragmentQueue: IChannelQueue<IFragmentMessage>;
     private serviceChannel: IChannel<IServiceMessage>;
-    private ioQueue: IMessageQueue<IIOMessage>;
+    private ioQueue: IChannelQueue<IIOMessage>;
     private statusChannel: IChannel<IStatusMessage>;
 
     serviceHandlers: Map<ServiceMessageType, (message: IServiceMessage) => void>;
@@ -32,10 +32,10 @@ export default class RunnerPlugin implements IRunnerPlugin {
     readonly channelAttach = [InternalChannelName.FILE, InternalChannelName.FRAGMENT, InternalChannelName.SERVICE, InternalChannelName.STANDARD_IO, InternalChannelName.STATUS];
     init(conduit: IConduit, [fileChannel, fragmentChannel, serviceChannel, ioChannel, statusChannel]): void {
         this.conduit = conduit;
-        this.fileQueue = new MessageQueue(fileChannel);
-        this.fragmentQueue = new MessageQueue(fragmentChannel);
+        this.fileQueue = new ChannelQueue(fileChannel);
+        this.fragmentQueue = new ChannelQueue(fragmentChannel);
         this.serviceChannel = serviceChannel;
-        this.ioQueue = new MessageQueue(ioChannel);
+        this.ioQueue = new ChannelQueue(ioChannel);
         this.statusChannel = statusChannel;
 
         this.serviceChannel.send(new serviceMessages.Hello());
