@@ -1,6 +1,6 @@
 const enum InternalChannelName {
+    CHUNK = "__chunk",
     FILE = "__file",
-    FRAGMENT = "__fragment",
     SERVICE = "__service",
     STANDARD_IO = "__stdio",
     STATUS = "__status",

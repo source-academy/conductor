@@ -2,7 +2,7 @@ import MessageQueue from "../../common/ds/MessageQueue";
 import { ChannelQueue, IChannel, IChannelQueue, IConduit, IPlugin } from "../../conduit";
 import InternalChannelName from "../strings/InternalChannelName";
 import InternalPluginName from "../strings/InternalPluginName";
-import { Fragment, IFileMessage, IFragmentMessage, IIOMessage, IServiceMessage, IStatusMessage, RunnerStatus, serviceMessages } from "../types";
+import { Chunk, IChunkMessage, IFileMessage, IIOMessage, IServiceMessage, IStatusMessage, RunnerStatus, serviceMessages } from "../types";
 import ServiceMessageType from "../types/ServiceMessageType";
 import { IHostPlugin } from "./types";
 
@@ -11,17 +11,17 @@ export default abstract class BasicHostPlugin implements IHostPlugin {
 
     private conduit: IConduit;
     private fileQueue: IChannelQueue<IFileMessage>;
-    private fragmentChannel: IChannel<IFragmentMessage>;
+    private chunkChannel: IChannel<IChunkMessage>;
     private serviceChannel: IChannel<IServiceMessage>;
     private ioChannel: IChannel<IIOMessage>;
     private ioQueues: MessageQueue<IIOMessage>[];
     private statusChannel: IChannel<IStatusMessage>;
 
-    private fragmentCount: number = 0;
+    private chunkCount: number = 0;
     serviceHandlers: Map<ServiceMessageType, (message: IServiceMessage) => void>;
 
-    readonly channelAttach = [InternalChannelName.FILE, InternalChannelName.FRAGMENT, InternalChannelName.SERVICE, InternalChannelName.STANDARD_IO, InternalChannelName.STATUS];
-    init(conduit: IConduit, [fileChannel, fragmentChannel, serviceChannel, ioChannel, statusChannel]): void {
+    readonly channelAttach = [InternalChannelName.FILE, InternalChannelName.CHUNK, InternalChannelName.SERVICE, InternalChannelName.STANDARD_IO, InternalChannelName.STATUS];
+    init(conduit: IConduit, [fileChannel, chunkChannel, serviceChannel, ioChannel, statusChannel]): void {
         this.conduit = conduit;
 
         this.fileQueue = new ChannelQueue(fileChannel);
@@ -32,7 +32,7 @@ export default abstract class BasicHostPlugin implements IHostPlugin {
             });
         });
 
-        this.fragmentChannel = fragmentChannel;
+        this.chunkChannel = chunkChannel;
         this.serviceChannel = serviceChannel;
 
         this.ioChannel = ioChannel;
@@ -56,8 +56,8 @@ export default abstract class BasicHostPlugin implements IHostPlugin {
 
     abstract requestFile(fileName: string): Promise<string>;
 
-    sendFragment(fragment: Fragment): void {
-        this.fragmentChannel.send({ id: this.fragmentCount++, fragment });
+    sendChunk(chunk: Chunk): void {
+        this.chunkChannel.send({ id: this.chunkCount++, chunk });
     }
 
     sendInput(message: string): void {

@@ -1,5 +1,5 @@
 import { IPlugin } from "../../../conduit";
-import { Fragment, RunnerStatus } from "../../types";
+import { Chunk, RunnerStatus } from "../../types";
 
 interface IHostPlugin extends IPlugin {
     /**
@@ -10,10 +10,10 @@ interface IHostPlugin extends IPlugin {
     requestFile(fileName: string): Promise<string>;
 
     /**
-     * Send the next fragment to be run.
-     * @param fragment The next fragment to be run.
+     * Send the next chunk to be run.
+     * @param chunk The next chunk to be run.
      */
-    sendFragment(fragment: Fragment): void;
+    sendChunk(chunk: Chunk): void;
 
     /**
      * Send an input on standard-input.

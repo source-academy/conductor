@@ -2,7 +2,7 @@ import { IConduit, IChannelQueue, IChannel, ChannelQueue, IPlugin } from "../../
 import { IModulePlugin } from "../module";
 import InternalChannelName from "../strings/InternalChannelName";
 import InternalPluginName from "../strings/InternalPluginName";
-import { IFileMessage, Fragment, IServiceMessage, IIOMessage, IStatusMessage, RunnerStatus, IFragmentMessage, serviceMessages } from "../types";
+import { Chunk, IChunkMessage, IFileMessage, IServiceMessage, IIOMessage, IStatusMessage, RunnerStatus, serviceMessages } from "../types";
 import ServiceMessageType from "../types/ServiceMessageType";
 import { IRunnerPlugin, IEvaluator } from "./types";
 
@@ -22,18 +22,18 @@ export default class RunnerPlugin implements IRunnerPlugin {
     private readonly evaluator: IEvaluator;
     private conduit: IConduit;
     private fileQueue: IChannelQueue<IFileMessage>;
-    private fragmentQueue: IChannelQueue<IFragmentMessage>;
+    private chunkQueue: IChannelQueue<IChunkMessage>;
     private serviceChannel: IChannel<IServiceMessage>;
     private ioQueue: IChannelQueue<IIOMessage>;
     private statusChannel: IChannel<IStatusMessage>;
 
     serviceHandlers: Map<ServiceMessageType, (message: IServiceMessage) => void>;
 
-    readonly channelAttach = [InternalChannelName.FILE, InternalChannelName.FRAGMENT, InternalChannelName.SERVICE, InternalChannelName.STANDARD_IO, InternalChannelName.STATUS];
-    init(conduit: IConduit, [fileChannel, fragmentChannel, serviceChannel, ioChannel, statusChannel]): void {
+    readonly channelAttach = [InternalChannelName.FILE, InternalChannelName.CHUNK, InternalChannelName.SERVICE, InternalChannelName.STANDARD_IO, InternalChannelName.STATUS];
+    init(conduit: IConduit, [fileChannel, chunkChannel, serviceChannel, ioChannel, statusChannel]): void {
         this.conduit = conduit;
         this.fileQueue = new ChannelQueue(fileChannel);
-        this.fragmentQueue = new ChannelQueue(fragmentChannel);
+        this.chunkQueue = new ChannelQueue(chunkChannel);
         this.serviceChannel = serviceChannel;
         this.ioQueue = new ChannelQueue(ioChannel);
         this.statusChannel = statusChannel;
@@ -63,8 +63,8 @@ export default class RunnerPlugin implements IRunnerPlugin {
         }
     }
 
-    async requestFragment(): Promise<Fragment> {
-        return (await this.fragmentQueue.receive()).fragment;
+    async requestChunk(): Promise<Chunk> {
+        return (await this.chunkQueue.receive()).chunk;
     }
 
     async requestInput(): Promise<string> {

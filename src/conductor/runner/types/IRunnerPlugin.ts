@@ -1,6 +1,6 @@
 import { IPlugin } from "../../../conduit";
 import { IModulePlugin } from "../../module";
-import { Fragment, RunnerStatus } from "../../types";
+import { Chunk, RunnerStatus } from "../../types";
 
 interface IRunnerPlugin extends IPlugin {
     /**
@@ -11,10 +11,10 @@ interface IRunnerPlugin extends IPlugin {
     requestFile(fileName: string): Promise<string>;
 
     /**
-     * Request the next fragment to run.
-     * @returns A promise resolving to the next fragment.
+     * Request the next chunk to run.
+     * @returns A promise resolving to the next chunk.
      */
-    requestFragment(): Promise<Fragment>;
+    requestChunk(): Promise<Chunk>;
 
     /**
      * Request for some input on standard-input.

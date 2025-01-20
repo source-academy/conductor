@@ -8,18 +8,18 @@ export default abstract class BasicEvaluator implements IEvaluator {
     }
 
     async runEvaluator(entryPoint: string): Promise<any> {
-        const initialFragment = await this.conductor.requestFile(entryPoint);
-        await this.evaluateFile(entryPoint, initialFragment);
+        const initialChunk = await this.conductor.requestFile(entryPoint);
+        await this.evaluateFile(entryPoint, initialChunk);
         while (true) {
-            const fragment = await this.conductor.requestFragment();
-            await this.evaluateFragment(fragment);
+            const chunk = await this.conductor.requestChunk();
+            await this.evaluateChunk(chunk);
         }
     }
 
     async evaluateFile(fileName: string, fileContent: string): Promise<void> {
-        return await this.evaluateFragment(fileContent);
+        return await this.evaluateChunk(fileContent);
     }
-    abstract evaluateFragment(fragment: string): Promise<void>;
+    abstract evaluateChunk(chunk: string): Promise<void>;
 
     abstract pair_make(): Identifier;
     abstract pair_gethead(p: PairIdentifier): ExternValue;
