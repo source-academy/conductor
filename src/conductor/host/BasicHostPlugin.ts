@@ -4,7 +4,7 @@ import InternalChannelName from "../strings/InternalChannelName";
 import InternalPluginName from "../strings/InternalPluginName";
 import { Fragment, IFileMessage, IFragmentMessage, IIOMessage, IServiceMessage, IStatusMessage, RunnerStatus, serviceMessages } from "../types";
 import ServiceMessageType from "../types/ServiceMessageType";
-import IHostPlugin from "./types/IHostPlugin";
+import { IHostPlugin } from "./types";
 
 export default abstract class BasicHostPlugin implements IHostPlugin {
     name = InternalPluginName.HOST_MAIN;
