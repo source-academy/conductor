@@ -54,7 +54,7 @@ export default abstract class BasicHostPlugin implements IHostPlugin {
         });
     }
 
-    abstract requestFile(fileName: string): Promise<string>;
+    abstract requestFile(fileName: string): Promise<string | undefined>;
 
     sendChunk(chunk: Chunk): void {
         this.chunkChannel.send({ id: this.chunkCount++, chunk });
