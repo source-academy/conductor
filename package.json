@@ -1,7 +1,7 @@
 {
   "name": "sa-conductor",
   "packageManager": "yarn@4.2.2",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "",
   "type": "module",
   "main": "index.js",
@@ -16,6 +16,9 @@
   },
   "author": "tsammeow",
   "license": "ISC",
+  "files": [
+    "dist"
+  ],
   "bugs": {
     "url": "https://github.com/tsammeow/sa-conductor/issues"
   },
