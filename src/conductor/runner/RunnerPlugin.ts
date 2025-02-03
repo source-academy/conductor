@@ -6,16 +6,6 @@ import { Chunk, IChunkMessage, IFileMessage, IServiceMessage, IIOMessage, IStatu
 import ServiceMessageType from "../types/ServiceMessageType";
 import { IRunnerPlugin, IEvaluator } from "./types";
 
-function serviceHandler(type: ServiceMessageType) {
-    return function (originalMethod: (data: IServiceMessage) => void, context: ClassMethodDecoratorContext) {
-        context.addInitializer(function () {
-            const _this = this as RunnerPlugin;
-            if (!_this.serviceHandlers) _this.serviceHandlers = new Map();
-            _this.serviceHandlers.set(type, originalMethod.bind(_this));
-        });
-    }
-}
-
 export default class RunnerPlugin implements IRunnerPlugin {
     name = InternalPluginName.RUNNER_MAIN;
 
@@ -26,8 +16,6 @@ export default class RunnerPlugin implements IRunnerPlugin {
     private serviceChannel: IChannel<IServiceMessage>;
     private ioQueue: IChannelQueue<IIOMessage>;
     private statusChannel: IChannel<IStatusMessage>;
-
-    serviceHandlers: Map<ServiceMessageType, (message: IServiceMessage) => void>;
 
     readonly channelAttach = [InternalChannelName.FILE, InternalChannelName.CHUNK, InternalChannelName.SERVICE, InternalChannelName.STANDARD_IO, InternalChannelName.STATUS];
     init(conduit: IConduit, [fileChannel, chunkChannel, serviceChannel, ioChannel, statusChannel]): void {
@@ -40,20 +28,20 @@ export default class RunnerPlugin implements IRunnerPlugin {
 
         this.serviceChannel.send(new serviceMessages.Hello());
         this.serviceChannel.subscribe(message => {
-            if (this.serviceHandlers.has(message.type)) this.serviceHandlers.get(message.type)(message);
+            if (this.serviceHandlers.has(message.type)) this.serviceHandlers.get(message.type).call(this, message);
         });
         this.evaluator.init(this);
     }
 
-    @serviceHandler(ServiceMessageType.HELLO)
-    helloServiceHandler(message: serviceMessages.Hello): void {
-        console.log(`host is using api version ${message.data.version}`);
-    }
-
-    @serviceHandler(ServiceMessageType.ENTRY)
-    entryServiceHandler(message: serviceMessages.Entry): void {
-        this.evaluator.runEvaluator(message.data);
-    }
+    serviceHandlers: Map<ServiceMessageType, (message: IServiceMessage) => void> = new Map<ServiceMessageType, (message: IServiceMessage) => void>([
+        [ServiceMessageType.HELLO, function (message: serviceMessages.Hello) {
+            const a: IServiceMessage = message;
+            console.log(`host is using api version ${message.data.version}`);
+        }],
+        [ServiceMessageType.ENTRY, function (message: serviceMessages.Entry) {
+            this.evaluator.runEvaluator(message.data);
+        }]
+    ]);
 
     async requestFile(fileName: string): Promise<string> {
         this.fileQueue.send({ fileName });
@@ -115,6 +103,5 @@ export default class RunnerPlugin implements IRunnerPlugin {
 
     constructor(evaluator: IEvaluator) {
         this.evaluator = evaluator;
-        if (!this.serviceHandlers) this.serviceHandlers = new Map();
     }
 }
