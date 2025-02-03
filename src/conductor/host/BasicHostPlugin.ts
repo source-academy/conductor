@@ -13,12 +13,10 @@ export default abstract class BasicHostPlugin implements IHostPlugin {
     private fileQueue: IChannelQueue<IFileMessage>;
     private chunkChannel: IChannel<IChunkMessage>;
     private serviceChannel: IChannel<IServiceMessage>;
-    private ioChannel: IChannel<IIOMessage>;
-    private ioQueues: MessageQueue<IIOMessage>[];
+    private ioQueue: IChannelQueue<IIOMessage>;
     private statusChannel: IChannel<IStatusMessage>;
 
     private chunkCount: number = 0;
-    serviceHandlers: Map<ServiceMessageType, (message: IServiceMessage) => void>;
 
     readonly channelAttach = [InternalChannelName.FILE, InternalChannelName.CHUNK, InternalChannelName.SERVICE, InternalChannelName.STANDARD_IO, InternalChannelName.STATUS];
     init(conduit: IConduit, [fileChannel, chunkChannel, serviceChannel, ioChannel, statusChannel]): void {
@@ -35,13 +33,7 @@ export default abstract class BasicHostPlugin implements IHostPlugin {
         this.chunkChannel = chunkChannel;
         this.serviceChannel = serviceChannel;
 
-        this.ioChannel = ioChannel;
-        this.ioQueues = [null, new MessageQueue(), new MessageQueue()];
-        ioChannel.subscribe((ioMessage: IIOMessage) => {
-            this.ioQueues[ioMessage.stream].push(ioMessage);
-            if (ioMessage.stream === 1) this.receiveOutput?.(ioMessage.message);
-            else if (ioMessage.stream === 2) this.receiveError?.(ioMessage.message);
-        });
+        this.ioQueue = new ChannelQueue(ioChannel);
 
         this.statusChannel = statusChannel;
         statusChannel.subscribe((statusMessage: IStatusMessage) => {
@@ -50,9 +42,15 @@ export default abstract class BasicHostPlugin implements IHostPlugin {
 
         this.serviceChannel.send(new serviceMessages.Hello());
         this.serviceChannel.subscribe(message => {
-            if (this.serviceHandlers.has(message.type)) this.serviceHandlers.get(message.type)(message); // TODO: implement service handlers?
+            if (this.serviceHandlers.has(message.type)) this.serviceHandlers.get(message.type).call(this, message);
         });
     }
+
+    serviceHandlers = new Map<ServiceMessageType, (message: IServiceMessage) => void>([
+        [ServiceMessageType.HELLO, function (message: serviceMessages.Hello) {
+            console.log(`runner is using api version ${message.data.version}`);
+        }]
+    ]);
 
     abstract requestFile(fileName: string): Promise<string | undefined>;
 
@@ -61,28 +59,28 @@ export default abstract class BasicHostPlugin implements IHostPlugin {
     }
 
     sendInput(message: string): void {
-        this.ioChannel.send({ stream: 1, message });
+        this.ioQueue.send({ message });
     }
 
     async requestOutput(): Promise<string> {
-        return (await this.ioQueues[1].pop()).message;
+        return (await this.ioQueue.receive()).message;
     }
 
     tryRequestOutput(): string | undefined {
-        return this.ioQueues[1].tryPop()?.message;
+        return this.ioQueue.tryReceive()?.message;
     }
 
     receiveOutput?(message: string): void;
 
-    async requestError(): Promise<string> {
-        return (await this.ioQueues[2].pop()).message;
+    async requestError(): Promise<string> { // TODO: separate error channel
+        throw Error("unimplemented");
     }
 
-    tryRequestError(): string | undefined {
-        return this.ioQueues[2].tryPop()?.message;
+    tryRequestError(): string | undefined { // TODO: separate error channel
+        throw Error("unimplemented");
     }
 
-    receiveError?(message: string): void;
+    receiveError?(message: string): void; // TODO: separate error channel
 
     receiveStatusUpdate?(status: RunnerStatus, isActive: boolean): void;
 
@@ -98,9 +96,5 @@ export default abstract class BasicHostPlugin implements IHostPlugin {
         const plugin = await import(location) as IPlugin;
         this.registerPlugin(plugin);
         return plugin;
-    }
-
-    constructor() {
-        if (!this.serviceHandlers) this.serviceHandlers = new Map();
     }
 }

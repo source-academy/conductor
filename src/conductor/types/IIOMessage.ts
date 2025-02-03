@@ -1,5 +1,5 @@
 interface IIOMessage {
-    stream: number;
+    // stream: number;
     message: string;
 }
 

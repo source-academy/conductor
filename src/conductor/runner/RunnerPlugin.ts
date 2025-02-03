@@ -33,9 +33,8 @@ export default class RunnerPlugin implements IRunnerPlugin {
         this.evaluator.init(this);
     }
 
-    serviceHandlers: Map<ServiceMessageType, (message: IServiceMessage) => void> = new Map<ServiceMessageType, (message: IServiceMessage) => void>([
+    serviceHandlers = new Map<ServiceMessageType, (message: IServiceMessage) => void>([
         [ServiceMessageType.HELLO, function (message: serviceMessages.Hello) {
-            const a: IServiceMessage = message;
             console.log(`host is using api version ${message.data.version}`);
         }],
         [ServiceMessageType.ENTRY, function (message: serviceMessages.Entry) {
@@ -66,11 +65,11 @@ export default class RunnerPlugin implements IRunnerPlugin {
     }
 
     sendOutput(message: string): void {
-        this.ioQueue.send({ stream: 1, message });
+        this.ioQueue.send({ message });
     }
 
-    sendError(message: string): void {
-        this.ioQueue.send({ stream: 2, message });
+    sendError(message: string): void { // TODO: separate error channel
+        throw Error("unimplemented");
     }
 
     updateStatus(status: RunnerStatus, isActive: boolean): void {
