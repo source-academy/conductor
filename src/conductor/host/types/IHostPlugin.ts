@@ -10,6 +10,12 @@ interface IHostPlugin extends IPlugin {
     requestFile(fileName: string): Promise<string>;
 
     /**
+     * Start running the evaluator.
+     * @param entryPoint The entry point to start running from.
+     */
+    runEvaluator(entryPoint: string): void;
+
+    /**
      * Send the next chunk to be run.
      * @param chunk The next chunk to be run.
      */

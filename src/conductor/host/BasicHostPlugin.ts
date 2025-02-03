@@ -54,6 +54,10 @@ export default abstract class BasicHostPlugin implements IHostPlugin {
 
     abstract requestFile(fileName: string): Promise<string | undefined>;
 
+    runEvaluator(entryPoint: string): void {
+        this.serviceChannel.send(new serviceMessages.Entry(entryPoint));
+    }
+
     sendChunk(chunk: Chunk): void {
         this.chunkChannel.send({ id: this.chunkCount++, chunk });
     }
