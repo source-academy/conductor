@@ -1,7 +1,7 @@
 import { Identifier, PairIdentifier, ExternValue, DataType, ArrayIdentifier, IFunctionSignature, ExternCallable, ClosureIdentifier, OpaqueIdentifier } from "../types";
-import { IEvaluator, IRunnerPlugin } from "./types";
+import { IInterfacableEvaluator, IRunnerPlugin } from "./types";
 
-export default abstract class BasicEvaluator implements IEvaluator {
+export default abstract class BasicEvaluator implements IInterfacableEvaluator {
     conductor: IRunnerPlugin;
     init(conductor: IRunnerPlugin): void {
         this.conductor = conductor;
@@ -20,6 +20,8 @@ export default abstract class BasicEvaluator implements IEvaluator {
         return await this.evaluateChunk(fileContent);
     }
     abstract evaluateChunk(chunk: string): Promise<void>;
+
+    hasDataInterface = true as const;
 
     abstract pair_make(): Identifier;
     abstract pair_gethead(p: PairIdentifier): ExternValue;

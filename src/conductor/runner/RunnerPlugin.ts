@@ -4,12 +4,12 @@ import InternalChannelName from "../strings/InternalChannelName";
 import InternalPluginName from "../strings/InternalPluginName";
 import { Chunk, IChunkMessage, IFileMessage, IServiceMessage, IIOMessage, IStatusMessage, RunnerStatus, serviceMessages } from "../types";
 import ServiceMessageType from "../types/ServiceMessageType";
-import { IRunnerPlugin, IEvaluator } from "./types";
+import { IRunnerPlugin, IEvaluator, IInterfacableEvaluator } from "./types";
 
 export default class RunnerPlugin implements IRunnerPlugin {
     name = InternalPluginName.RUNNER_MAIN;
 
-    private readonly evaluator: IEvaluator;
+    private readonly evaluator: IEvaluator | IInterfacableEvaluator;
     private conduit: IConduit;
     private fileQueue: IChannelQueue<IFileMessage>;
     private chunkQueue: IChannelQueue<IChunkMessage>;
@@ -91,16 +91,17 @@ export default class RunnerPlugin implements IRunnerPlugin {
     }
 
     async loadModule(location: string) {
+        if (!this.evaluator.hasDataInterface) throw Error("Evaluator has no data interface");
         const module = await this.loadPlugin(location) as IModulePlugin;
         if (!module.hook) {
             this.unregisterPlugin(module);
             throw Error("plugin is not module!");
         }
-        module.hook(this.evaluator);
+        module.hook(this.evaluator as IInterfacableEvaluator);
         return module;
     }
 
-    constructor(evaluator: IEvaluator) {
+    constructor(evaluator: IEvaluator | IInterfacableEvaluator) {
         this.evaluator = evaluator;
     }
 }

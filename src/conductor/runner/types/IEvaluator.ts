@@ -1,7 +1,8 @@
-import { IDataHandler } from "../../types";
 import IRunnerPlugin from "./IRunnerPlugin";
 
-interface IEvaluator extends IDataHandler {
+interface IEvaluator {
+    readonly hasDataInterface?: boolean;
+
     init(runnerPlugin: IRunnerPlugin): void;
     runEvaluator(entryPoint: string): Promise<any>;
 }

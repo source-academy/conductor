@@ -1,6 +1,8 @@
 import type { ArrayIdentifier, ClosureIdentifier, DataType, ExternCallable, ExternValue, Identifier, IFunctionSignature, OpaqueIdentifier, PairIdentifier } from ".";
 
 interface IDataHandler {
+    readonly hasDataInterface: true;
+
     pair_make(): Identifier; // not PairIdentifier so evaluators do not need to cast
     pair_gethead(p: PairIdentifier): ExternValue;
     pair_typehead(p: PairIdentifier): DataType;
