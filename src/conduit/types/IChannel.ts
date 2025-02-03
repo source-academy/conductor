@@ -1,6 +1,6 @@
-import type Subscriber from "./Subscriber";
+import type { Subscriber } from "./Subscriber";
 
-interface IChannel<T> {
+export interface IChannel<T> {
     /** The name of the channel. */
     readonly name: string;
 
@@ -28,5 +28,3 @@ interface IChannel<T> {
      */
     close(): void;
 }
-
-export type { IChannel as default };

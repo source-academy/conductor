@@ -1,5 +1,3 @@
-import type ExternValue from "./ExternValue";
+import type { ExternValue } from "./ExternValue";
 
-type ExternCallable = (...args: ExternValue[]) => ExternValue;
-
-export type { ExternCallable as default };
+export type ExternCallable = (...args: ExternValue[]) => ExternValue;

@@ -1,5 +1,5 @@
 import { IConduit, IChannel } from "../../conduit";
-import InternalChannelName from "../strings/InternalChannelName";
+import { InternalChannelName } from "../strings";
 import { IDataHandler, PairIdentifier, ExternValue, DataType, ArrayIdentifier, IFunctionSignature, ExternCallable, ClosureIdentifier, Identifier, OpaqueIdentifier } from "../types";
 import { IModulePlugin, IModuleExport } from "./types";
 
@@ -11,7 +11,7 @@ const methods = [
     "type", "tie", "untie"// , "free"
 ];
 
-export default abstract class BaseModulePlugin implements IModulePlugin {
+export abstract class BaseModulePlugin implements IModulePlugin {
     abstract readonly channelAttach: InternalChannelName[];
     abstract init(conduit: IConduit, channels: IChannel<any>[]): void;
 

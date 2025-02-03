@@ -1,6 +1,6 @@
-import Queue from "./Queue";
+import { Queue } from "./Queue";
 
-export default class MessageQueue<T> {
+export class MessageQueue<T> {
     private readonly inputQueue: Queue<T> = new Queue();
     private readonly promiseQueue: Queue<Function> = new Queue();
 

@@ -1,6 +1,6 @@
-import type IPlugin from "./IPlugin";
+import type { IPlugin } from "./IPlugin";
 
-interface IConduit {
+export interface IConduit {
     /**
      * Register a plugin with the conduit.
      * @param plugin The plugin to be registered.
@@ -24,5 +24,3 @@ interface IConduit {
      */
     terminate(): void;
 }
-
-export type { IConduit as default };

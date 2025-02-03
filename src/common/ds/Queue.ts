@@ -1,4 +1,4 @@
-export default class Queue<T> {
+export class Queue<T> {
     private s1!: T[];
     private s2!: T[];
     constructor() {

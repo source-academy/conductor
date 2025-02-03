@@ -1,8 +1,6 @@
-import type Chunk from "./Chunk";
+import type { Chunk } from "./Chunk";
 
-interface IChunkMessage {
+export interface IChunkMessage {
     id: number;
     chunk: Chunk;
 }
-
-export type { IChunkMessage as default };

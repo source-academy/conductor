@@ -1,9 +1,7 @@
-import type DataType from "./DataType";
+import type { DataType } from "./DataType";
 
-interface IFunctionSignature {
+export interface IFunctionSignature {
     name?: string;
     args: DataType[];
     returnValue: DataType;
 }
-
-export type { IFunctionSignature as default };

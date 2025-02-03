@@ -1,4 +1,4 @@
-const enum DataType {
+export const enum DataType {
     /** The return type of functions with no returned value. As a convention, the associated JS value is undefined. */
     VOID = 0,
 
@@ -26,5 +26,3 @@ const enum DataType {
     /** An opaque value that cannot be manipulated from user code. */
     OPAQUE = 8
 };
-
-export default DataType;

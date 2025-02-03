@@ -1,6 +1,6 @@
 import type { ArrayIdentifier, ClosureIdentifier, DataType, ExternCallable, ExternValue, Identifier, IFunctionSignature, OpaqueIdentifier, PairIdentifier } from ".";
 
-interface IDataHandler {
+export interface IDataHandler {
     readonly hasDataInterface: true;
 
     pair_make(): Identifier; // not PairIdentifier so evaluators do not need to cast
@@ -27,5 +27,3 @@ interface IDataHandler {
     untie(dependent: Identifier, dependee: Identifier): void;
     // free(i: Identifier): void;
 }
-
-export type { IDataHandler as default };

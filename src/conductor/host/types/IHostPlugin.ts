@@ -1,7 +1,7 @@
 import { IPlugin } from "../../../conduit";
 import { Chunk, RunnerStatus } from "../../types";
 
-interface IHostPlugin extends IPlugin {
+export interface IHostPlugin extends IPlugin {
     /**
      * Request a file's contents.
      * @param fileName The name of the file to request.
@@ -88,5 +88,3 @@ interface IHostPlugin extends IPlugin {
      */
     loadPlugin(location: string): Promise<IPlugin>;
 }
-
-export type { IHostPlugin as default };

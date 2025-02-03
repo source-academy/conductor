@@ -1,7 +1,7 @@
-import type IChannel from "./IChannel";
-import IConduit from "./IConduit";
+import type { IChannel } from "./IChannel";
+import type { IConduit } from "./IConduit";
 
-interface IPlugin {
+export interface IPlugin {
     /** The name of the plugin. Can be undefined for an unnamed plugin. */
     readonly name?: string;
 
@@ -19,5 +19,3 @@ interface IPlugin {
      */
     destroy?(): void;
 }
-
-export type { IPlugin as default };

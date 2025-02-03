@@ -1,6 +1,6 @@
 import type { ExternCallable, IFunctionSignature, NativeValue } from "../../types";
 
-interface IModuleExport {
+export interface IModuleExport {
     /** The symbol referencing the export. */
     symbol: string;
 
@@ -10,5 +10,3 @@ interface IModuleExport {
     /** If value is a function, provides its function signature. */
     signature?: IFunctionSignature; // TODO: allow richer typing somehow?
 }
-
-export type { IModuleExport as default };

@@ -1,8 +1,6 @@
-import type ServiceMessageType from "./ServiceMessageType";
+import type { ServiceMessageType } from "./ServiceMessageType";
 
-interface IServiceMessage {
+export interface IServiceMessage {
     type: ServiceMessageType;
     data?: any;
 }
-
-export type { IServiceMessage as default };

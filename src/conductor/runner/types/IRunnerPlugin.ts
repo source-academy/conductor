@@ -2,7 +2,7 @@ import { IPlugin } from "../../../conduit";
 import { IModulePlugin } from "../../module";
 import { Chunk, RunnerStatus } from "../../types";
 
-interface IRunnerPlugin extends IPlugin {
+export interface IRunnerPlugin extends IPlugin {
     /**
      * Request a file's contents.
      * @param fileName The name of the file to request.
@@ -71,5 +71,3 @@ interface IRunnerPlugin extends IPlugin {
      */
     loadModule(location: string): Promise<IModulePlugin>;
 }
-
-export type { IRunnerPlugin as default };

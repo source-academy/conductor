@@ -1,2 +1,2 @@
-export type { default as IModuleExport } from "./IModuleExport";
-export type { default as IModulePlugin } from "./IModulePlugin";
+export type { IModuleExport } from "./IModuleExport";
+export type { IModulePlugin } from "./IModulePlugin";

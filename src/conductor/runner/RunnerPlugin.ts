@@ -1,12 +1,10 @@
 import { IConduit, IChannelQueue, IChannel, ChannelQueue, IPlugin } from "../../conduit";
 import { IModulePlugin } from "../module";
-import InternalChannelName from "../strings/InternalChannelName";
-import InternalPluginName from "../strings/InternalPluginName";
-import { Chunk, IChunkMessage, IFileMessage, IServiceMessage, IIOMessage, IStatusMessage, RunnerStatus, serviceMessages } from "../types";
-import ServiceMessageType from "../types/ServiceMessageType";
+import { InternalChannelName, InternalPluginName } from "../strings";
+import { Chunk, IChunkMessage, IFileMessage, IServiceMessage, IIOMessage, IStatusMessage, RunnerStatus, serviceMessages, ServiceMessageType } from "../types";
 import { IRunnerPlugin, IEvaluator, IInterfacableEvaluator } from "./types";
 
-export default class RunnerPlugin implements IRunnerPlugin {
+export class RunnerPlugin implements IRunnerPlugin {
     name = InternalPluginName.RUNNER_MAIN;
 
     private readonly evaluator: IEvaluator | IInterfacableEvaluator;

@@ -1,10 +1,8 @@
-import IRunnerPlugin from "./IRunnerPlugin";
+import { IRunnerPlugin } from "./IRunnerPlugin";
 
-interface IEvaluator {
+export interface IEvaluator {
     readonly hasDataInterface?: boolean;
 
     init(runnerPlugin: IRunnerPlugin): void;
     runEvaluator(entryPoint: string): Promise<any>;
 }
-
-export type { IEvaluator as default };

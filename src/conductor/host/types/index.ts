@@ -1,1 +1,1 @@
-export type { default as IHostPlugin } from "./IHostPlugin";
+export type { IHostPlugin } from "./IHostPlugin";

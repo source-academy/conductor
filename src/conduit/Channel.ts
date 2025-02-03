@@ -1,6 +1,6 @@
 import { IChannel, Subscriber } from "./types";
 
-export default class Channel<T> implements IChannel<T> {
+export class Channel<T> implements IChannel<T> {
     readonly name: string;
 
     /** The underlying MessagePort of this Channel. */

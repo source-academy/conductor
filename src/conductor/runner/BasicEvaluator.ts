@@ -1,7 +1,7 @@
 import { Identifier, PairIdentifier, ExternValue, DataType, ArrayIdentifier, IFunctionSignature, ExternCallable, ClosureIdentifier, OpaqueIdentifier } from "../types";
 import { IInterfacableEvaluator, IRunnerPlugin } from "./types";
 
-export default abstract class BasicEvaluator implements IInterfacableEvaluator {
+export abstract class BasicEvaluator implements IInterfacableEvaluator {
     conductor: IRunnerPlugin;
     init(conductor: IRunnerPlugin): void {
         this.conductor = conductor;

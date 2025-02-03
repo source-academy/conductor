@@ -1,8 +1,8 @@
 import type { IPlugin } from "../../../conduit";
 import type { ArrayIdentifier, ClosureIdentifier, DataType, ExternCallable, ExternValue, Identifier, IDataHandler, IFunctionSignature, OpaqueIdentifier, PairIdentifier } from "../../types";
-import type IModuleExport from "./IModuleExport";
+import type { IModuleExport } from "./IModuleExport";
 
-interface IModulePlugin extends IPlugin {
+export interface IModulePlugin extends IPlugin {
     exports: IModuleExport[];
 
     /**
@@ -49,5 +49,3 @@ interface IModulePlugin extends IPlugin {
     untie(dependent: Identifier, dependee: Identifier): void;
     // free(i: Identifier): void;
 }
-
-export type { IModulePlugin as default };

@@ -1,7 +1,7 @@
-import Channel from "./Channel";
+import { Channel } from "./Channel";
 import { IConduit, ILink, IPlugin, IChannel } from "./types";
 
-export default class Conduit implements IConduit {
+export class Conduit implements IConduit {
     private alive: boolean = true;
     private readonly link: ILink;
     private readonly parent: boolean;

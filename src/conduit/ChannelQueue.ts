@@ -1,7 +1,7 @@
-import MessageQueue from "../common/ds/MessageQueue";
+import { MessageQueue } from "../common/ds";
 import { IChannelQueue, IChannel } from "./types";
 
-export default class ChannelQueue<T> implements IChannelQueue<T> {
+export class ChannelQueue<T> implements IChannelQueue<T> {
     readonly name: string;
     private channel: IChannel<T>;
     private messageQueue: MessageQueue<T> = new MessageQueue();
