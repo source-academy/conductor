@@ -32,6 +32,7 @@ export abstract class BasicHostPlugin implements IHostPlugin {
         this.serviceChannel = serviceChannel;
 
         this.ioQueue = new ChannelQueue(ioChannel);
+        ioChannel.subscribe((ioMessage: IIOMessage) => this.receiveOutput?.(ioMessage.message));
 
         this.statusChannel = statusChannel;
         statusChannel.subscribe((statusMessage: IStatusMessage) => {
@@ -84,7 +85,7 @@ export abstract class BasicHostPlugin implements IHostPlugin {
 
     receiveError?(message: string): void; // TODO: separate error channel
 
-    receiveStatusUpdate?(status: RunnerStatus, isActive: boolean): void;
+    receiveStatusUpdate?(status: RunnerStatus, isActive: boolean): void; // TODO: hook up to channel
 
     registerPlugin(plugin: IPlugin): void {
         this.conduit.registerPlugin(plugin);
