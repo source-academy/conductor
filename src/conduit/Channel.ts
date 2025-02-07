@@ -35,7 +35,7 @@ export class Channel<T> implements IChannel<T> {
      * @throws Throws an error if the Channel has been closed.
      */
     private checkIsAlive() {
-        if (!this.isAlive) throw Error(`channel ${name} has been closed!`); // TODO: custom error?
+        if (!this.isAlive) throw Error(`channel ${this.name} has been closed!`); // TODO: custom error?
     }
 
     /**
