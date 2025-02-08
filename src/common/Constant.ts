@@ -1,4 +1,4 @@
 export const enum Constant {
-    VERSION = "0.1.0",
-    API_VERSION = "0",
+    PROTOCOL_VERSION = 0,
+    PROTOCOL_MIN_VERSION = 0,
 }

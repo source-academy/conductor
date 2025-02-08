@@ -10,6 +10,7 @@ export class RunnerPlugin implements IRunnerPlugin {
     name = InternalPluginName.RUNNER_MAIN;
 
     private readonly evaluator: IEvaluator | IInterfacableEvaluator;
+    private readonly isCompatibleWithModules: boolean;
     private conduit: IConduit;
     private fileQueue: IChannelQueue<IFileMessage>;
     private chunkQueue: IChannelQueue<IChunkMessage>;
@@ -38,7 +39,7 @@ export class RunnerPlugin implements IRunnerPlugin {
             console.log(`host is using api version ${message.data.version}`);
         }],
         [ServiceMessageType.ENTRY, function (message: serviceMessages.Entry) {
-            this.evaluator.runEvaluator(message.data);
+            this.evaluator.startEvaluator(message.data);
         }]
     ]);
 
@@ -85,7 +86,7 @@ export class RunnerPlugin implements IRunnerPlugin {
     }
 
     registerModule(module: IModulePlugin): void {
-        if (!this.evaluator.hasDataInterface) throw Error("Evaluator has no data interface");
+        if (!this.isCompatibleWithModules) throw Error("Evaluator has no data interface");
         this.registerPlugin(module);
         module.hook(this.evaluator as IInterfacableEvaluator);
     }
@@ -109,5 +110,6 @@ export class RunnerPlugin implements IRunnerPlugin {
 
     constructor(evaluator: IEvaluator | IInterfacableEvaluator) {
         this.evaluator = evaluator;
+        this.isCompatibleWithModules = (this.evaluator as IInterfacableEvaluator).hasDataInterface ?? false;
     }
 }
