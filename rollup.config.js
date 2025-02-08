@@ -1,6 +1,7 @@
 import { globSync } from "glob";
 import nodeResolve from "@rollup/plugin-node-resolve";
 import path from "node:path";
+import terser from "@rollup/plugin-terser";
 import typescript from "@rollup/plugin-typescript";
 
 export default [{
@@ -15,6 +16,12 @@ export default [{
         ])
     ),
     output: {
+        plugins: [terser({
+            module: true,
+            format: {
+                comments: /webpackIgnore/
+            }
+        })],
         dir: "dist",
         format: "es",
         sourcemap: true,
