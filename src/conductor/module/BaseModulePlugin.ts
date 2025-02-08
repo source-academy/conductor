@@ -9,7 +9,7 @@ const methods = [
     "closure_make", "closure_call",
     "opaque_make", "opaque_get",
     "type", "tie", "untie"// , "free"
-];
+] as const;
 
 export abstract class BaseModulePlugin implements IModulePlugin {
     abstract readonly channelAttach: InternalChannelName[];
@@ -27,6 +27,13 @@ export abstract class BaseModulePlugin implements IModulePlugin {
             this[methodName] = evaluator[methodName].bind(evaluator);
         }
     }
+    unhook(): void {
+        if (!this.hooked) throw Error("not hooked!"); // TODO: custom error?
+        this.hooked = false;
+        for (const methodName of methods) {
+            delete this[methodName];
+        }
+    }
     isHooked(): boolean {
         return this.hooked;
     }
@@ -34,6 +41,7 @@ export abstract class BaseModulePlugin implements IModulePlugin {
         if (!this.hooked) throw Error("not hooked!"); // TODO: custom error?
     }
 
+    // To be populated by hook():
     pair_make: () => PairIdentifier;
     pair_gethead: (p: PairIdentifier) => ExternValue;
     pair_typehead: (p: PairIdentifier) => DataType;

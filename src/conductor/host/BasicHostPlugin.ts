@@ -1,8 +1,9 @@
+import { importExternalPlugin } from "../../common/util";
 import { ChannelQueue, IChannel, IChannelQueue, IConduit, IPlugin } from "../../conduit";
 import { InternalChannelName, InternalPluginName } from "../strings";
 import { Chunk, IChunkMessage, IFileMessage, IIOMessage, IServiceMessage, IStatusMessage, RunnerStatus, serviceMessages } from "../types";
 import { ServiceMessageType } from "../types";
-import { IHostPlugin } from "./types";
+import type { IHostPlugin } from "./types";
 
 export abstract class BasicHostPlugin implements IHostPlugin {
     name = InternalPluginName.HOST_MAIN;
@@ -95,8 +96,8 @@ export abstract class BasicHostPlugin implements IHostPlugin {
         this.conduit.unregisterPlugin(plugin);
     }
 
-    async loadPlugin(location: string): Promise<IPlugin> {
-        const plugin = await import(location) as IPlugin;
+    async importAndRegisterExternalPlugin(location: string): Promise<IPlugin> {
+        const plugin = await importExternalPlugin(location);
         this.registerPlugin(plugin);
         return plugin;
     }

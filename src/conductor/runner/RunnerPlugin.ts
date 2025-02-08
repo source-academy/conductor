@@ -1,3 +1,5 @@
+import { importExternalPlugin } from "../../common/util";
+import { importExternalModule } from "../../common/util/importExternalModule";
 import { IConduit, IChannelQueue, IChannel, ChannelQueue, IPlugin } from "../../conduit";
 import { IModulePlugin } from "../module";
 import { InternalChannelName, InternalPluginName } from "../strings";
@@ -82,20 +84,26 @@ export class RunnerPlugin implements IRunnerPlugin {
         this.conduit.unregisterPlugin(plugin);
     }
 
-    async loadPlugin(location: string): Promise<IPlugin> {
-        const plugin = await import(location) as IPlugin;
+    registerModule(module: IModulePlugin): void {
+        if (!this.evaluator.hasDataInterface) throw Error("Evaluator has no data interface");
+        this.registerPlugin(module);
+        module.hook(this.evaluator as IInterfacableEvaluator);
+    }
+
+    unregisterModule(module: IModulePlugin): void {
+        module.unhook();
+        this.unregisterPlugin(module);
+    }
+
+    async importAndRegisterExternalPlugin(location: string): Promise<IPlugin> {
+        const plugin = await importExternalPlugin(location);
         this.registerPlugin(plugin);
         return plugin;
     }
 
-    async loadModule(location: string) {
-        if (!this.evaluator.hasDataInterface) throw Error("Evaluator has no data interface");
-        const module = await this.loadPlugin(location) as IModulePlugin;
-        if (!module.hook) {
-            this.unregisterPlugin(module);
-            throw Error("plugin is not module!");
-        }
-        module.hook(this.evaluator as IInterfacableEvaluator);
+    async importAndRegisterExternalModule(location: string): Promise<IModulePlugin> {
+        const module = await importExternalModule(location);
+        this.registerModule(module);
         return module;
     }
 

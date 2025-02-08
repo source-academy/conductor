@@ -60,14 +60,26 @@ export interface IRunnerPlugin extends IPlugin {
     unregisterPlugin(plugin: IPlugin): void;
 
     /**
-     * Imports a plugin and registers it with the conduit.
-     * @param location The path to the plugin file.
+     * Registers an external module with the conduit, and links it with the evaluator.
+     * @param module The module to be registered.
      */
-    loadPlugin(location: string): Promise<IPlugin>;
+    registerModule(module: IModulePlugin): void;
 
     /**
-     * Imports a plugin as a module, registers it with the conduit, and links it with the evaluator.
-     * @param location The path to the module file.
+     * Unregisters an external module from the conduit, and unlinks it from the evaluator.
+     * @param module The module to be unregistered.
      */
-    loadModule(location: string): Promise<IModulePlugin>;
+    unregisterModule(module: IModulePlugin): void;
+
+    /**
+     * Imports an external plugin and registers it with the conduit.
+     * @param location The location of the external plugin.
+     */
+    importAndRegisterExternalPlugin(location: string): Promise<IPlugin>;
+
+    /**
+     * Imports an external module and registers it with the conduit.
+     * @param location The location of the external module.
+     */
+    importAndRegisterExternalModule(location: string): Promise<IModulePlugin>;
 }

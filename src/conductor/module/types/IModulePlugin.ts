@@ -11,6 +11,11 @@ export interface IModulePlugin extends IPlugin {
      */
     hook(evaluator: IDataHandler): void;
 
+    /**
+     * Unhooks the evaluator from this module.
+     */
+    unhook(): void;
+
     /** 
      * Checks if the module has been hooked up.
      * @returns True if the module has been hooked up.

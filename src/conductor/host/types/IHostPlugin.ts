@@ -83,8 +83,8 @@ export interface IHostPlugin extends IPlugin {
     unregisterPlugin(plugin: IPlugin): void;
 
     /**
-     * Imports a plugin and registers it with the conduit.
-     * @param location The path to the plugin file.
+     * Imports an external plugin and registers it with the conduit.
+     * @param location The location of the external plugin.
      */
-    loadPlugin(location: string): Promise<IPlugin>;
+    importAndRegisterExternalPlugin(location: string): Promise<IPlugin>;
 }
