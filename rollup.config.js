@@ -18,8 +18,10 @@ export default [{
     output: {
         plugins: [terser({
             module: true,
+            ecma: 2015,
             format: {
-                comments: /webpackIgnore/
+                comments: /webpackIgnore/,
+                preserve_annotations: true
             }
         })],
         dir: "dist",
