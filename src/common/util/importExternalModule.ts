@@ -1,5 +1,6 @@
 import type { IModulePlugin } from "../../conductor/module";
 import { importExternalPlugin } from "./importExternalPlugin";
+import { InvalidModuleError } from "./InvalidModuleError";
 
 /**
  * Imports an external module from a given location.
@@ -9,7 +10,7 @@ import { importExternalPlugin } from "./importExternalPlugin";
 export async function importExternalModule(location: string): Promise<IModulePlugin> {
     const plugin = await importExternalPlugin(location) as IModulePlugin;
     if (!plugin.hook) { // TODO: additional verification it is a module
-        throw new Error("not a module");
+        throw new InvalidModuleError();
     }
     return plugin;
 }

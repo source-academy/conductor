@@ -1,3 +1,4 @@
+import { ConductorInternalError } from "../common/errors/ConductorInternalError";
 import { Channel } from "./Channel";
 import { IConduit, ILink, IPlugin, IChannel } from "./types";
 
@@ -14,10 +15,13 @@ export class Conduit implements IConduit {
         this.link.postMessage([channelName, port2], [port2]); // TODO: update communication protocol?
         this.channels.set(channelName, channel);
     }
+    private verifyAlive() {
+        if (!this.alive) throw new ConductorInternalError("conduit terminated");
+    }
     registerPlugin(plugin: IPlugin): void {
-        if (!this.alive) return;
+        this.verifyAlive();
         if (plugin.name !== undefined) {
-            if (this.pluginMap.has(plugin.name)) throw Error(`plugin ${plugin.name} already registered`); // TODO: custom error?
+            if (this.pluginMap.has(plugin.name)) throw new ConductorInternalError(`Plugin ${plugin.name} already registered`);
             this.pluginMap.set(plugin.name, plugin);
         }
         this.plugins.push(plugin);
@@ -29,16 +33,30 @@ export class Conduit implements IConduit {
         plugin.init(this, attachedChannels);
     }
     unregisterPlugin(plugin: IPlugin): void {
-        // TODO
+        this.verifyAlive();
+        let p = 0;
+        for (let i = 0; i < this.plugins.length; ++i) {
+            if (this.plugins[p] === plugin) ++p;
+            this.plugins[i] = this.plugins[i + p];
+        }
+        for (let i = this.plugins.length - 1, e = this.plugins.length - p; i >= e; --i) {
+            delete this.plugins[i];
+        }
+        if (plugin.name) {
+            this.pluginMap.delete(plugin.name);
+        }
         plugin.destroy?.();
     }
     lookupPlugin(pluginName: string): IPlugin {
-        if (!this.pluginMap.has(pluginName)) throw Error(`plugin ${pluginName} not registered`); // TODO: custom error?
+        this.verifyAlive();
+        if (!this.pluginMap.has(pluginName)) throw new ConductorInternalError(`Plugin ${pluginName} not registered`);
         return this.pluginMap.get(pluginName);
     }
     terminate(): void {
+        this.verifyAlive();
         for (const plugin of this.plugins) {
-            this.unregisterPlugin(plugin);
+            //this.unregisterPlugin(plugin);
+            plugin.destroy?.();
         }
         this.link.terminate?.();
         this.alive = false;

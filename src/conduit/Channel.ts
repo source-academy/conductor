@@ -1,3 +1,4 @@
+import { ConductorInternalError } from "../common/errors/ConductorInternalError";
 import { IChannel, Subscriber } from "./types";
 
 export class Channel<T> implements IChannel<T> {
@@ -13,19 +14,19 @@ export class Channel<T> implements IChannel<T> {
     private isAlive: boolean = true;
 
     send(message: T, transfer?: Transferable[]): void {
-        this.checkIsAlive();
+        this.verifyAlive();
         this.port.postMessage(message, transfer);
     }
     subscribe(subscriber: Subscriber<T>): void {
-        this.checkIsAlive();
+        this.verifyAlive();
         this.subscribers.add(subscriber);
     }
     unsubscribe(subscriber: Subscriber<T>): void {
-        this.checkIsAlive();
+        this.verifyAlive();
         this.subscribers.delete(subscriber);
     }
     close(): void {
-        this.checkIsAlive();
+        this.verifyAlive();
         this.isAlive = false;
         this.port?.close();
     }
@@ -34,8 +35,8 @@ export class Channel<T> implements IChannel<T> {
      * Check if this Channel is allowed to be used.
      * @throws Throws an error if the Channel has been closed.
      */
-    private checkIsAlive() {
-        if (!this.isAlive) throw Error(`channel ${this.name} has been closed!`); // TODO: custom error?
+    private verifyAlive() {
+        if (!this.isAlive) throw new ConductorInternalError(`Channel ${this.name} has been closed`);
     }
 
     /**
@@ -43,7 +44,7 @@ export class Channel<T> implements IChannel<T> {
      * @param data The data to be dispatched to subscribers.
      */
     private dispatch(data: T): void {
-        this.checkIsAlive();
+        this.verifyAlive();
         for (const subscriber of this.subscribers) {
             subscriber(data);
         }
@@ -63,7 +64,7 @@ export class Channel<T> implements IChannel<T> {
      * @param port The new port to use.
      */
     replacePort(port: MessagePort): void {
-        this.checkIsAlive();
+        this.verifyAlive();
         this.port?.close();
         this.port = port;
         this.listenToPort(port);

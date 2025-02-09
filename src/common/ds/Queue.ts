@@ -10,7 +10,7 @@ export class Queue<T> {
     }
     pop(): T {
         if (this.s1.length === 0) {
-            if (this.s2.length === 0) throw Error("queue is empty");
+            if (this.s2.length === 0) throw new Error("queue is empty");
             let temp = this.s1;
             this.s1 = this.s2.reverse();
             this.s2 = temp;

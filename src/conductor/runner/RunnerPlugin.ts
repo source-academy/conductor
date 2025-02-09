@@ -1,3 +1,4 @@
+import { ConductorInternalError } from "../../common/errors/ConductorInternalError";
 import { importExternalPlugin } from "../../common/util";
 import { importExternalModule } from "../../common/util/importExternalModule";
 import { IConduit, IChannelQueue, IChannel, ChannelQueue, IPlugin } from "../../conduit";
@@ -70,7 +71,7 @@ export class RunnerPlugin implements IRunnerPlugin {
     }
 
     sendError(message: string): void { // TODO: separate error channel
-        throw Error("unimplemented");
+        throw new ConductorInternalError("unimplemented");
     }
 
     updateStatus(status: RunnerStatus, isActive: boolean): void {
@@ -86,7 +87,7 @@ export class RunnerPlugin implements IRunnerPlugin {
     }
 
     registerModule(module: IModulePlugin): void {
-        if (!this.isCompatibleWithModules) throw Error("Evaluator has no data interface");
+        if (!this.isCompatibleWithModules) throw new ConductorInternalError("Evaluator has no data interface");
         this.registerPlugin(module);
         module.hook(this.evaluator as IInterfacableEvaluator);
     }

@@ -1,3 +1,4 @@
+import { ConductorInternalError } from "../../common/errors/ConductorInternalError";
 import { IConduit, IChannel } from "../../conduit";
 import { InternalChannelName } from "../strings";
 import { IDataHandler, PairIdentifier, ExternValue, DataType, ArrayIdentifier, IFunctionSignature, ExternCallable, ClosureIdentifier, Identifier, OpaqueIdentifier } from "../types";
@@ -21,14 +22,14 @@ export abstract class BaseModulePlugin implements IModulePlugin {
     private hooked: boolean = false;
 
     hook(evaluator: IDataHandler): void {
-        if (this.hooked) throw Error("already hooked!"); // TODO: custom error?
+        if (this.hooked) throw new ConductorInternalError("Module already hooked");
         this.hooked = true;
         for (const methodName of methods) {
             this[methodName] = evaluator[methodName].bind(evaluator);
         }
     }
     unhook(): void {
-        if (!this.hooked) throw Error("not hooked!"); // TODO: custom error?
+        this.verifyHooked();
         this.hooked = false;
         for (const methodName of methods) {
             delete this[methodName];
@@ -38,7 +39,7 @@ export abstract class BaseModulePlugin implements IModulePlugin {
         return this.hooked;
     }
     verifyHooked(): void {
-        if (!this.hooked) throw Error("not hooked!"); // TODO: custom error?
+        if (!this.hooked) throw new ConductorInternalError("Module not hooked");
     }
 
     // To be populated by hook():

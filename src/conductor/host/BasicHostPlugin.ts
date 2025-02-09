@@ -1,3 +1,4 @@
+import { ConductorInternalError } from "../../common/errors/ConductorInternalError";
 import { importExternalPlugin } from "../../common/util";
 import { ChannelQueue, IChannel, IChannelQueue, IConduit, IPlugin } from "../../conduit";
 import { InternalChannelName, InternalPluginName } from "../strings";
@@ -77,11 +78,11 @@ export abstract class BasicHostPlugin implements IHostPlugin {
     receiveOutput?(message: string): void;
 
     async requestError(): Promise<string> { // TODO: separate error channel
-        throw Error("unimplemented");
+        throw new ConductorInternalError("unimplemented");
     }
 
     tryRequestError(): string | undefined { // TODO: separate error channel
-        throw Error("unimplemented");
+        throw new ConductorInternalError("unimplemented");
     }
 
     receiveError?(message: string): void; // TODO: separate error channel
