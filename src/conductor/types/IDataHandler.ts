@@ -119,7 +119,7 @@ export interface IDataHandler {
      * @param dependsOn An optional array of Identifiers the Closure will depend on.
      * @returns An identifier to the new Closure.
      */
-    closure_make<T extends IFunctionSignature>(sig: T, func: ExternCallable<T>, dependsOn?: Identifier[]): Identifier; // not ClosureIdentifier
+    closure_make<T extends IFunctionSignature>(sig: T, func: ExternCallable<T>, dependsOn?: (Identifier | null)[]): Identifier; // not ClosureIdentifier
 
     /**
      * Gets the arity (number of parameters) of a Closure.
@@ -187,12 +187,12 @@ export interface IDataHandler {
      * @param dependent The object that requires the existence of the dependee.
      * @param dependee The object whose existence is required by the dependent.
      */
-    tie(dependent: Identifier, dependee: Identifier): void;
-    
+    tie(dependent: Identifier, dependee: Identifier | null): void;
+
     /**
      * Unties the lifetime of the dependee from the dependent.
      * @param dependent The tied dependent object.
      * @param dependee The tied dependee object.
      */
-    untie(dependent: Identifier, dependee: Identifier): void;
+    untie(dependent: Identifier, dependee: Identifier | null): void;
 }
