@@ -49,7 +49,7 @@ export abstract class BasicHostPlugin implements IHostPlugin {
     }
 
     serviceHandlers = new Map<ServiceMessageType, (message: IServiceMessage) => void>([
-        [ServiceMessageType.HELLO, function helloServiceHandler(message: serviceMessages.Hello) {
+        [ServiceMessageType.HELLO, function helloServiceHandler(this: BasicHostPlugin, message: serviceMessages.Hello) {
             if (message.data.version < Constant.PROTOCOL_MIN_VERSION) {
                 this.serviceChannel.send(new serviceMessages.Abort(Constant.PROTOCOL_MIN_VERSION));
                 console.error(`Runner's protocol version (${message.data.version}) must be at least ${Constant.PROTOCOL_MIN_VERSION}`);
@@ -57,7 +57,7 @@ export abstract class BasicHostPlugin implements IHostPlugin {
                 console.log(`Runner is using protocol version ${message.data.version}`);
             }
         }],
-        [ServiceMessageType.ABORT, function abortServiceHandler(message: serviceMessages.Abort) {
+        [ServiceMessageType.ABORT, function abortServiceHandler(this: BasicHostPlugin, message: serviceMessages.Abort) {
             console.error(`Runner expects at least protocol version ${message.data.minVersion}, but we are on version ${Constant.PROTOCOL_VERSION}`);
             this.conduit.terminate();
         }]

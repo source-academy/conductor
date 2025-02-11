@@ -37,7 +37,7 @@ export class RunnerPlugin implements IRunnerPlugin {
     }
 
     serviceHandlers = new Map<ServiceMessageType, (message: IServiceMessage) => void>([
-        [ServiceMessageType.HELLO, function helloServiceHandler(message: serviceMessages.Hello) {
+        [ServiceMessageType.HELLO, function helloServiceHandler(this: RunnerPlugin, message: serviceMessages.Hello) {
             if (message.data.version < Constant.PROTOCOL_MIN_VERSION) {
                 this.serviceChannel.send(new serviceMessages.Abort(Constant.PROTOCOL_MIN_VERSION));
                 console.error(`Host's protocol version (${message.data.version}) must be at least ${Constant.PROTOCOL_MIN_VERSION}`);
@@ -45,11 +45,11 @@ export class RunnerPlugin implements IRunnerPlugin {
                 console.log(`Host is using protocol version ${message.data.version}`);
             }
         }],
-        [ServiceMessageType.ABORT, function abortServiceHandler(message: serviceMessages.Abort) {
+        [ServiceMessageType.ABORT, function abortServiceHandler(this: RunnerPlugin, message: serviceMessages.Abort) {
             console.error(`Host expects at least protocol version ${message.data.minVersion}, but we are on version ${Constant.PROTOCOL_VERSION}`);
             this.conduit.terminate();
         }],
-        [ServiceMessageType.ENTRY, function entryServiceHandler(message: serviceMessages.Entry) {
+        [ServiceMessageType.ENTRY, function entryServiceHandler(this: RunnerPlugin, message: serviceMessages.Entry) {
             this.evaluator.startEvaluator(message.data);
         }]
     ]);
