@@ -4,13 +4,13 @@ import { InternalChannelName } from "../strings";
 import { IDataHandler, PairIdentifier, ExternValue, DataType, ArrayIdentifier, IFunctionSignature, ExternCallable, ClosureIdentifier, Identifier, OpaqueIdentifier } from "../types";
 import { IModulePlugin, IModuleExport } from "./types";
 
-const methods = [
+const methods: readonly (Exclude<keyof IDataHandler, "hasDataInterface">)[] = [
     "pair_make", "pair_gethead", "pair_typehead", "pair_sethead", "pair_gettail", "pair_typetail", "pair_settail",
     "array_make", "array_get", "array_type", "array_set",
     "closure_make", "closure_call",
     "opaque_make", "opaque_get",
-    "type", "tie", "untie"// , "free"
-] as const;
+    "tie", "untie"
+];
 
 export abstract class BaseModulePlugin implements IModulePlugin {
     abstract readonly channelAttach: InternalChannelName[];
@@ -56,14 +56,12 @@ export abstract class BaseModulePlugin implements IModulePlugin {
     array_type: (a: ArrayIdentifier) => DataType;
     array_set: (a: ArrayIdentifier, idx: number, v: ExternValue) => void;
 
-    closure_make: (sig: IFunctionSignature, func: ExternCallable) => ClosureIdentifier;
+    closure_make: (sig: IFunctionSignature, func: ExternCallable, dependsOn?: Identifier[]) => ClosureIdentifier;
     closure_call: (c: ClosureIdentifier, args: ExternValue[]) => ExternValue;
 
     opaque_make: (v: any) => OpaqueIdentifier;
     opaque_get: (o: OpaqueIdentifier) => any;
 
-    type: (i: Identifier) => DataType;
     tie: (dependent: Identifier, dependee: Identifier) => void;
     untie: (dependent: Identifier, dependee: Identifier) => void;
-    // free: (i: Identifier) => void;
 }

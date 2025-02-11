@@ -30,29 +30,126 @@ export interface IModulePlugin extends IPlugin {
      */
     verifyHooked(): void;
 
-    // TODO: documentation for extern manip functions
-
+    /**
+     * Makes a new Pair.
+     * @returns An identifier to the new Pair.
+     */
     pair_make(): PairIdentifier;
+
+    /**
+     * Gets the value in the head of a Pair.
+     * @param p The Pair to retrieve the head of.
+     * @returns The value in the head of the Pair.
+     */
     pair_gethead(p: PairIdentifier): ExternValue;
+
+    /**
+     * Gets the type of the head of a Pair.
+     * @param p The Pair to retrieve the head type of.
+     * @returns The type of the head of the Pair.
+     */
     pair_typehead(p: PairIdentifier): DataType;
+
+    /**
+     * Sets the head of a Pair.
+     * @param p The Pair to set the head of.
+     * @param t The type of the value to be set.
+     * @param v The value to set the head of the Pair to.
+     */
     pair_sethead(p: PairIdentifier, t: DataType, v: ExternValue): void;
+
+    /**
+     * Gets the value in the tail of a Pair.
+     * @param p The Pair to retrieve the tail of.
+     * @returns The value in the tail of the Pair.
+     */
     pair_gettail(p: PairIdentifier): ExternValue;
+
+    /**
+     * Gets the type of the tail of a Pair.
+     * @param p The Pair to retrieve the tail type of.
+     * @returns The type of the tail of the Pair.
+     */
     pair_typetail(p: PairIdentifier): DataType;
+
+    /**
+     * Sets the tail of a Pair.
+     * @param p The Pair to set the tail of.
+     * @param t The type of the value to be set.
+     * @param v The value to set the tail of the Pair to.
+     */
     pair_settail(p: PairIdentifier, t: DataType, v: ExternValue): void;
 
+    /**
+     * Makes a new Array.
+     * @returns An identifier to the new Array.
+     */
     array_make(t: DataType, len: number, init?: ExternValue): ArrayIdentifier;
+
+    /**
+     * Gets the value at a specific index of an Array.
+     * @param a The Array to retrieve the value from.
+     * @param idx The index of the value wanted.
+     * @returns The value at the given index of the given Array.
+     */
     array_get(a: ArrayIdentifier, idx: number): ExternValue;
+
+    /**
+     * Gets the type of the elements of an Array.
+     * @param a The Array to retrieve the element type of.
+     * @returns The type of the elements of the Array.
+     */
     array_type(a: ArrayIdentifier): DataType;
+
+    /**
+     * Sets a value at a specific index of an Array.
+     * @param a The Array to be modified.
+     * @param idx The index to be modified.
+     * @param v The new value at the given index of the given Array.
+     */
     array_set(a: ArrayIdentifier, idx: number, v: ExternValue): void;
 
-    closure_make(sig: IFunctionSignature, func: ExternCallable): ClosureIdentifier;
+    /**
+     * Makes a new Closure.
+     * @param sig The signature of the new Closure.
+     * @param func A callback to be called when the Closure is called.
+     * @param dependsOn An optional array of Identifiers the Closure will depend on.
+     * @returns An identifier to the new Closure.
+     */
+    closure_make(sig: IFunctionSignature, func: ExternCallable, dependsOn?: Identifier[]): ClosureIdentifier;
+
+    /**
+     * Calls a Closure.
+     * @param c The Closure to be called.
+     * @param args An array of arguments to be passed to the Closure.
+     */
     closure_call(c: ClosureIdentifier, args: ExternValue[]): ExternValue;
 
+    /**
+     * Makes a new Opaque object.
+     * @param v The value to be stored under this Opaque object.
+     * @returns An identifier to the new Opaque object.
+     */
     opaque_make(v: any): OpaqueIdentifier;
+
+    /**
+     * Gets the value stored under an Opaque object.
+     * @param o The identifier to the new Opaque object.
+     * @returns The value stored under this new Opaque object.
+     */
     opaque_get(o: OpaqueIdentifier): any;
 
-    type(i: Identifier): DataType;
+    /**
+     * Ties the lifetime of the dependee to the dependent.
+     * @param dependent The object that requires the existence of the dependee.
+     * @param dependee The object whose existence is required by the dependent.
+     */
     tie(dependent: Identifier, dependee: Identifier): void;
+    
+    /**
+     * Unties the lifetime of the dependee from the dependent.
+     * @param dependent The tied dependent object.
+     * @param dependee The tied dependee object.
+     */
     untie(dependent: Identifier, dependee: Identifier): void;
-    // free(i: Identifier): void;
 }

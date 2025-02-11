@@ -16,14 +16,12 @@ export interface IDataHandler {
     array_type(a: ArrayIdentifier): DataType;
     array_set(a: ArrayIdentifier, idx: number, v: ExternValue): void;
 
-    closure_make(sig: IFunctionSignature, func: ExternCallable): Identifier; // not ClosureIdentifier
+    closure_make(sig: IFunctionSignature, func: ExternCallable, dependsOn?: Identifier[]): Identifier; // not ClosureIdentifier
     closure_call(c: ClosureIdentifier, args: ExternValue[]): ExternValue;
 
     opaque_make(v: any): Identifier; // not OpaqueIdentifier
     opaque_get(o: OpaqueIdentifier): any;
 
-    type(i: Identifier): DataType;
     tie(dependent: Identifier, dependee: Identifier): void;
     untie(dependent: Identifier, dependee: Identifier): void;
-    // free(i: Identifier): void;
 }
