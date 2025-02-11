@@ -6,11 +6,11 @@ export class EvaluatorTypeError extends ConductorError {
     name = "EvaluatorTypeError";
     readonly errorType = ErrorType.TYPE;
 
-    readonly expected: DataType;
-    readonly actual: DataType;
+    readonly expected: string;
+    readonly actual: string;
 
-    constructor(message: string, expected: DataType, actual: DataType) {
-        super(`${message} (expected ${DataType[expected]}, got ${DataType[actual]})`);
+    constructor(message: string, expected: string, actual: string) {
+        super(`${message} (expected ${expected}, got ${actual})`);
         this.expected = expected;
         this.actual = actual;
     }
