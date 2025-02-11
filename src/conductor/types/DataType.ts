@@ -1,4 +1,4 @@
-export const enum DataType {
+export enum DataType {
     /** The return type of functions with no returned value. As a convention, the associated JS value is undefined. */
     VOID = 0,
 

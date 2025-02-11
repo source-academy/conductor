@@ -1,13 +1,14 @@
+import { EvaluatorTypeError } from "../../common/errors";
 import { ConductorInternalError } from "../../common/errors/ConductorInternalError";
 import { IConduit, IChannel } from "../../conduit";
 import { InternalChannelName } from "../strings";
-import { IDataHandler, PairIdentifier, ExternValue, DataType, ArrayIdentifier, IFunctionSignature, ExternCallable, ClosureIdentifier, Identifier, OpaqueIdentifier } from "../types";
+import { IDataHandler, PairIdentifier, ExternValue, DataType, ArrayIdentifier, IFunctionSignature, ExternCallable, ClosureIdentifier, Identifier, OpaqueIdentifier, ReturnValue } from "../types";
 import { IModulePlugin, IModuleExport } from "./types";
 
 const methods: readonly (Exclude<keyof IDataHandler, "hasDataInterface">)[] = [
     "pair_make", "pair_gethead", "pair_typehead", "pair_sethead", "pair_gettail", "pair_typetail", "pair_settail",
     "array_make", "array_length", "array_get", "array_type", "array_set",
-    "closure_make", "closure_call",
+    "closure_make", "closure_arity", "closure_call",
     "opaque_make", "opaque_get",
     "tie", "untie"
 ];
@@ -42,6 +43,39 @@ export abstract class BaseModulePlugin implements IModulePlugin {
         if (!this.__hooked) throw new ConductorInternalError("Module not hooked");
     }
 
+    pair_assert(p: PairIdentifier, headType?: DataType, tailType?: DataType): boolean {
+        if (headType) {
+            const t = this.pair_typehead(p);
+            if (t !== headType) throw new EvaluatorTypeError("Pair head assertion failure", DataType[headType], DataType[t]);
+        }
+        if (tailType) {
+            const t = this.pair_typetail(p);
+            if (t !== tailType) throw new EvaluatorTypeError("Pair tail assertion failure", DataType[tailType], DataType[t]);
+        }
+        return true;
+    }
+    array_assert(a: ArrayIdentifier, type?: DataType, length?: number): boolean {
+        if (type) {
+            const t = this.array_type(a);
+            if (t !== type) throw new EvaluatorTypeError("Array type assertion failure", DataType[type], DataType[t]);
+        }
+        if (length) {
+            const l = this.array_length(a);
+            if (l !== length) throw new EvaluatorTypeError("Array length assertion failure", String(length), String(l));
+        }
+        return true;
+    }
+    closure_arity_assert(c: ClosureIdentifier, arity: number): boolean {
+        const a = this.closure_arity(c);
+        if (a !== arity) throw new EvaluatorTypeError("Closure arity assertion failure", String(arity), String(a));
+        return true;
+    }
+    closure_returntype_assert<T extends DataType>(rv: ReturnValue<any>, type: T): rv is ReturnValue<T> {
+        const [_returnValue, returnType] = rv;
+        if (returnType !== type) throw new EvaluatorTypeError("Closure return type assertion failure", DataType[type], DataType[returnType]);
+        return true;
+    }
+
     // To be populated by hook():
     pair_make: () => PairIdentifier;
     pair_gethead: (p: PairIdentifier) => ExternValue;
@@ -58,7 +92,8 @@ export abstract class BaseModulePlugin implements IModulePlugin {
     array_set: (a: ArrayIdentifier, idx: number, v: ExternValue) => void;
 
     closure_make: <T extends IFunctionSignature>(sig: T, func: ExternCallable<T>, dependsOn?: Identifier[]) => ClosureIdentifier;
-    closure_call: (c: ClosureIdentifier, args: ExternValue[]) => ExternValue;
+    closure_arity: (c: ClosureIdentifier) => number;
+    closure_call: <T extends DataType>(c: ClosureIdentifier, args: ExternValue[]) => ReturnValue<T>;
 
     opaque_make: (v: any) => OpaqueIdentifier;
     opaque_get: (o: OpaqueIdentifier) => any;

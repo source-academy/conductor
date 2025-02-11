@@ -1,5 +1,5 @@
 import type { IPlugin } from "../../../conduit";
-import type { ArrayIdentifier, ClosureIdentifier, DataType, ExternCallable, ExternValue, Identifier, IDataHandler, IFunctionSignature, OpaqueIdentifier, PairIdentifier } from "../../types";
+import type { ArrayIdentifier, ClosureIdentifier, DataType, ExternCallable, ExternValue, Identifier, IDataHandler, IFunctionSignature, OpaqueIdentifier, PairIdentifier, ReturnValue } from "../../types";
 import type { IModuleExport } from "./IModuleExport";
 
 export interface IModulePlugin extends IPlugin {
@@ -81,6 +81,15 @@ export interface IModulePlugin extends IPlugin {
     pair_settail(p: PairIdentifier, t: DataType, v: ExternValue): void;
 
     /**
+     * Asserts the type of a Pair.
+     * @param p The Pair to assert the type of.
+     * @param headType The expected type of the head of the Pair.
+     * @param tailType The expected type of the tail of the Pair.
+     * @throws If the Pair's type is not as expected.
+     */
+    pair_assert(p: PairIdentifier, headType?: DataType, tailType?: DataType): boolean;
+
+    /**
      * Makes a new Array.
      * @param t The type of the elements of the Array
      * @param len The length of the Array
@@ -122,6 +131,15 @@ export interface IModulePlugin extends IPlugin {
     array_set(a: ArrayIdentifier, idx: number, v: ExternValue): void;
 
     /**
+     * Asserts the type of an Array.
+     * @param a The Array to assert the type of.
+     * @param type The expected type of the elements of the Array.
+     * @param length The expected length of the Array.
+     * @throws If the Array's type is not as expected.
+     */
+    array_assert(a: ArrayIdentifier, type?: DataType, length?: number): boolean;
+
+    /**
      * Makes a new Closure.
      * @param sig The signature of the new Closure.
      * @param func A callback to be called when the Closure is called.
@@ -131,11 +149,35 @@ export interface IModulePlugin extends IPlugin {
     closure_make<T extends IFunctionSignature>(sig: T, func: ExternCallable<T>, dependsOn?: Identifier[]): ClosureIdentifier;
 
     /**
+     * Gets the arity (number of parameters) of a Closure.
+     * @param c The Closure to get the arity of.
+     * @returns The arity of the Closure.
+     */
+    closure_arity(c: ClosureIdentifier): number;
+
+    /**
      * Calls a Closure.
      * @param c The Closure to be called.
      * @param args An array of arguments to be passed to the Closure.
+     * @returns A tuple of the returned value, and its type.
      */
-    closure_call(c: ClosureIdentifier, args: ExternValue[]): ExternValue;
+    closure_call<T extends DataType>(c: ClosureIdentifier, args: ExternValue[]): ReturnValue<T>;
+
+    /**
+     * Asserts the arity of a Closure.
+     * @param c The Closure to assert the arity of.
+     * @param arity The expected arity of the Closure.
+     * @throws If the Closure's arity is not as expected.
+     */
+    closure_arity_assert(c: ClosureIdentifier, arity: number): boolean;
+
+    /**
+     * Asserts the type of a Closure-returned value.
+     * @param rv The Closure-returned value to assert the type of.
+     * @param type The expected type of the Closure-returned value.
+     * @throws If the Closure-returned value's type is not as expected.
+     */
+    closure_returntype_assert<T extends DataType>(rv: ReturnValue<T>, type: T): rv is ReturnValue<T>;
 
     /**
      * Makes a new Opaque object.

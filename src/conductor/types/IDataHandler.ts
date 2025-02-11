@@ -1,4 +1,4 @@
-import type { ArrayIdentifier, ClosureIdentifier, DataType, ExternCallable, ExternValue, Identifier, IFunctionSignature, OpaqueIdentifier, PairIdentifier } from ".";
+import type { ArrayIdentifier, ClosureIdentifier, DataType, ExternCallable, ExternValue, Identifier, IFunctionSignature, OpaqueIdentifier, PairIdentifier, ReturnValue } from ".";
 
 export interface IDataHandler {
     readonly hasDataInterface: true;
@@ -104,11 +104,19 @@ export interface IDataHandler {
     closure_make<T extends IFunctionSignature>(sig: T, func: ExternCallable<T>, dependsOn?: Identifier[]): Identifier; // not ClosureIdentifier
 
     /**
+     * Gets the arity (number of parameters) of a Closure.
+     * @param c The Closure to get the arity of.
+     * @returns The arity of the Closure.
+     */
+    closure_arity(c: ClosureIdentifier): number;
+
+    /**
      * Calls a Closure.
      * @param c The Closure to be called.
      * @param args An array of arguments to be passed to the Closure.
+     * @returns A tuple of the returned value, and its type.
      */
-    closure_call(c: ClosureIdentifier, args: ExternValue[]): ExternValue;
+    closure_call<T extends DataType>(c: ClosureIdentifier, args: ExternValue[]): ReturnValue<T>;
 
     /**
      * Makes a new Opaque object.
