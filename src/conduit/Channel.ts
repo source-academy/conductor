@@ -5,47 +5,47 @@ export class Channel<T> implements IChannel<T> {
     readonly name: string;
 
     /** The underlying MessagePort of this Channel. */
-    private port: MessagePort;
+    private __port: MessagePort;
 
     /** The callbacks subscribed to this Channel. */
-    private readonly subscribers: Set<Subscriber<T>> = new Set(); // TODO: use WeakRef? but callbacks tend to be thrown away and leaking is better than incorrect behaviour
+    private readonly __subscribers: Set<Subscriber<T>> = new Set(); // TODO: use WeakRef? but callbacks tend to be thrown away and leaking is better than incorrect behaviour
 
     /** Is the Channel allowed to be used? */
-    private isAlive: boolean = true;
+    private __isAlive: boolean = true;
 
     send(message: T, transfer?: Transferable[]): void {
-        this.verifyAlive();
-        this.port.postMessage(message, transfer);
+        this.__verifyAlive();
+        this.__port.postMessage(message, transfer);
     }
     subscribe(subscriber: Subscriber<T>): void {
-        this.verifyAlive();
-        this.subscribers.add(subscriber);
+        this.__verifyAlive();
+        this.__subscribers.add(subscriber);
     }
     unsubscribe(subscriber: Subscriber<T>): void {
-        this.verifyAlive();
-        this.subscribers.delete(subscriber);
+        this.__verifyAlive();
+        this.__subscribers.delete(subscriber);
     }
     close(): void {
-        this.verifyAlive();
-        this.isAlive = false;
-        this.port?.close();
+        this.__verifyAlive();
+        this.__isAlive = false;
+        this.__port?.close();
     }
 
     /**
      * Check if this Channel is allowed to be used.
      * @throws Throws an error if the Channel has been closed.
      */
-    private verifyAlive() {
-        if (!this.isAlive) throw new ConductorInternalError(`Channel ${this.name} has been closed`);
+    private __verifyAlive() {
+        if (!this.__isAlive) throw new ConductorInternalError(`Channel ${this.name} has been closed`);
     }
 
     /**
      * Dispatch some data to subscribers.
      * @param data The data to be dispatched to subscribers.
      */
-    private dispatch(data: T): void {
-        this.verifyAlive();
-        for (const subscriber of this.subscribers) {
+    private __dispatch(data: T): void {
+        this.__verifyAlive();
+        for (const subscriber of this.__subscribers) {
             subscriber(data);
         }
     }
@@ -55,7 +55,7 @@ export class Channel<T> implements IChannel<T> {
      * @param port The MessagePort to listen to.
      */
     listenToPort(port: MessagePort): void {
-        port.addEventListener("message", e => this.dispatch(e.data));
+        port.addEventListener("message", e => this.__dispatch(e.data));
         port.start();
     }
 
@@ -64,9 +64,9 @@ export class Channel<T> implements IChannel<T> {
      * @param port The new port to use.
      */
     replacePort(port: MessagePort): void {
-        this.verifyAlive();
-        this.port?.close();
-        this.port = port;
+        this.__verifyAlive();
+        this.__port?.close();
+        this.__port = port;
         this.listenToPort(port);
     }
 

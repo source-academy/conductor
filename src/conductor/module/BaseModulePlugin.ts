@@ -6,7 +6,7 @@ import { IModulePlugin, IModuleExport } from "./types";
 
 const methods: readonly (Exclude<keyof IDataHandler, "hasDataInterface">)[] = [
     "pair_make", "pair_gethead", "pair_typehead", "pair_sethead", "pair_gettail", "pair_typetail", "pair_settail",
-    "array_make", "array_get", "array_type", "array_set",
+    "array_make", "array_length", "array_get", "array_type", "array_set",
     "closure_make", "closure_call",
     "opaque_make", "opaque_get",
     "tie", "untie"
@@ -19,27 +19,27 @@ export abstract class BaseModulePlugin implements IModulePlugin {
     abstract exports: IModuleExport[];
 
     /** Is this module ready for use? */
-    private hooked: boolean = false;
+    private __hooked: boolean = false;
 
     hook(evaluator: IDataHandler): void {
-        if (this.hooked) throw new ConductorInternalError("Module already hooked");
-        this.hooked = true;
+        if (this.__hooked) throw new ConductorInternalError("Module already hooked");
+        this.__hooked = true;
         for (const methodName of methods) {
             this[methodName] = evaluator[methodName].bind(evaluator);
         }
     }
     unhook(): void {
         this.verifyHooked();
-        this.hooked = false;
+        this.__hooked = false;
         for (const methodName of methods) {
             delete this[methodName];
         }
     }
     isHooked(): boolean {
-        return this.hooked;
+        return this.__hooked;
     }
     verifyHooked(): void {
-        if (!this.hooked) throw new ConductorInternalError("Module not hooked");
+        if (!this.__hooked) throw new ConductorInternalError("Module not hooked");
     }
 
     // To be populated by hook():
@@ -52,6 +52,7 @@ export abstract class BaseModulePlugin implements IModulePlugin {
     pair_settail: (p: PairIdentifier, t: DataType, v: ExternValue) => void;
 
     array_make: (t: DataType, len: number, init?: ExternValue) => ArrayIdentifier;
+    array_length: (a: ArrayIdentifier) => number;
     array_get: (a: ArrayIdentifier, idx: number) => ExternValue;
     array_type: (a: ArrayIdentifier) => DataType;
     array_set: (a: ArrayIdentifier, idx: number, v: ExternValue) => void;

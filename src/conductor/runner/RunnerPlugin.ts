@@ -11,35 +11,35 @@ import { IRunnerPlugin, IEvaluator, IInterfacableEvaluator } from "./types";
 export class RunnerPlugin implements IRunnerPlugin {
     name = InternalPluginName.RUNNER_MAIN;
 
-    private readonly evaluator: IEvaluator | IInterfacableEvaluator;
-    private readonly isCompatibleWithModules: boolean;
-    private conduit: IConduit;
-    private fileQueue: IChannelQueue<IFileMessage>;
-    private chunkQueue: IChannelQueue<IChunkMessage>;
-    private serviceChannel: IChannel<IServiceMessage>;
-    private ioQueue: IChannelQueue<IIOMessage>;
-    private statusChannel: IChannel<IStatusMessage>;
+    private readonly __evaluator: IEvaluator | IInterfacableEvaluator;
+    private readonly __isCompatibleWithModules: boolean;
+    private __conduit: IConduit;
+    private __fileQueue: IChannelQueue<IFileMessage>;
+    private __chunkQueue: IChannelQueue<IChunkMessage>;
+    private __serviceChannel: IChannel<IServiceMessage>;
+    private __ioQueue: IChannelQueue<IIOMessage>;
+    private __statusChannel: IChannel<IStatusMessage>;
 
     readonly channelAttach = [InternalChannelName.FILE, InternalChannelName.CHUNK, InternalChannelName.SERVICE, InternalChannelName.STANDARD_IO, InternalChannelName.STATUS];
     init(conduit: IConduit, [fileChannel, chunkChannel, serviceChannel, ioChannel, statusChannel]): void {
-        this.conduit = conduit;
-        this.fileQueue = new ChannelQueue(fileChannel);
-        this.chunkQueue = new ChannelQueue(chunkChannel);
-        this.serviceChannel = serviceChannel;
-        this.ioQueue = new ChannelQueue(ioChannel);
-        this.statusChannel = statusChannel;
+        this.__conduit = conduit;
+        this.__fileQueue = new ChannelQueue(fileChannel);
+        this.__chunkQueue = new ChannelQueue(chunkChannel);
+        this.__serviceChannel = serviceChannel;
+        this.__ioQueue = new ChannelQueue(ioChannel);
+        this.__statusChannel = statusChannel;
 
-        this.serviceChannel.send(new serviceMessages.Hello());
-        this.serviceChannel.subscribe(message => {
-            if (this.serviceHandlers.has(message.type)) this.serviceHandlers.get(message.type).call(this, message);
+        this.__serviceChannel.send(new serviceMessages.Hello());
+        this.__serviceChannel.subscribe(message => {
+            if (this.__serviceHandlers.has(message.type)) this.__serviceHandlers.get(message.type).call(this, message);
         });
-        this.evaluator.init(this);
+        this.__evaluator.init(this);
     }
 
-    serviceHandlers = new Map<ServiceMessageType, (message: IServiceMessage) => void>([
+    private __serviceHandlers = new Map<ServiceMessageType, (message: IServiceMessage) => void>([
         [ServiceMessageType.HELLO, function helloServiceHandler(this: RunnerPlugin, message: serviceMessages.Hello) {
             if (message.data.version < Constant.PROTOCOL_MIN_VERSION) {
-                this.serviceChannel.send(new serviceMessages.Abort(Constant.PROTOCOL_MIN_VERSION));
+                this.__serviceChannel.send(new serviceMessages.Abort(Constant.PROTOCOL_MIN_VERSION));
                 console.error(`Host's protocol version (${message.data.version}) must be at least ${Constant.PROTOCOL_MIN_VERSION}`);
             } else {
                 console.log(`Host is using protocol version ${message.data.version}`);
@@ -47,37 +47,37 @@ export class RunnerPlugin implements IRunnerPlugin {
         }],
         [ServiceMessageType.ABORT, function abortServiceHandler(this: RunnerPlugin, message: serviceMessages.Abort) {
             console.error(`Host expects at least protocol version ${message.data.minVersion}, but we are on version ${Constant.PROTOCOL_VERSION}`);
-            this.conduit.terminate();
+            this.__conduit.terminate();
         }],
         [ServiceMessageType.ENTRY, function entryServiceHandler(this: RunnerPlugin, message: serviceMessages.Entry) {
-            this.evaluator.startEvaluator(message.data);
+            this.__evaluator.startEvaluator(message.data);
         }]
     ]);
 
     async requestFile(fileName: string): Promise<string> {
-        this.fileQueue.send({ fileName });
+        this.__fileQueue.send({ fileName });
         while (true) {
-            const file = await this.fileQueue.receive();
+            const file = await this.__fileQueue.receive();
             if (file.fileName === fileName) return file.content;
         }
     }
 
     async requestChunk(): Promise<Chunk> {
-        return (await this.chunkQueue.receive()).chunk;
+        return (await this.__chunkQueue.receive()).chunk;
     }
 
     async requestInput(): Promise<string> {
-        const { message } = await this.ioQueue.receive();
+        const { message } = await this.__ioQueue.receive();
         return message;
     }
 
     tryRequestInput(): string | undefined {
-        const out = this.ioQueue.tryReceive();
+        const out = this.__ioQueue.tryReceive();
         return out?.message;
     }
 
     sendOutput(message: string): void {
-        this.ioQueue.send({ message });
+        this.__ioQueue.send({ message });
     }
 
     sendError(message: string): void { // TODO: separate error channel
@@ -85,21 +85,21 @@ export class RunnerPlugin implements IRunnerPlugin {
     }
 
     updateStatus(status: RunnerStatus, isActive: boolean): void {
-        this.statusChannel.send({ status, isActive });
+        this.__statusChannel.send({ status, isActive });
     }
 
     registerPlugin(plugin: IPlugin): void {
-        this.conduit.registerPlugin(plugin);
+        this.__conduit.registerPlugin(plugin);
     }
 
     unregisterPlugin(plugin: IPlugin): void {
-        this.conduit.unregisterPlugin(plugin);
+        this.__conduit.unregisterPlugin(plugin);
     }
 
     registerModule(module: IModulePlugin): void {
-        if (!this.isCompatibleWithModules) throw new ConductorInternalError("Evaluator has no data interface");
+        if (!this.__isCompatibleWithModules) throw new ConductorInternalError("Evaluator has no data interface");
         this.registerPlugin(module);
-        module.hook(this.evaluator as IInterfacableEvaluator);
+        module.hook(this.__evaluator as IInterfacableEvaluator);
     }
 
     unregisterModule(module: IModulePlugin): void {
@@ -120,7 +120,7 @@ export class RunnerPlugin implements IRunnerPlugin {
     }
 
     constructor(evaluator: IEvaluator | IInterfacableEvaluator) {
-        this.evaluator = evaluator;
-        this.isCompatibleWithModules = (this.evaluator as IInterfacableEvaluator).hasDataInterface ?? false;
+        this.__evaluator = evaluator;
+        this.__isCompatibleWithModules = (this.__evaluator as IInterfacableEvaluator).hasDataInterface ?? false;
     }
 }

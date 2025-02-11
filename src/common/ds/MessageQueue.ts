@@ -1,23 +1,23 @@
 import { Queue } from "./Queue";
 
 export class MessageQueue<T> {
-    private readonly inputQueue: Queue<T> = new Queue();
-    private readonly promiseQueue: Queue<Function> = new Queue();
+    private readonly __inputQueue: Queue<T> = new Queue();
+    private readonly __promiseQueue: Queue<Function> = new Queue();
 
     push(item: T) {
-        if (this.promiseQueue.length !== 0) this.promiseQueue.pop()(item);
-        else this.inputQueue.push(item);
+        if (this.__promiseQueue.length !== 0) this.__promiseQueue.pop()(item);
+        else this.__inputQueue.push(item);
     }
 
     async pop(): Promise<T> {
-        if (this.inputQueue.length !== 0) return this.inputQueue.pop();
+        if (this.__inputQueue.length !== 0) return this.__inputQueue.pop();
         return new Promise((resolve, _reject) => {
-            this.promiseQueue.push(resolve);
+            this.__promiseQueue.push(resolve);
         });
     }
 
     tryPop(): T | undefined {
-        if (this.inputQueue.length !== 0) return this.inputQueue.pop();
+        if (this.__inputQueue.length !== 0) return this.__inputQueue.pop();
         return undefined;
     }
 

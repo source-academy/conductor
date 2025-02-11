@@ -10,20 +10,20 @@ import type { IHostPlugin } from "./types";
 export abstract class BasicHostPlugin implements IHostPlugin {
     name = InternalPluginName.HOST_MAIN;
 
-    private conduit: IConduit;
-    private fileQueue: IChannelQueue<IFileMessage>;
-    private chunkChannel: IChannel<IChunkMessage>;
-    private serviceChannel: IChannel<IServiceMessage>;
-    private ioQueue: IChannelQueue<IIOMessage>;
-    private statusChannel: IChannel<IStatusMessage>;
+    private __conduit: IConduit;
+    private __fileQueue: IChannelQueue<IFileMessage>;
+    private __chunkChannel: IChannel<IChunkMessage>;
+    private __serviceChannel: IChannel<IServiceMessage>;
+    private __ioQueue: IChannelQueue<IIOMessage>;
+    private __statusChannel: IChannel<IStatusMessage>;
 
-    private chunkCount: number = 0;
+    private __chunkCount: number = 0;
 
     readonly channelAttach = [InternalChannelName.FILE, InternalChannelName.CHUNK, InternalChannelName.SERVICE, InternalChannelName.STANDARD_IO, InternalChannelName.STATUS];
     init(conduit: IConduit, [fileChannel, chunkChannel, serviceChannel, ioChannel, statusChannel]): void {
-        this.conduit = conduit;
+        this.__conduit = conduit;
 
-        this.fileQueue = new ChannelQueue(fileChannel);
+        this.__fileQueue = new ChannelQueue(fileChannel);
         fileChannel.subscribe(async (fileMessage: IFileMessage) => {
             fileChannel.send({
                 content: await this.requestFile(fileMessage.fileName),
@@ -31,27 +31,27 @@ export abstract class BasicHostPlugin implements IHostPlugin {
             });
         });
 
-        this.chunkChannel = chunkChannel;
-        this.serviceChannel = serviceChannel;
+        this.__chunkChannel = chunkChannel;
+        this.__serviceChannel = serviceChannel;
 
-        this.ioQueue = new ChannelQueue(ioChannel);
+        this.__ioQueue = new ChannelQueue(ioChannel);
         ioChannel.subscribe((ioMessage: IIOMessage) => this.receiveOutput?.(ioMessage.message));
 
-        this.statusChannel = statusChannel;
+        this.__statusChannel = statusChannel;
         statusChannel.subscribe((statusMessage: IStatusMessage) => {
             this.receiveStatusUpdate?.(statusMessage.status, statusMessage.isActive);
         });
 
-        this.serviceChannel.send(new serviceMessages.Hello());
-        this.serviceChannel.subscribe(message => {
-            if (this.serviceHandlers.has(message.type)) this.serviceHandlers.get(message.type).call(this, message);
+        this.__serviceChannel.send(new serviceMessages.Hello());
+        this.__serviceChannel.subscribe(message => {
+            if (this.__serviceHandlers.has(message.type)) this.__serviceHandlers.get(message.type).call(this, message);
         });
     }
 
-    serviceHandlers = new Map<ServiceMessageType, (message: IServiceMessage) => void>([
+    private __serviceHandlers = new Map<ServiceMessageType, (message: IServiceMessage) => void>([
         [ServiceMessageType.HELLO, function helloServiceHandler(this: BasicHostPlugin, message: serviceMessages.Hello) {
             if (message.data.version < Constant.PROTOCOL_MIN_VERSION) {
-                this.serviceChannel.send(new serviceMessages.Abort(Constant.PROTOCOL_MIN_VERSION));
+                this.__serviceChannel.send(new serviceMessages.Abort(Constant.PROTOCOL_MIN_VERSION));
                 console.error(`Runner's protocol version (${message.data.version}) must be at least ${Constant.PROTOCOL_MIN_VERSION}`);
             } else {
                 console.log(`Runner is using protocol version ${message.data.version}`);
@@ -59,30 +59,30 @@ export abstract class BasicHostPlugin implements IHostPlugin {
         }],
         [ServiceMessageType.ABORT, function abortServiceHandler(this: BasicHostPlugin, message: serviceMessages.Abort) {
             console.error(`Runner expects at least protocol version ${message.data.minVersion}, but we are on version ${Constant.PROTOCOL_VERSION}`);
-            this.conduit.terminate();
+            this.__conduit.terminate();
         }]
     ]);
 
     abstract requestFile(fileName: string): Promise<string | undefined>;
 
     startEvaluator(entryPoint: string): void {
-        this.serviceChannel.send(new serviceMessages.Entry(entryPoint));
+        this.__serviceChannel.send(new serviceMessages.Entry(entryPoint));
     }
 
     sendChunk(chunk: Chunk): void {
-        this.chunkChannel.send({ id: this.chunkCount++, chunk });
+        this.__chunkChannel.send({ id: this.__chunkCount++, chunk });
     }
 
     sendInput(message: string): void {
-        this.ioQueue.send({ message });
+        this.__ioQueue.send({ message });
     }
 
     async requestOutput(): Promise<string> {
-        return (await this.ioQueue.receive()).message;
+        return (await this.__ioQueue.receive()).message;
     }
 
     tryRequestOutput(): string | undefined {
-        return this.ioQueue.tryReceive()?.message;
+        return this.__ioQueue.tryReceive()?.message;
     }
 
     receiveOutput?(message: string): void;
@@ -100,11 +100,11 @@ export abstract class BasicHostPlugin implements IHostPlugin {
     receiveStatusUpdate?(status: RunnerStatus, isActive: boolean): void; // TODO: hook up to channel
 
     registerPlugin(plugin: IPlugin): void {
-        this.conduit.registerPlugin(plugin);
+        this.__conduit.registerPlugin(plugin);
     }
 
     unregisterPlugin(plugin: IPlugin): void {
-        this.conduit.unregisterPlugin(plugin);
+        this.__conduit.unregisterPlugin(plugin);
     }
 
     async importAndRegisterExternalPlugin(location: string): Promise<IPlugin> {
