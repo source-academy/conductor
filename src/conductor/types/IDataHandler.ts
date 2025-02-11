@@ -1,4 +1,4 @@
-import type { ArrayIdentifier, ClosureIdentifier, DataType, ExternCallable, ExternValue, Identifier, IFunctionSignature, OpaqueIdentifier, PairIdentifier, ReturnValue } from ".";
+import type { ArrayIdentifier, ClosureIdentifier, DataType, ExternCallable, ExternTypeOf, ExternValue, Identifier, IFunctionSignature, OpaqueIdentifier, PairIdentifier, ReturnValue } from ".";
 
 export interface IDataHandler {
     readonly hasDataInterface: true;
@@ -54,6 +54,15 @@ export interface IDataHandler {
     pair_settail(p: PairIdentifier, t: DataType, v: ExternValue): void;
 
     /**
+     * Asserts the type of a Pair.
+     * @param p The Pair to assert the type of.
+     * @param headType The expected type of the head of the Pair.
+     * @param tailType The expected type of the tail of the Pair.
+     * @throws If the Pair's type is not as expected.
+     */
+    pair_assert(p: PairIdentifier, headType?: DataType, tailType?: DataType): boolean;
+
+    /**
      * Makes a new Array.
      * @param t The type of the elements of the Array
      * @param len The length of the Array
@@ -95,6 +104,15 @@ export interface IDataHandler {
     array_set(a: ArrayIdentifier, idx: number, v: ExternValue): void;
 
     /**
+     * Asserts the type of an Array.
+     * @param a The Array to assert the type of.
+     * @param type The expected type of the elements of the Array.
+     * @param length The expected length of the Array.
+     * @throws If the Array's type is not as expected.
+     */
+    array_assert(a: ArrayIdentifier, type?: DataType, length?: number): boolean;
+
+    /**
      * Makes a new Closure.
      * @param sig The signature of the new Closure.
      * @param func A callback to be called when the Closure is called.
@@ -117,6 +135,38 @@ export interface IDataHandler {
      * @returns A tuple of the returned value, and its type.
      */
     closure_call<T extends DataType>(c: ClosureIdentifier, args: ExternValue[]): ReturnValue<T>;
+
+    /**
+     * Gets the value of a return.
+     * @param rv The Closure-returned value to extract the value from.
+     * @returns The return value.
+     */
+    closure_returnvalue<T extends DataType>(rv: ReturnValue<T>): ExternTypeOf<T>;
+
+    /**
+     * Gets the value of a return, and checks its type.
+     * @param rv The Closure-returned value to extract the value from.
+     * @param type The expected type of the Closure-returned value.
+     * @returns The return value.
+     * @throws If the Closure-returned value's type is not as expected.
+     */
+    closure_returnvalue_checked<T extends DataType>(rv: ReturnValue<any>, type: T): ExternTypeOf<T>;
+
+    /**
+     * Asserts the arity of a Closure.
+     * @param c The Closure to assert the arity of.
+     * @param arity The expected arity of the Closure.
+     * @throws If the Closure's arity is not as expected.
+     */
+    closure_arity_assert(c: ClosureIdentifier, arity: number): boolean;
+
+    /**
+     * Asserts the type of a Closure-returned value.
+     * @param rv The Closure-returned value to assert the type of.
+     * @param type The expected type of the Closure-returned value.
+     * @throws If the Closure-returned value's type is not as expected.
+     */
+    closure_returntype_assert<T extends DataType>(rv: ReturnValue<T>, type: T): asserts rv is ReturnValue<T>;
 
     /**
      * Makes a new Opaque object.
