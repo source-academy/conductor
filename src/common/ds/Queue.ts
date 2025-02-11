@@ -11,7 +11,7 @@ export class Queue<T> {
             this.__s1 = this.__s2.reverse();
             this.__s2 = temp;
         }
-        return this.__s1.pop();
+        return this.__s1.pop()!; // as the length is nonzero
     }
     get length() {
         return this.__s1.length + this.__s2.length;

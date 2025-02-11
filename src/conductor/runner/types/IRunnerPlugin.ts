@@ -8,7 +8,7 @@ export interface IRunnerPlugin extends IPlugin {
      * @param fileName The name of the file to request.
      * @returns A promise resolving to the content of the requested file.
      */
-    requestFile(fileName: string): Promise<string>;
+    requestFile(fileName: string): Promise<string | undefined>;
 
     /**
      * Request the next chunk to run.

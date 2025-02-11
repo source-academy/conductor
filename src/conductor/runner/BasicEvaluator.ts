@@ -1,13 +1,15 @@
+import { ConductorInternalError } from "../../common/errors";
 import { IEvaluator, IRunnerPlugin } from "./types";
 
 export abstract class BasicEvaluator implements IEvaluator {
-    conductor: IRunnerPlugin;
+    conductor!: IRunnerPlugin;
     init(conductor: IRunnerPlugin): void {
         this.conductor = conductor;
     }
 
     async startEvaluator(entryPoint: string): Promise<void> {
         const initialChunk = await this.conductor.requestFile(entryPoint);
+        if (!initialChunk) throw new ConductorInternalError("Cannot load entrypoint file");
         await this.evaluateFile(entryPoint, initialChunk);
         while (true) {
             const chunk = await this.conductor.requestChunk();

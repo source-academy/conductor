@@ -5,6 +5,6 @@ export class Abort implements IServiceMessage {
     type = ServiceMessageType.ABORT;
     data: {minVersion: number};
     constructor(minVersion: number) {
-        this.data.minVersion = minVersion;
+        this.data = {minVersion: minVersion};
     }
 }

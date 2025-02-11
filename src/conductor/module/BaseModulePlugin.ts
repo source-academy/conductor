@@ -27,6 +27,7 @@ export abstract class BaseModulePlugin implements IModulePlugin {
         if (this.__hooked) throw new ConductorInternalError("Module already hooked");
         this.__hooked = true;
         for (const methodName of methods) {
+            // @ts-expect-error not forcing typing of identifiers in the evaluator is the point
             this[methodName] = evaluator[methodName].bind(evaluator);
         }
     }
@@ -84,27 +85,27 @@ export abstract class BaseModulePlugin implements IModulePlugin {
     }
 
     // To be populated by hook():
-    pair_make: () => PairIdentifier;
-    pair_gethead: (p: PairIdentifier) => ExternValue;
-    pair_typehead: (p: PairIdentifier) => DataType;
-    pair_sethead: (p: PairIdentifier, t: DataType, v: ExternValue) => void;
-    pair_gettail: (p: PairIdentifier) => ExternValue;
-    pair_typetail: (p: PairIdentifier) => DataType;
-    pair_settail: (p: PairIdentifier, t: DataType, v: ExternValue) => void;
+    pair_make!: () => PairIdentifier;
+    pair_gethead!: (p: PairIdentifier) => ExternValue;
+    pair_typehead!: (p: PairIdentifier) => DataType;
+    pair_sethead!: (p: PairIdentifier, t: DataType, v: ExternValue) => void;
+    pair_gettail!: (p: PairIdentifier) => ExternValue;
+    pair_typetail!: (p: PairIdentifier) => DataType;
+    pair_settail!: (p: PairIdentifier, t: DataType, v: ExternValue) => void;
 
-    array_make: (t: DataType, len: number, init?: ExternValue) => ArrayIdentifier;
-    array_length: (a: ArrayIdentifier) => number;
-    array_get: (a: ArrayIdentifier, idx: number) => ExternValue;
-    array_type: (a: ArrayIdentifier) => DataType;
-    array_set: (a: ArrayIdentifier, idx: number, v: ExternValue) => void;
+    array_make!: (t: DataType, len: number, init?: ExternValue) => ArrayIdentifier;
+    array_length!: (a: ArrayIdentifier) => number;
+    array_get!: (a: ArrayIdentifier, idx: number) => ExternValue;
+    array_type!: (a: ArrayIdentifier) => DataType;
+    array_set!: (a: ArrayIdentifier, idx: number, v: ExternValue) => void;
 
-    closure_make: <T extends IFunctionSignature>(sig: T, func: ExternCallable<T>, dependsOn?: Identifier[]) => ClosureIdentifier;
-    closure_arity: (c: ClosureIdentifier) => number;
-    closure_call: <T extends DataType>(c: ClosureIdentifier, args: ExternValue[]) => ReturnValue<T>;
+    closure_make!: <T extends IFunctionSignature>(sig: T, func: ExternCallable<T>, dependsOn?: Identifier[]) => ClosureIdentifier;
+    closure_arity!: (c: ClosureIdentifier) => number;
+    closure_call!: <T extends DataType>(c: ClosureIdentifier, args: ExternValue[]) => ReturnValue<T>;
 
-    opaque_make: (v: any) => OpaqueIdentifier;
-    opaque_get: (o: OpaqueIdentifier) => any;
+    opaque_make!: (v: any) => OpaqueIdentifier;
+    opaque_get!: (o: OpaqueIdentifier) => any;
 
-    tie: (dependent: Identifier, dependee: Identifier) => void;
-    untie: (dependent: Identifier, dependee: Identifier) => void;
+    tie!: (dependent: Identifier, dependee: Identifier) => void;
+    untie!: (dependent: Identifier, dependee: Identifier) => void;
 }

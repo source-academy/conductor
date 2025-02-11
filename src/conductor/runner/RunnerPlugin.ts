@@ -13,15 +13,15 @@ export class RunnerPlugin implements IRunnerPlugin {
 
     private readonly __evaluator: IEvaluator | IInterfacableEvaluator;
     private readonly __isCompatibleWithModules: boolean;
-    private __conduit: IConduit;
-    private __fileQueue: IChannelQueue<IFileMessage>;
-    private __chunkQueue: IChannelQueue<IChunkMessage>;
-    private __serviceChannel: IChannel<IServiceMessage>;
-    private __ioQueue: IChannelQueue<IIOMessage>;
-    private __statusChannel: IChannel<IStatusMessage>;
+    private __conduit!: IConduit;
+    private __fileQueue!: IChannelQueue<IFileMessage>;
+    private __chunkQueue!: IChannelQueue<IChunkMessage>;
+    private __serviceChannel!: IChannel<IServiceMessage>;
+    private __ioQueue!: IChannelQueue<IIOMessage>;
+    private __statusChannel!: IChannel<IStatusMessage>;
 
     readonly channelAttach = [InternalChannelName.FILE, InternalChannelName.CHUNK, InternalChannelName.SERVICE, InternalChannelName.STANDARD_IO, InternalChannelName.STATUS];
-    init(conduit: IConduit, [fileChannel, chunkChannel, serviceChannel, ioChannel, statusChannel]): void {
+    init(conduit: IConduit, [fileChannel, chunkChannel, serviceChannel, ioChannel, statusChannel]: IChannel<any>[]): void {
         this.__conduit = conduit;
         this.__fileQueue = new ChannelQueue(fileChannel);
         this.__chunkQueue = new ChannelQueue(chunkChannel);
@@ -31,11 +31,12 @@ export class RunnerPlugin implements IRunnerPlugin {
 
         this.__serviceChannel.send(new serviceMessages.Hello());
         this.__serviceChannel.subscribe(message => {
-            if (this.__serviceHandlers.has(message.type)) this.__serviceHandlers.get(message.type).call(this, message);
+            this.__serviceHandlers.get(message.type)?.call(this, message);
         });
         this.__evaluator.init(this);
     }
 
+    // @ts-expect-error TODO: figure proper way to typecheck this
     private __serviceHandlers = new Map<ServiceMessageType, (message: IServiceMessage) => void>([
         [ServiceMessageType.HELLO, function helloServiceHandler(this: RunnerPlugin, message: serviceMessages.Hello) {
             if (message.data.version < Constant.PROTOCOL_MIN_VERSION) {
@@ -54,7 +55,7 @@ export class RunnerPlugin implements IRunnerPlugin {
         }]
     ]);
 
-    async requestFile(fileName: string): Promise<string> {
+    async requestFile(fileName: string): Promise<string | undefined> {
         this.__fileQueue.send({ fileName });
         while (true) {
             const file = await this.__fileQueue.receive();

@@ -10,17 +10,17 @@ import type { IHostPlugin } from "./types";
 export abstract class BasicHostPlugin implements IHostPlugin {
     name = InternalPluginName.HOST_MAIN;
 
-    private __conduit: IConduit;
-    private __fileQueue: IChannelQueue<IFileMessage>;
-    private __chunkChannel: IChannel<IChunkMessage>;
-    private __serviceChannel: IChannel<IServiceMessage>;
-    private __ioQueue: IChannelQueue<IIOMessage>;
-    private __statusChannel: IChannel<IStatusMessage>;
+    private __conduit!: IConduit;
+    private __fileQueue!: IChannelQueue<IFileMessage>;
+    private __chunkChannel!: IChannel<IChunkMessage>;
+    private __serviceChannel!: IChannel<IServiceMessage>;
+    private __ioQueue!: IChannelQueue<IIOMessage>;
+    private __statusChannel!: IChannel<IStatusMessage>;
 
     private __chunkCount: number = 0;
 
     readonly channelAttach = [InternalChannelName.FILE, InternalChannelName.CHUNK, InternalChannelName.SERVICE, InternalChannelName.STANDARD_IO, InternalChannelName.STATUS];
-    init(conduit: IConduit, [fileChannel, chunkChannel, serviceChannel, ioChannel, statusChannel]): void {
+    init(conduit: IConduit, [fileChannel, chunkChannel, serviceChannel, ioChannel, statusChannel]: IChannel<any>[]): void {
         this.__conduit = conduit;
 
         this.__fileQueue = new ChannelQueue(fileChannel);
@@ -44,10 +44,11 @@ export abstract class BasicHostPlugin implements IHostPlugin {
 
         this.__serviceChannel.send(new serviceMessages.Hello());
         this.__serviceChannel.subscribe(message => {
-            if (this.__serviceHandlers.has(message.type)) this.__serviceHandlers.get(message.type).call(this, message);
+            this.__serviceHandlers.get(message.type)?.call(this, message);
         });
     }
 
+    // @ts-expect-error TODO: figure proper way to typecheck this
     private __serviceHandlers = new Map<ServiceMessageType, (message: IServiceMessage) => void>([
         [ServiceMessageType.HELLO, function helloServiceHandler(this: BasicHostPlugin, message: serviceMessages.Hello) {
             if (message.data.version < Constant.PROTOCOL_MIN_VERSION) {

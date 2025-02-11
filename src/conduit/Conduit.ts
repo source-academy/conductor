@@ -28,7 +28,7 @@ export class Conduit implements IConduit {
         const attachedChannels: IChannel<any>[] = [];
         for (const channelName of plugin.channelAttach) {
             if (!this.__channels.has(channelName)) this.__negotiateChannel(channelName);
-            attachedChannels.push(this.__channels.get(channelName));
+            attachedChannels.push(this.__channels.get(channelName)!); // as the Channel has been negotiated
         }
         plugin.init(this, attachedChannels);
     }
@@ -50,7 +50,7 @@ export class Conduit implements IConduit {
     lookupPlugin(pluginName: string): IPlugin {
         this.__verifyAlive();
         if (!this.__pluginMap.has(pluginName)) throw new ConductorInternalError(`Plugin ${pluginName} not registered`);
-        return this.__pluginMap.get(pluginName);
+        return this.__pluginMap.get(pluginName)!; // as the map has been checked
     }
     terminate(): void {
         this.__verifyAlive();
@@ -64,7 +64,7 @@ export class Conduit implements IConduit {
     private __handlePort(data: [string, MessagePort]) { // TODO: update communication protocol?
         const [channelName, port] = data;
         if (this.__channels.has(channelName)) { // uh-oh, we already have a port for this channel
-            const channel = this.__channels.get(channelName);
+            const channel = this.__channels.get(channelName)!; // as the map has been checked
             if (this.__parent) { // extract the data and discard the messageport; child's Channel will close it
                 channel.listenToPort(port);
             } else { // replace our messageport; Channel will close it

@@ -13,6 +13,7 @@ export type { IFunctionSignature } from "./IFunctionSignature";
 export type { IIOMessage } from "./IIOMessage";
 export type { IServiceMessage } from "./IServiceMessage";
 export type { IStatusMessage } from "./IStatusMessage";
+export type { List } from "./List";
 export type { NativeValue } from "./NativeValue";
 export type { OpaqueIdentifier } from "./OpaqueIdentifier";
 export type { PairIdentifier } from "./PairIdentifier";

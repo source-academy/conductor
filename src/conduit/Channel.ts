@@ -5,7 +5,7 @@ export class Channel<T> implements IChannel<T> {
     readonly name: string;
 
     /** The underlying MessagePort of this Channel. */
-    private __port: MessagePort;
+    private __port?: MessagePort;
 
     /** The callbacks subscribed to this Channel. */
     private readonly __subscribers: Set<Subscriber<T>> = new Set(); // TODO: use WeakRef? but callbacks tend to be thrown away and leaking is better than incorrect behaviour
@@ -15,7 +15,7 @@ export class Channel<T> implements IChannel<T> {
 
     send(message: T, transfer?: Transferable[]): void {
         this.__verifyAlive();
-        this.__port.postMessage(message, transfer);
+        this.__port!.postMessage(message, transfer ?? []);
     }
     subscribe(subscriber: Subscriber<T>): void {
         this.__verifyAlive();

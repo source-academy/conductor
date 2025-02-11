@@ -1,6 +1,7 @@
 import type { ArrayIdentifier } from "./ArrayIdentifier";
 import type { ClosureIdentifier } from "./ClosureIdentifier";
 import { DataType } from "./DataType";
+import { List } from "./List";
 import type { OpaqueIdentifier } from "./OpaqueIdentifier";
 import type { PairIdentifier } from "./PairIdentifier";
 
@@ -14,7 +15,7 @@ type typeMap = {
     [DataType.ARRAY]: ArrayIdentifier;
     [DataType.CLOSURE]: ClosureIdentifier;
     [DataType.OPAQUE]: OpaqueIdentifier;
-    [DataType.LIST]: PairIdentifier | null;
+    [DataType.LIST]: List;
 }
 
 export type ExternTypeOf<T> = T extends DataType ? typeMap[T] : never;
