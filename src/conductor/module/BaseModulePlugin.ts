@@ -1,9 +1,6 @@
-import { EvaluatorTypeError } from "../../common/errors";
 import { ConductorInternalError } from "../../common/errors/ConductorInternalError";
 import { IConduit, IChannel } from "../../conduit";
-import { InternalChannelName } from "../strings";
 import { IDataHandler, PairIdentifier, ExternValue, DataType, ArrayIdentifier, IFunctionSignature, ExternCallable, ClosureIdentifier, Identifier, OpaqueIdentifier, ReturnValue, ExternTypeOf } from "../types";
-import { isSameType } from "../util";
 import { IModulePlugin, IModuleExport } from "./types";
 
 const methods: readonly (Exclude<keyof IDataHandler, "hasDataInterface">)[] = [
