@@ -82,12 +82,23 @@ export interface IModulePlugin extends IPlugin {
 
     /**
      * Makes a new Array.
+     * @param t The type of the elements of the Array
+     * @param len The length of the Array
+     * @param init An optional initial value for the elements of the Array
      * @returns An identifier to the new Array.
      */
     array_make(t: DataType, len: number, init?: ExternValue): ArrayIdentifier;
 
     /**
+     * Gets the length of an Array.
+     * @param a The Array to retrieve the length of.
+     * @returns The length of the given Array.
+     */
+    array_length(a: ArrayIdentifier): number;
+
+    /**
      * Gets the value at a specific index of an Array.
+     * Arrays are 0-indexed.
      * @param a The Array to retrieve the value from.
      * @param idx The index of the value wanted.
      * @returns The value at the given index of the given Array.
@@ -103,6 +114,7 @@ export interface IModulePlugin extends IPlugin {
 
     /**
      * Sets a value at a specific index of an Array.
+     * Arrays are 0-indexed.
      * @param a The Array to be modified.
      * @param idx The index to be modified.
      * @param v The new value at the given index of the given Array.
