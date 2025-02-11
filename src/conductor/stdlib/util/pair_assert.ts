@@ -2,7 +2,6 @@ import { EvaluatorTypeError } from "../../../common/errors";
 import { DataType, IDataHandler, PairIdentifier } from "../../types";
 import { isSameType } from "../../util";
 
-
 export function pair_assert(this: IDataHandler, p: PairIdentifier, headType?: DataType, tailType?: DataType): boolean {
     if (headType) {
         const t = this.pair_typehead(p);
