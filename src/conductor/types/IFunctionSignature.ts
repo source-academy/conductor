@@ -2,6 +2,6 @@ import type { DataType } from "./DataType";
 
 export interface IFunctionSignature {
     name?: string;
-    args: DataType[];
+    args: readonly DataType[];
     returnType: DataType;
 }

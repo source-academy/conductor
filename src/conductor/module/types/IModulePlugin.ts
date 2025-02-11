@@ -128,7 +128,7 @@ export interface IModulePlugin extends IPlugin {
      * @param dependsOn An optional array of Identifiers the Closure will depend on.
      * @returns An identifier to the new Closure.
      */
-    closure_make(sig: IFunctionSignature, func: ExternCallable, dependsOn?: Identifier[]): ClosureIdentifier;
+    closure_make<T extends IFunctionSignature>(sig: T, func: ExternCallable<T>, dependsOn?: Identifier[]): ClosureIdentifier;
 
     /**
      * Calls a Closure.

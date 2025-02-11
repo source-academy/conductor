@@ -1,3 +1,9 @@
-import type { ExternValue } from "./ExternValue";
+import type { DataType } from "./DataType";
+import type { ExternTypeOf } from "./ExternTypeOf";
+import type { IFunctionSignature } from "./IFunctionSignature";
 
-export type ExternCallable = (...args: ExternValue[]) => ExternValue;
+type DataTypeMap<T extends readonly [...DataType[]]> = {
+    [Idx in keyof T]: ExternTypeOf<T[Idx]>
+};
+
+export type ExternCallable<T extends IFunctionSignature> = (...args: DataTypeMap<T["args"]>) => ExternTypeOf<T["returnType"]>;

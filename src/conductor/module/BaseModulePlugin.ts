@@ -57,7 +57,7 @@ export abstract class BaseModulePlugin implements IModulePlugin {
     array_type: (a: ArrayIdentifier) => DataType;
     array_set: (a: ArrayIdentifier, idx: number, v: ExternValue) => void;
 
-    closure_make: (sig: IFunctionSignature, func: ExternCallable, dependsOn?: Identifier[]) => ClosureIdentifier;
+    closure_make: <T extends IFunctionSignature>(sig: T, func: ExternCallable<T>, dependsOn?: Identifier[]) => ClosureIdentifier;
     closure_call: (c: ClosureIdentifier, args: ExternValue[]) => ExternValue;
 
     opaque_make: (v: any) => OpaqueIdentifier;
