@@ -13,7 +13,7 @@ const methods: readonly (Exclude<keyof IDataHandler, "hasDataInterface">)[] = [
 ];
 
 export abstract class BaseModulePlugin implements IModulePlugin {
-    abstract readonly channelAttach: InternalChannelName[];
+    abstract readonly channelAttach: string[];
     abstract init(conduit: IConduit, channels: IChannel<any>[]): void;
 
     abstract exports: IModuleExport[];
