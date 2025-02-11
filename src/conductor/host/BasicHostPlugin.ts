@@ -1,3 +1,4 @@
+import { Constant } from "../../common/Constant";
 import { ConductorInternalError } from "../../common/errors/ConductorInternalError";
 import { importExternalPlugin } from "../../common/util";
 import { ChannelQueue, IChannel, IChannelQueue, IConduit, IPlugin } from "../../conduit";
@@ -48,8 +49,17 @@ export abstract class BasicHostPlugin implements IHostPlugin {
     }
 
     serviceHandlers = new Map<ServiceMessageType, (message: IServiceMessage) => void>([
-        [ServiceMessageType.HELLO, function (message: serviceMessages.Hello) {
-            console.log(`runner is using api version ${message.data.version}`);
+        [ServiceMessageType.HELLO, function helloServiceHandler(message: serviceMessages.Hello) {
+            if (message.data.version < Constant.PROTOCOL_MIN_VERSION) {
+                this.serviceChannel.send(new serviceMessages.Abort(Constant.PROTOCOL_MIN_VERSION));
+                console.error(`Runner's protocol version (${message.data.version}) must be at least ${Constant.PROTOCOL_MIN_VERSION}`);
+            } else {
+                console.log(`Runner is using protocol version ${message.data.version}`);
+            }
+        }],
+        [ServiceMessageType.ABORT, function abortServiceHandler(message: serviceMessages.Abort) {
+            console.error(`Runner expects at least protocol version ${message.data.minVersion}, but we are on version ${Constant.PROTOCOL_VERSION}`);
+            this.conduit.terminate();
         }]
     ]);
 

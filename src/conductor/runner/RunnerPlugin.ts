@@ -1,3 +1,4 @@
+import { Constant } from "../../common/Constant";
 import { ConductorInternalError } from "../../common/errors/ConductorInternalError";
 import { importExternalPlugin } from "../../common/util";
 import { importExternalModule } from "../../common/util/importExternalModule";
@@ -36,10 +37,19 @@ export class RunnerPlugin implements IRunnerPlugin {
     }
 
     serviceHandlers = new Map<ServiceMessageType, (message: IServiceMessage) => void>([
-        [ServiceMessageType.HELLO, function (message: serviceMessages.Hello) {
-            console.log(`host is using api version ${message.data.version}`);
+        [ServiceMessageType.HELLO, function helloServiceHandler(message: serviceMessages.Hello) {
+            if (message.data.version < Constant.PROTOCOL_MIN_VERSION) {
+                this.serviceChannel.send(new serviceMessages.Abort(Constant.PROTOCOL_MIN_VERSION));
+                console.error(`Host's protocol version (${message.data.version}) must be at least ${Constant.PROTOCOL_MIN_VERSION}`);
+            } else {
+                console.log(`Host is using protocol version ${message.data.version}`);
+            }
         }],
-        [ServiceMessageType.ENTRY, function (message: serviceMessages.Entry) {
+        [ServiceMessageType.ABORT, function abortServiceHandler(message: serviceMessages.Abort) {
+            console.error(`Host expects at least protocol version ${message.data.minVersion}, but we are on version ${Constant.PROTOCOL_VERSION}`);
+            this.conduit.terminate();
+        }],
+        [ServiceMessageType.ENTRY, function entryServiceHandler(message: serviceMessages.Entry) {
             this.evaluator.startEvaluator(message.data);
         }]
     ]);
