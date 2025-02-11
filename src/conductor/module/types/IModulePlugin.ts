@@ -163,7 +163,21 @@ export interface IModulePlugin extends IPlugin {
      */
     closure_call<T extends DataType>(c: ClosureIdentifier, args: ExternValue[]): ReturnValue<T>;
 
+    /**
+     * Gets the value of a return.
+     * @param rv The Closure-returned value to extract the value from.
+     * @returns The return value.
+     */
     closure_returnvalue<T extends DataType>(rv: ReturnValue<T>): ExternTypeOf<T>;
+
+    /**
+     * Gets the value of a return, and checks its type.
+     * @param rv The Closure-returned value to extract the value from.
+     * @param type The expected type of the Closure-returned value.
+     * @returns The return value.
+     * @throws If the Closure-returned value's type is not as expected.
+     */
+    closure_returnvalue_checked<T extends DataType>(rv: ReturnValue<any>, type: T): ExternTypeOf<T>;
 
     /**
      * Asserts the arity of a Closure.

@@ -69,6 +69,10 @@ export abstract class BaseModulePlugin implements IModulePlugin {
     closure_returnvalue<T extends DataType>(rv: ReturnValue<T>): ExternTypeOf<T> {
         return rv[0];
     }
+    closure_returnvalue_checked<T extends DataType>(rv: ReturnValue<any>, type: T): ExternTypeOf<T> {
+        this.closure_returntype_assert(rv, type);
+        return rv[0];
+    }
     closure_arity_assert(c: ClosureIdentifier, arity: number): boolean {
         const a = this.closure_arity(c);
         if (a !== arity) throw new EvaluatorTypeError("Closure arity assertion failure", String(arity), String(a));
