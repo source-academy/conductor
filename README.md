@@ -15,6 +15,8 @@ Source Academy standard communication interface for languages
 
 ## Implementing a new language
 
+To get started, use the `conductor-runner-example` template. It contains a basic evaluator that calls Javascript's `eval` on the provided chunks.
+
 ### The IEvaluator interface
 
 To implement a new language using Conductor, implement the `conductor/runner/types/IEvaluator` interface.
