@@ -22,6 +22,11 @@ export default [{
             format: {
                 comments: /webpackIgnore/,
                 preserve_annotations: true
+            },
+            mangle: {
+                properties: {
+                    regex: /^__/
+                }
             }
         })],
         dir: "dist",
