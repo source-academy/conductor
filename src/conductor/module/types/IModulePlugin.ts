@@ -1,5 +1,5 @@
 import type { IPlugin } from "../../../conduit";
-import type { ArrayIdentifier, ClosureIdentifier, DataType, ExternCallable, ExternValue, Identifier, IDataHandler, IFunctionSignature, OpaqueIdentifier, PairIdentifier, ReturnValue } from "../../types";
+import type { ArrayIdentifier, ClosureIdentifier, DataType, ExternCallable, ExternValue, Identifier, IDataHandler, IFunctionSignature, OpaqueIdentifier, PairIdentifier, ReturnValue, ExternTypeOf } from "../../types";
 import type { IModuleExport } from "./IModuleExport";
 
 export interface IModulePlugin extends IPlugin {
@@ -163,6 +163,8 @@ export interface IModulePlugin extends IPlugin {
      */
     closure_call<T extends DataType>(c: ClosureIdentifier, args: ExternValue[]): ReturnValue<T>;
 
+    closure_returnvalue<T extends DataType>(rv: ReturnValue<T>): ExternTypeOf<T>;
+
     /**
      * Asserts the arity of a Closure.
      * @param c The Closure to assert the arity of.
@@ -177,7 +179,7 @@ export interface IModulePlugin extends IPlugin {
      * @param type The expected type of the Closure-returned value.
      * @throws If the Closure-returned value's type is not as expected.
      */
-    closure_returntype_assert<T extends DataType>(rv: ReturnValue<T>, type: T): rv is ReturnValue<T>;
+    closure_returntype_assert<T extends DataType>(rv: ReturnValue<T>, type: T): asserts rv is ReturnValue<T>;
 
     /**
      * Makes a new Opaque object.

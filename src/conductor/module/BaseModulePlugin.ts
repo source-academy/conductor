@@ -2,7 +2,8 @@ import { EvaluatorTypeError } from "../../common/errors";
 import { ConductorInternalError } from "../../common/errors/ConductorInternalError";
 import { IConduit, IChannel } from "../../conduit";
 import { InternalChannelName } from "../strings";
-import { IDataHandler, PairIdentifier, ExternValue, DataType, ArrayIdentifier, IFunctionSignature, ExternCallable, ClosureIdentifier, Identifier, OpaqueIdentifier, ReturnValue } from "../types";
+import { IDataHandler, PairIdentifier, ExternValue, DataType, ArrayIdentifier, IFunctionSignature, ExternCallable, ClosureIdentifier, Identifier, OpaqueIdentifier, ReturnValue, ExternTypeOf } from "../types";
+import { isSameType } from "../util";
 import { IModulePlugin, IModuleExport } from "./types";
 
 const methods: readonly (Exclude<keyof IDataHandler, "hasDataInterface">)[] = [
@@ -46,18 +47,18 @@ export abstract class BaseModulePlugin implements IModulePlugin {
     pair_assert(p: PairIdentifier, headType?: DataType, tailType?: DataType): boolean {
         if (headType) {
             const t = this.pair_typehead(p);
-            if (t !== headType) throw new EvaluatorTypeError("Pair head assertion failure", DataType[headType], DataType[t]);
+            if (!isSameType(t, headType)) throw new EvaluatorTypeError("Pair head assertion failure", DataType[headType], DataType[t]);
         }
         if (tailType) {
             const t = this.pair_typetail(p);
-            if (t !== tailType) throw new EvaluatorTypeError("Pair tail assertion failure", DataType[tailType], DataType[t]);
+            if (!isSameType(t, tailType)) throw new EvaluatorTypeError("Pair tail assertion failure", DataType[tailType], DataType[t]);
         }
         return true;
     }
     array_assert(a: ArrayIdentifier, type?: DataType, length?: number): boolean {
         if (type) {
             const t = this.array_type(a);
-            if (t !== type) throw new EvaluatorTypeError("Array type assertion failure", DataType[type], DataType[t]);
+            if (!isSameType(t, type)) throw new EvaluatorTypeError("Array type assertion failure", DataType[type], DataType[t]);
         }
         if (length) {
             const l = this.array_length(a);
@@ -65,15 +66,17 @@ export abstract class BaseModulePlugin implements IModulePlugin {
         }
         return true;
     }
+    closure_returnvalue<T extends DataType>(rv: ReturnValue<T>): ExternTypeOf<T> {
+        return rv[0];
+    }
     closure_arity_assert(c: ClosureIdentifier, arity: number): boolean {
         const a = this.closure_arity(c);
         if (a !== arity) throw new EvaluatorTypeError("Closure arity assertion failure", String(arity), String(a));
         return true;
     }
-    closure_returntype_assert<T extends DataType>(rv: ReturnValue<any>, type: T): rv is ReturnValue<T> {
+    closure_returntype_assert<T extends DataType>(rv: ReturnValue<any>, type: T): asserts rv is ReturnValue<T> {
         const [_returnValue, returnType] = rv;
-        if (returnType !== type) throw new EvaluatorTypeError("Closure return type assertion failure", DataType[type], DataType[returnType]);
-        return true;
+        if (isSameType(returnType, type)) throw new EvaluatorTypeError("Closure return type assertion failure", DataType[type], DataType[returnType]);
     }
 
     // To be populated by hook():

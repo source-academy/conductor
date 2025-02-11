@@ -14,6 +14,7 @@ type typeMap = {
     [DataType.ARRAY]: ArrayIdentifier;
     [DataType.CLOSURE]: ClosureIdentifier;
     [DataType.OPAQUE]: OpaqueIdentifier;
+    [DataType.LIST]: PairIdentifier | null;
 }
 
 export type ExternTypeOf<T> = T extends DataType ? typeMap[T] : never;
