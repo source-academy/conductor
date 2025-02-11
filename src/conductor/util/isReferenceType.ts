@@ -13,6 +13,6 @@ const lookupTable = {
     [DataType.LIST]: true, // technically not, but easier to do this due to pair being so
 }
 
-export function isReferenceType(this: IDataHandler, type: DataType): boolean {
+export function isReferenceType(type: DataType): boolean {
     return lookupTable[type];
 }
