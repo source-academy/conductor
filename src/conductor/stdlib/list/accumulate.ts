@@ -12,7 +12,7 @@ import { isReferenceType } from "../../util/isReferenceType";
 export function accumulate<U extends Exclude<DataType, DataType.VOID>>(this: IDataHandler, resultType: U, op: ClosureIdentifier, initial: ExternTypeOf<U>, sequence: List): ExternTypeOf<U> {
     // Use CPS to prevent stack overflow
     const $accumulate = this.closure_make(
-        {args: [DataType.LIST, DataType.CLOSURE] as const, returnType: resultType},
+        {args: [DataType.LIST, DataType.CLOSURE], returnType: resultType},
         (xs, cont) => {
             if (xs === null) {
                 return this.closure_returnvalue_checked(this.closure_call(cont, [initial]), resultType);

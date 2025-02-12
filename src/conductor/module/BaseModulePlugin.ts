@@ -59,7 +59,7 @@ export abstract class BaseModulePlugin implements IModulePlugin {
     array_set!: (a: ArrayIdentifier, idx: number, v: ExternValue) => void;
     array_assert!: (a: ArrayIdentifier, type?: DataType, length?: number) => boolean;
 
-    closure_make!: <T extends IFunctionSignature>(sig: T, func: ExternCallable<T>, dependsOn?: (Identifier | null)[]) => ClosureIdentifier;
+    closure_make!: <const T extends IFunctionSignature>(sig: T, func: ExternCallable<T>, dependsOn?: (Identifier | null)[]) => ClosureIdentifier;
     closure_arity!: (c: ClosureIdentifier) => number;
     closure_call!: <T extends DataType>(c: ClosureIdentifier, args: ExternValue[]) => ReturnValue<T>;
     closure_returnvalue!: <T extends DataType>(rv: ReturnValue<T>) => ExternTypeOf<T>;

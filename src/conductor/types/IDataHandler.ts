@@ -119,7 +119,7 @@ export interface IDataHandler {
      * @param dependsOn An optional array of Identifiers the Closure will depend on.
      * @returns An identifier to the new Closure.
      */
-    closure_make<T extends IFunctionSignature>(sig: T, func: ExternCallable<T>, dependsOn?: (Identifier | null)[]): Identifier; // not ClosureIdentifier
+    closure_make<const T extends IFunctionSignature>(sig: T, func: ExternCallable<T>, dependsOn?: (Identifier | null)[]): Identifier; // not ClosureIdentifier
 
     /**
      * Gets the arity (number of parameters) of a Closure.
