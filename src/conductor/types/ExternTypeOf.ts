@@ -18,4 +18,5 @@ type typeMap = {
     [DataType.LIST]: List;
 }
 
+/** Maps the Conductor DataTypes to their corresponding native types. */
 export type ExternTypeOf<T> = T extends DataType ? typeMap[T] : never;
