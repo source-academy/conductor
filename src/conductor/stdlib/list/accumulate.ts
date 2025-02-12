@@ -1,5 +1,5 @@
 import { ClosureIdentifier, DataType, ExternTypeOf, IDataHandler, Identifier, List, ReturnValue } from "../../types"
-import { isReferenceType } from "../../util/isReferenceType";
+import { isReferenceType } from "../../util";
 
 /**
  * Accumulate applies given operation op to elements of a list
