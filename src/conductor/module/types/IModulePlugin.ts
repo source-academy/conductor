@@ -146,14 +146,14 @@ export interface IModulePlugin extends IPlugin {
      * @param dependsOn An optional array of Identifiers the Closure will depend on.
      * @returns An identifier to the new Closure.
      */
-    closure_make<const T extends IFunctionSignature>(sig: T, func: ExternCallable<T>, dependsOn?: (Identifier | null)[]): ClosureIdentifier;
+    closure_make<const T extends IFunctionSignature>(sig: T, func: ExternCallable<T>, dependsOn?: (Identifier | null)[]): ClosureIdentifier<T["returnType"]>;
 
     /**
      * Gets the arity (number of parameters) of a Closure.
      * @param c The Closure to get the arity of.
      * @returns The arity of the Closure.
      */
-    closure_arity(c: ClosureIdentifier): number;
+    closure_arity(c: ClosureIdentifier<DataType>): number;
 
     /**
      * Calls a Closure.
@@ -161,7 +161,7 @@ export interface IModulePlugin extends IPlugin {
      * @param args An array of arguments to be passed to the Closure.
      * @returns A tuple of the returned value, and its type.
      */
-    closure_call<T extends DataType>(c: ClosureIdentifier, args: ExternValue[]): ReturnValue<T>;
+    closure_call<T extends DataType>(c: ClosureIdentifier<T>, args: ExternValue[]): ReturnValue<NoInfer<T>>;
 
     /**
      * Gets the value of a return.
@@ -185,7 +185,7 @@ export interface IModulePlugin extends IPlugin {
      * @param arity The expected arity of the Closure.
      * @throws If the Closure's arity is not as expected.
      */
-    closure_arity_assert(c: ClosureIdentifier, arity: number): boolean;
+    closure_arity_assert(c: ClosureIdentifier<DataType>, arity: number): boolean;
 
     /**
      * Asserts the type of a Closure-returned value.

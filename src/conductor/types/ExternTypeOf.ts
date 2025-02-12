@@ -13,7 +13,7 @@ type typeMap = {
     [DataType.EMPTY_LIST]: null;
     [DataType.PAIR]: PairIdentifier;
     [DataType.ARRAY]: ArrayIdentifier;
-    [DataType.CLOSURE]: ClosureIdentifier;
+    [DataType.CLOSURE]: ClosureIdentifier<DataType>;
     [DataType.OPAQUE]: OpaqueIdentifier;
     [DataType.LIST]: List;
 }

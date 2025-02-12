@@ -59,12 +59,12 @@ export abstract class BaseModulePlugin implements IModulePlugin {
     array_set!: (a: ArrayIdentifier, idx: number, v: ExternValue) => void;
     array_assert!: (a: ArrayIdentifier, type?: DataType, length?: number) => boolean;
 
-    closure_make!: <const T extends IFunctionSignature>(sig: T, func: ExternCallable<T>, dependsOn?: (Identifier | null)[]) => ClosureIdentifier;
-    closure_arity!: (c: ClosureIdentifier) => number;
-    closure_call!: <T extends DataType>(c: ClosureIdentifier, args: ExternValue[]) => ReturnValue<T>;
+    closure_make!: <const T extends IFunctionSignature>(sig: T, func: ExternCallable<T>, dependsOn?: (Identifier | null)[]) => ClosureIdentifier<T["returnType"]>;
+    closure_arity!: (c: ClosureIdentifier<DataType>) => number;
+    closure_call!: <T extends DataType> (c: ClosureIdentifier<T>, args: ExternValue[]) => ReturnValue<NoInfer<T>>;
     closure_returnvalue!: <T extends DataType>(rv: ReturnValue<T>) => ExternTypeOf<T>;
     closure_returnvalue_checked!: <T extends DataType>(rv: ReturnValue<any>, type: T) => ExternTypeOf<T>;
-    closure_arity_assert!: (c: ClosureIdentifier, arity: number) => boolean;
+    closure_arity_assert!: (c: ClosureIdentifier<DataType>, arity: number) => boolean;
     closure_returntype_assert!: <T extends DataType>(rv: ReturnValue<T>, type: T) => asserts rv is ReturnValue<T>;
 
     opaque_make!: (v: any) => OpaqueIdentifier;
