@@ -132,28 +132,29 @@ export interface IDataHandler {
     closure_arity(c: ClosureIdentifier<DataType>): number;
 
     /**
+     * Calls a Closure and checks the type of the returned value.
+     * @param c The Closure to be called.
+     * @param args An array of arguments to be passed to the Closure.
+     * @param returnType The expected type of the returned value.
+     * @returns The returned value.
+     */
+    closure_call<T extends DataType>(c: ClosureIdentifier<DataType>, args: ExternValue[], returnType: T): ExternTypeOf<NoInfer<T>>;
+
+    /**
      * Calls a Closure.
      * @param c The Closure to be called.
      * @param args An array of arguments to be passed to the Closure.
-     * @returns A tuple of the returned value, and its type.
+     * @returns The returned value.
      */
-    closure_call<T extends DataType>(c: ClosureIdentifier<T>, args: ExternValue[]): ReturnValue<NoInfer<T>>;
+    closure_call_unchecked(c: ClosureIdentifier<DataType>, args: ExternValue[]): ExternValue;
 
     /**
-     * Gets the value of a return.
-     * @param rv The Closure-returned value to extract the value from.
-     * @returns The return value.
+     * Calls a Closure of known return type.
+     * @param c The Closure to be called.
+     * @param args An array of arguments to be passed to the Closure.
+     * @returns The returned value.
      */
-    closure_returnvalue<T extends DataType>(rv: ReturnValue<T>): ExternTypeOf<T>;
-
-    /**
-     * Gets the value of a return, and checks its type.
-     * @param rv The Closure-returned value to extract the value from.
-     * @param type The expected type of the Closure-returned value.
-     * @returns The return value.
-     * @throws If the Closure-returned value's type is not as expected.
-     */
-    closure_returnvalue_checked<T extends DataType>(rv: ReturnValue<any>, type: T): ExternTypeOf<T>;
+    closure_call_unchecked<T extends DataType>(c: ClosureIdentifier<T>, args: ExternValue[]): ExternTypeOf<NoInfer<T>>;
 
     /**
      * Asserts the arity of a Closure.
@@ -162,14 +163,6 @@ export interface IDataHandler {
      * @throws If the Closure's arity is not as expected.
      */
     closure_arity_assert(c: ClosureIdentifier<DataType>, arity: number): boolean;
-
-    /**
-     * Asserts the type of a Closure-returned value.
-     * @param rv The Closure-returned value to assert the type of.
-     * @param type The expected type of the Closure-returned value.
-     * @throws If the Closure-returned value's type is not as expected.
-     */
-    closure_returntype_assert<T extends DataType>(rv: ReturnValue<T>, type: T): asserts rv is ReturnValue<T>;
 
     /**
      * Makes a new Opaque object.
