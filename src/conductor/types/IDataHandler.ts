@@ -195,6 +195,6 @@ export interface IDataHandler {
     ///// Standard library functions
 
     is_list(xs: List): boolean;
-    accumulate<T extends Exclude<DataType, DataType.VOID>>(resultType: T, op: ClosureIdentifier<DataType>, initial: ExternTypeOf<T>, sequence: List): ExternTypeOf<T>;
+    accumulate<T extends Exclude<DataType, DataType.VOID>>(op: ClosureIdentifier<DataType>, initial: ExternTypeOf<T>, sequence: List, resultType: T): ExternTypeOf<T>;
     length(xs: List): number;
 }
