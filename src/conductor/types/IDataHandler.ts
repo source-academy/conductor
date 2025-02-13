@@ -10,7 +10,7 @@ export interface IDataHandler {
      * Makes a new Pair.
      * @returns An identifier to the new Pair.
      */
-    pair_make(): Identifier; // not PairIdentifier so evaluators do not need to cast
+    pair_make(): PairIdentifier;
 
     /**
      * Gets the value in the head of a Pair.
@@ -72,7 +72,7 @@ export interface IDataHandler {
      * @param init An optional initial value for the elements of the Array
      * @returns An identifier to the new Array.
      */
-    array_make(t: DataType, len: number, init?: ExternValue): Identifier; // not ArrayIdentifier
+    array_make(t: DataType, len: number, init?: ExternValue): ArrayIdentifier;
 
     /**
      * Gets the length of an Array.
@@ -122,7 +122,7 @@ export interface IDataHandler {
      * @param dependsOn An optional array of Identifiers the Closure will depend on.
      * @returns An identifier to the new Closure.
      */
-    closure_make<const T extends IFunctionSignature>(sig: T, func: ExternCallable<T>, dependsOn?: (Identifier | null)[]): Identifier; // not ClosureIdentifier
+    closure_make<const T extends IFunctionSignature>(sig: T, func: ExternCallable<T>, dependsOn?: (Identifier | null)[]): ClosureIdentifier<T["returnType"]>;
 
     /**
      * Gets the arity (number of parameters) of a Closure.
@@ -176,7 +176,7 @@ export interface IDataHandler {
      * @param v The value to be stored under this Opaque object.
      * @returns An identifier to the new Opaque object.
      */
-    opaque_make(v: any): Identifier; // not OpaqueIdentifier
+    opaque_make(v: any): OpaqueIdentifier;
 
     /**
      * Gets the value stored under an Opaque object.
