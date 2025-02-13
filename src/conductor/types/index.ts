@@ -20,4 +20,5 @@ export type { PairIdentifier } from "./PairIdentifier";
 export type { ReturnValue } from "./ReturnValue";
 export { RunnerStatus } from "./RunnerStatus";
 export { ServiceMessageType } from "./ServiceMessageType";
+export type { StdlibFunction } from "./StdlibFunction";
 export * as serviceMessages from "./serviceMessages";

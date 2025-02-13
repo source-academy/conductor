@@ -1,10 +1,10 @@
 import type { IPlugin } from "../../../conduit";
-import type { ArrayIdentifier, ClosureIdentifier, DataType, ExternCallable, ExternValue, Identifier, IDataHandler, IFunctionSignature, OpaqueIdentifier, PairIdentifier, ReturnValue, ExternTypeOf } from "../../types";
+import type { ArrayIdentifier, ClosureIdentifier, DataType, ExternCallable, ExternValue, Identifier, IDataHandler, IFunctionSignature, OpaqueIdentifier, PairIdentifier, ReturnValue, ExternTypeOf, List } from "../../types";
 import type { IModuleExport } from "./IModuleExport";
 
 export interface IModulePlugin extends IPlugin {
-    exports: IModuleExport[];
-
+    readonly exports: IModuleExport[];
+    
     /**
      * Hooks an evaluator up to this module.
      * @param evaluator The evaluator we are interacting with.
@@ -29,6 +29,8 @@ export interface IModulePlugin extends IPlugin {
      * @throws ConductorInternalError if the module has not been hooked up.
      */
     verifyHooked(): void;
+
+    ///// Data Handling Functions
 
     /**
      * Makes a new Pair.
@@ -222,4 +224,10 @@ export interface IModulePlugin extends IPlugin {
      * @param dependee The tied dependee object.
      */
     untie(dependent: Identifier, dependee: Identifier | null): void;
+    
+    ///// Standard library functions
+
+    is_list(xs: List): boolean;
+    accumulate<T extends Exclude<DataType, DataType.VOID>>(resultType: T, op: ClosureIdentifier<DataType>, initial: ExternTypeOf<T>, sequence: List): ExternTypeOf<T>;
+    length(xs: List): number;
 }

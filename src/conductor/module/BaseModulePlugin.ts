@@ -1,14 +1,17 @@
 import { ConductorInternalError } from "../../common/errors/ConductorInternalError";
 import { IConduit, IChannel } from "../../conduit";
-import { IDataHandler, PairIdentifier, ExternValue, DataType, ArrayIdentifier, IFunctionSignature, ExternCallable, ClosureIdentifier, Identifier, OpaqueIdentifier, ReturnValue, ExternTypeOf } from "../types";
+import { IDataHandler, PairIdentifier, ExternValue, DataType, ArrayIdentifier, IFunctionSignature, ExternCallable, ClosureIdentifier, Identifier, OpaqueIdentifier, ReturnValue, ExternTypeOf, List } from "../types";
 import { IModulePlugin, IModuleExport } from "./types";
 
-const methods: readonly (Exclude<keyof IDataHandler, "hasDataInterface">)[] = [
+const methods: readonly (Exclude<keyof IDataHandler, "hasDataInterface" | "stdlib">)[] = [
+    ///// Data Handling Functions
     "pair_make", "pair_gethead", "pair_typehead", "pair_sethead", "pair_gettail", "pair_typetail", "pair_settail", "pair_assert",
     "array_make", "array_length", "array_get", "array_type", "array_set", "array_assert",
     "closure_make", "closure_arity", "closure_call", "closure_returnvalue", "closure_returnvalue_checked", "closure_arity_assert", "closure_returntype_assert",
     "opaque_make", "opaque_get",
-    "tie", "untie"
+    "tie", "untie",
+    ///// Standard library functions
+    "is_list", "accumulate", "length",
 ];
 
 export abstract class BaseModulePlugin implements IModulePlugin {
@@ -72,4 +75,8 @@ export abstract class BaseModulePlugin implements IModulePlugin {
 
     tie!: (dependent: Identifier, dependee: Identifier | null) => void;
     untie!: (dependent: Identifier, dependee: Identifier | null) => void;
+
+    is_list!: (xs: List) => boolean;
+    accumulate!: <T extends Exclude<DataType, DataType.VOID>>(resultType: T, op: ClosureIdentifier<DataType>, initial: ExternTypeOf<T>, sequence: List) => ExternTypeOf<T>;
+    length!: (xs: List) => number;
 }
