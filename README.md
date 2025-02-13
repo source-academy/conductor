@@ -45,6 +45,7 @@ Consult `sa-languages` repository for more information. (TODO)
 
 Several standard data types are available for module-language interfacing.
 Some are passed directly as JS values, others as identifiers. See `conductor/types/DataType`.
+Note that all identifiers across data types must be unique - in other words, a raw identifier must be able to be mapped back to the correct data.
 
 | Data type    | Passed as  | Notes                                                         |
 | ------------ | ---------- | ------------------------------------------------------------- |
