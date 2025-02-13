@@ -19,6 +19,7 @@ export class Channel<T> implements IChannel<T> {
     }
     subscribe(subscriber: Subscriber<T>): void {
         this.__verifyAlive();
+        this.__port?.start();
         this.__subscribers.add(subscriber);
     }
     unsubscribe(subscriber: Subscriber<T>): void {
@@ -51,12 +52,12 @@ export class Channel<T> implements IChannel<T> {
     }
 
     /**
-     * Listens to the port's message event, and starts the port.
+     * Listens to the port's message event, and starts the port if there are subscribers (otherwise it will be started in the subscribe method).
      * @param port The MessagePort to listen to.
      */
     listenToPort(port: MessagePort): void {
         port.addEventListener("message", e => this.__dispatch(e.data));
-        port.start();
+        if (this.__subscribers.size > 0) port.start();
     }
 
     /**
