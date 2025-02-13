@@ -141,14 +141,6 @@ export interface IDataHandler {
     closure_call<T extends DataType>(c: ClosureIdentifier<DataType>, args: ExternValue[], returnType: T): ExternTypeOf<NoInfer<T>>;
 
     /**
-     * Calls a Closure.
-     * @param c The Closure to be called.
-     * @param args An array of arguments to be passed to the Closure.
-     * @returns The returned value.
-     */
-    closure_call_unchecked(c: ClosureIdentifier<DataType>, args: ExternValue[]): ExternValue;
-
-    /**
      * Calls a Closure of known return type.
      * @param c The Closure to be called.
      * @param args An array of arguments to be passed to the Closure.
