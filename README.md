@@ -57,9 +57,15 @@ Some are passed directly as JS values, others as identifiers. See `conductor/typ
 | array        | Identifier | Arrays are singly-typed                                       |
 | closure      | Identifier | Closures have fixed arity                                     |
 | opaque       | Identifier | For values that can manipulated only by modules (e.g. a Rune) |
+| list         | see notes  | Either a Pair (passed by identifier) or empty list (null\*)   |
 
 \* as a convention, `undefined` is passed as the JS value for void type, and `null` is passed as the JS value for empty list type,
-though it is always better to check the data type specified than to test for equality using the JS values.
+though it is always better to check the data type to be retrieved using the `*_type` functions than to test for equality using the JS values.
+Currently, an equality comparison with null is required to distinguish between a `Pair` and the empty list when accepting a parameter of the type List,
+though it is hoped that an alternative can be found soon.
+
+Note that language implementations **are expected to verify that the types of arguments to external closures are correct**,
+as it is not possible for the data type to be retrieved from a raw Identifier.
 
 ### Communication interface
 
@@ -68,3 +74,7 @@ Thus, evaluators are responsible for providing functions to allow modules to rea
 
 Each of the data types passed as identifier have functions to create an instance of that data type,
 as well as read and write data to it (or call it, in the case of closures). See `conductor/types/IDataHandler`.
+
+### Standard library
+
+A standard library of functions must be made available to modules. See `conductor/stdlib` for sample implementations.
