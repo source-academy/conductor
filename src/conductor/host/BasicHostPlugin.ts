@@ -1,10 +1,10 @@
 import { Constant } from "../../common/Constant";
-import { ConductorInternalError } from "../../common/errors/ConductorInternalError";
+import type { ConductorError } from "../../common/errors";
 import { importExternalPlugin } from "../../common/util";
-import { ChannelQueue, IChannel, IChannelQueue, IConduit, IPlugin } from "../../conduit";
+import { IChannel, IConduit, IPlugin } from "../../conduit";
 import { makeRpc } from "../../conduit/rpc";
 import { InternalChannelName, InternalPluginName } from "../strings";
-import { AbortServiceMessage, Chunk, EntryServiceMessage, HelloServiceMessage, IChunkMessage, IIOMessage, IServiceMessage, IStatusMessage, RunnerStatus } from "../types";
+import { AbortServiceMessage, Chunk, EntryServiceMessage, HelloServiceMessage, IChunkMessage, IErrorMessage, IIOMessage, IServiceMessage, IStatusMessage, RunnerStatus } from "../types";
 import { ServiceMessageType } from "../types";
 import { IHostFileRpc, IHostPlugin } from "./types";
 
@@ -14,13 +14,14 @@ export abstract class BasicHostPlugin implements IHostPlugin {
     private __conduit!: IConduit;
     private __chunkChannel!: IChannel<IChunkMessage>;
     private __serviceChannel!: IChannel<IServiceMessage>;
-    private __ioQueue!: IChannelQueue<IIOMessage>;
-    private __statusChannel!: IChannel<IStatusMessage>;
+    private __ioChannel!: IChannel<IIOMessage>;
+
+    private readonly __status = new Map<RunnerStatus, boolean>();
 
     private __chunkCount: number = 0;
 
-    readonly channelAttach = [InternalChannelName.FILE, InternalChannelName.CHUNK, InternalChannelName.SERVICE, InternalChannelName.STANDARD_IO, InternalChannelName.STATUS];
-    init(conduit: IConduit, [fileChannel, chunkChannel, serviceChannel, ioChannel, statusChannel]: IChannel<any>[]): void {
+    readonly channelAttach = [InternalChannelName.FILE, InternalChannelName.CHUNK, InternalChannelName.SERVICE, InternalChannelName.STANDARD_IO, InternalChannelName.ERROR, InternalChannelName.STATUS];
+    init(conduit: IConduit, [fileChannel, chunkChannel, serviceChannel, ioChannel, errorChannel, statusChannel]: IChannel<any>[]): void {
         this.__conduit = conduit;
 
         makeRpc<IHostFileRpc, {}>(fileChannel, {
@@ -30,12 +31,15 @@ export abstract class BasicHostPlugin implements IHostPlugin {
         this.__chunkChannel = chunkChannel;
         this.__serviceChannel = serviceChannel;
 
-        this.__ioQueue = new ChannelQueue(ioChannel);
+        this.__ioChannel = ioChannel;
         ioChannel.subscribe((ioMessage: IIOMessage) => this.receiveOutput?.(ioMessage.message));
 
-        this.__statusChannel = statusChannel;
+        errorChannel.subscribe((errorMessage: IErrorMessage) => this.receiveError?.(errorMessage.error));
+
         statusChannel.subscribe((statusMessage: IStatusMessage) => {
-            this.receiveStatusUpdate?.(statusMessage.status, statusMessage.isActive);
+            const {status, isActive} = statusMessage;
+            this.__status.set(status, isActive);
+            this.receiveStatusUpdate?.(status, isActive);
         });
 
         this.__serviceChannel.send(new HelloServiceMessage());
@@ -71,30 +75,18 @@ export abstract class BasicHostPlugin implements IHostPlugin {
     }
 
     sendInput(message: string): void {
-        this.__ioQueue.send({ message });
-    }
-
-    async requestOutput(): Promise<string> {
-        return (await this.__ioQueue.receive()).message;
-    }
-
-    tryRequestOutput(): string | undefined {
-        return this.__ioQueue.tryReceive()?.message;
+        this.__ioChannel.send({ message });
     }
 
     receiveOutput?(message: string): void;
 
-    async requestError(): Promise<string> { // TODO: separate error channel
-        throw new ConductorInternalError("unimplemented");
+    receiveError?(message: ConductorError): void;
+
+    isStatusActive(status: RunnerStatus): boolean {
+        return this.__status.get(status) ?? false;
     }
 
-    tryRequestError(): string | undefined { // TODO: separate error channel
-        throw new ConductorInternalError("unimplemented");
-    }
-
-    receiveError?(message: string): void; // TODO: separate error channel
-
-    receiveStatusUpdate?(status: RunnerStatus, isActive: boolean): void; // TODO: hook up to channel
+    receiveStatusUpdate?(status: RunnerStatus, isActive: boolean): void;
 
     registerPlugin(plugin: IPlugin): void {
         this.__conduit.registerPlugin(plugin);

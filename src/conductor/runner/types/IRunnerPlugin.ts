@@ -1,6 +1,7 @@
-import { IPlugin } from "../../../conduit";
-import { IModulePlugin } from "../../module";
-import { Chunk, RunnerStatus } from "../../types";
+import type { ConductorError } from "../../../common/errors";
+import type { IPlugin } from "../../../conduit";
+import type { IModulePlugin } from "../../module";
+import type { Chunk, RunnerStatus } from "../../types";
 
 export interface IRunnerPlugin extends IPlugin {
     /**
@@ -35,10 +36,10 @@ export interface IRunnerPlugin extends IPlugin {
     sendOutput(message: string): void;
 
     /**
-     * Sends a message on standard-error.
-     * @param message The error message to send.
+     * Sends an error.
+     * @param error The error to send.
      */
-    sendError(message: string): void;
+    sendError(error: ConductorError): void;
 
     /**
      * Provide a status update of the runner.

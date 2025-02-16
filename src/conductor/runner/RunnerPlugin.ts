@@ -1,4 +1,5 @@
 import { Constant } from "../../common/Constant";
+import type { ConductorError } from "../../common/errors";
 import { ConductorInternalError } from "../../common/errors/ConductorInternalError";
 import { importExternalPlugin } from "../../common/util";
 import { importExternalModule } from "../../common/util/importExternalModule";
@@ -8,7 +9,7 @@ import { Remote } from "../../conduit/rpc/types";
 import { IHostFileRpc } from "../host/types";
 import { IModulePlugin } from "../module";
 import { InternalChannelName, InternalPluginName } from "../strings";
-import { Chunk, IChunkMessage, IServiceMessage, IIOMessage, IStatusMessage, RunnerStatus, ServiceMessageType, HelloServiceMessage, AbortServiceMessage, type EntryServiceMessage } from "../types";
+import { Chunk, IChunkMessage, IServiceMessage, IIOMessage, IStatusMessage, RunnerStatus, ServiceMessageType, HelloServiceMessage, AbortServiceMessage, type EntryServiceMessage, IErrorMessage } from "../types";
 import { IRunnerPlugin, IEvaluator, IInterfacableEvaluator } from "./types";
 
 export class RunnerPlugin implements IRunnerPlugin {
@@ -21,15 +22,17 @@ export class RunnerPlugin implements IRunnerPlugin {
     private __chunkQueue!: IChannelQueue<IChunkMessage>;
     private __serviceChannel!: IChannel<IServiceMessage>;
     private __ioQueue!: IChannelQueue<IIOMessage>;
+    private __errorChannel!: IChannel<IErrorMessage>;
     private __statusChannel!: IChannel<IStatusMessage>;
 
-    readonly channelAttach = [InternalChannelName.FILE, InternalChannelName.CHUNK, InternalChannelName.SERVICE, InternalChannelName.STANDARD_IO, InternalChannelName.STATUS];
-    init(conduit: IConduit, [fileChannel, chunkChannel, serviceChannel, ioChannel, statusChannel]: IChannel<any>[]): void {
+    readonly channelAttach = [InternalChannelName.FILE, InternalChannelName.CHUNK, InternalChannelName.SERVICE, InternalChannelName.STANDARD_IO, InternalChannelName.ERROR, InternalChannelName.STATUS];
+    init(conduit: IConduit, [fileChannel, chunkChannel, serviceChannel, ioChannel, errorChannel, statusChannel]: IChannel<any>[]): void {
         this.__conduit = conduit;
         this.__fileRpc = makeRpc<{}, IHostFileRpc>(fileChannel, {});
         this.__chunkQueue = new ChannelQueue(chunkChannel);
         this.__serviceChannel = serviceChannel;
         this.__ioQueue = new ChannelQueue(ioChannel);
+        this.__errorChannel = errorChannel;
         this.__statusChannel = statusChannel;
 
         this.__serviceChannel.send(new HelloServiceMessage());
@@ -80,8 +83,8 @@ export class RunnerPlugin implements IRunnerPlugin {
         this.__ioQueue.send({ message });
     }
 
-    sendError(message: string): void { // TODO: separate error channel
-        throw new ConductorInternalError("unimplemented");
+    sendError(error: ConductorError): void {
+        this.__errorChannel.send({ error });
     }
 
     updateStatus(status: RunnerStatus, isActive: boolean): void {

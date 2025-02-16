@@ -1,5 +1,6 @@
-import { IPlugin } from "../../../conduit";
-import { Chunk, RunnerStatus } from "../../types";
+import type { ConductorError } from "../../../common/errors";
+import type { IPlugin } from "../../../conduit";
+import type { Chunk, RunnerStatus } from "../../types";
 
 export interface IHostPlugin extends IPlugin {
     /**
@@ -27,17 +28,17 @@ export interface IHostPlugin extends IPlugin {
      */
     sendInput(input: string): void;
 
-    /**
-     * Request for some output on standard-output.
-     * @returns A promise resolving to the output received.
-     */
-    requestOutput(): Promise<string>;
+    // /**
+    //  * Request for some output on standard-output.
+    //  * @returns A promise resolving to the output received.
+    //  */
+    // requestOutput(): Promise<string>;
 
-    /**
-     * Try to request for some output on standard-output.
-     * @returns The output received, or undefined if there is currently no output.
-     */
-    tryRequestOutput(): string | undefined;
+    // /**
+    //  * Try to request for some output on standard-output.
+    //  * @returns The output received, or undefined if there is currently no output.
+    //  */
+    // tryRequestOutput(): string | undefined;
 
     /**
      * An event handler called when an output is received.
@@ -45,23 +46,30 @@ export interface IHostPlugin extends IPlugin {
      */
     receiveOutput?(message: string): void;
 
-    /**
-     * Request for some output on standard-error.
-     * @returns A promise resolving to the error received.
-     */
-    requestError(): Promise<string>;
+    // /**
+    //  * Request for some output on standard-error.
+    //  * @returns A promise resolving to the error received.
+    //  */
+    // requestError(): Promise<ConductorError>;
 
-    /**
-     * Try to request for some output on standard-error.
-     * @returns The error received, or undefined if there is currently no error.
-     */
-    tryRequestError(): string | undefined;
+    // /**
+    //  * Try to request for some output on standard-error.
+    //  * @returns The error received, or undefined if there is currently no error.
+    //  */
+    // tryRequestError(): ConductorError | undefined;
 
     /**
      * An event handler called when an error is received.
      * @param message The error received.
      */
-    receiveError?(message: string): void;
+    receiveError?(message: ConductorError): void;
+
+    /**
+     * Checks if a runner status is active.
+     * @param status The runner status to check.
+     * @returns true if the given status is active.
+     */
+    isStatusActive(status: RunnerStatus): boolean;
 
     /**
      * An event handler called when a status update is received.
@@ -85,6 +93,7 @@ export interface IHostPlugin extends IPlugin {
     /**
      * Imports an external plugin and registers it with the conduit.
      * @param location The location of the external plugin.
+     * @returns The imported plugin.
      */
     importAndRegisterExternalPlugin(location: string): Promise<IPlugin>;
 }
