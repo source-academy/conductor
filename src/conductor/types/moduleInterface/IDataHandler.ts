@@ -137,7 +137,7 @@ export interface IDataHandler {
      * @param returnType The expected type of the returned value.
      * @returns The returned value.
      */
-    closure_call<T extends DataType>(c: ClosureIdentifier<DataType>, args: ExternValue[], returnType: T): ExternTypeOf<NoInfer<T>>;
+    closure_call<T extends DataType>(c: ClosureIdentifier<DataType>, args: ExternValue[], returnType: T): Promise<ExternTypeOf<NoInfer<T>>>;
 
     /**
      * Calls a Closure of known return type.
@@ -145,7 +145,7 @@ export interface IDataHandler {
      * @param args An array of arguments to be passed to the Closure.
      * @returns The returned value.
      */
-    closure_call_unchecked<T extends DataType>(c: ClosureIdentifier<T>, args: ExternValue[]): ExternTypeOf<NoInfer<T>>;
+    closure_call_unchecked<T extends DataType>(c: ClosureIdentifier<T>, args: ExternValue[]): Promise<ExternTypeOf<NoInfer<T>>>;
 
     /**
      * Asserts the arity of a Closure.
@@ -186,6 +186,6 @@ export interface IDataHandler {
     ///// Standard library functions
 
     is_list(xs: List): boolean;
-    accumulate<T extends Exclude<DataType, DataType.VOID>>(op: ClosureIdentifier<DataType>, initial: ExternTypeOf<T>, sequence: List, resultType: T): ExternTypeOf<T>;
+    accumulate<T extends Exclude<DataType, DataType.VOID>>(op: ClosureIdentifier<DataType>, initial: ExternTypeOf<T>, sequence: List, resultType: T): Promise<ExternTypeOf<T>>;
     length(xs: List): number;
 }
