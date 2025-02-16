@@ -7,4 +7,4 @@ type DataTypeMap<T extends readonly [...DataType[]]> = {
 };
 
 /** The expected function type based on an IFunctionSignature. */
-export type ExternCallable<T extends IFunctionSignature> = (...args: DataTypeMap<T["args"]>) => ExternTypeOf<T["returnType"]>;
+export type ExternCallable<T extends IFunctionSignature> = (...args: DataTypeMap<T["args"]>) => ExternTypeOf<T["returnType"]> | Promise<ExternTypeOf<T["returnType"]>>;
