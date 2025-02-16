@@ -1,1 +1,1 @@
-export { Rpc } from "./Rpc";
+export { makeRpc } from "./makeRpc";
