@@ -31,7 +31,7 @@ export interface IDataHandler {
      * @param t The type of the value to be set.
      * @param v The value to set the head of the Pair to.
      */
-    pair_sethead(p: PairIdentifier, t: DataType, v: ExternValue): void;
+    pair_sethead<T extends DataType>(p: PairIdentifier, t: T, v: ExternTypeOf<NoInfer<T>>): void;
 
     /**
      * Gets the value in the tail of a Pair.
@@ -53,7 +53,7 @@ export interface IDataHandler {
      * @param t The type of the value to be set.
      * @param v The value to set the tail of the Pair to.
      */
-    pair_settail(p: PairIdentifier, t: DataType, v: ExternValue): void;
+    pair_settail<T extends DataType>(p: PairIdentifier, t: T, v: ExternTypeOf<NoInfer<T>>): void;
 
     /**
      * Asserts the type of a Pair.
@@ -71,14 +71,14 @@ export interface IDataHandler {
      * @param init An optional initial value for the elements of the Array
      * @returns An identifier to the new Array.
      */
-    array_make(t: DataType, len: number, init?: ExternValue): ArrayIdentifier;
+    array_make<T extends DataType>(t: T, len: number, init?: ExternTypeOf<NoInfer<T>>): ArrayIdentifier<NoInfer<T>>;
 
     /**
      * Gets the length of an Array.
      * @param a The Array to retrieve the length of.
      * @returns The length of the given Array.
      */
-    array_length(a: ArrayIdentifier): number;
+    array_length(a: ArrayIdentifier<DataType>): number;
 
     /**
      * Gets the value at a specific index of an Array.
@@ -87,14 +87,14 @@ export interface IDataHandler {
      * @param idx The index of the value wanted.
      * @returns The value at the given index of the given Array.
      */
-    array_get(a: ArrayIdentifier, idx: number): ExternValue;
+    array_get<T extends DataType>(a: ArrayIdentifier<T>, idx: number): ExternTypeOf<NoInfer<T>>;
 
     /**
      * Gets the type of the elements of an Array.
      * @param a The Array to retrieve the element type of.
      * @returns The type of the elements of the Array.
      */
-    array_type(a: ArrayIdentifier): DataType;
+    array_type<T extends DataType>(a: ArrayIdentifier<T>): NoInfer<T>;
 
     /**
      * Sets a value at a specific index of an Array.
@@ -103,7 +103,7 @@ export interface IDataHandler {
      * @param idx The index to be modified.
      * @param v The new value at the given index of the given Array.
      */
-    array_set(a: ArrayIdentifier, idx: number, v: ExternValue): void;
+    array_set<T extends DataType>(a: ArrayIdentifier<T>, idx: number, v: ExternTypeOf<NoInfer<T>>): void;
 
     /**
      * Asserts the type of an Array.
@@ -112,7 +112,7 @@ export interface IDataHandler {
      * @param length The expected length of the Array.
      * @throws If the Array's type is not as expected.
      */
-    array_assert(a: ArrayIdentifier, type?: DataType, length?: number): boolean;
+    array_assert(a: ArrayIdentifier<DataType>, type?: DataType, length?: number): boolean;
 
     /**
      * Makes a new Closure.

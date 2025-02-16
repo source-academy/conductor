@@ -12,7 +12,7 @@ type typeMap = {
     [DataType.CONST_STRING]: string;
     [DataType.EMPTY_LIST]: null;
     [DataType.PAIR]: PairIdentifier;
-    [DataType.ARRAY]: ArrayIdentifier;
+    [DataType.ARRAY]: ArrayIdentifier<DataType>;
     [DataType.CLOSURE]: ClosureIdentifier<DataType>;
     [DataType.OPAQUE]: OpaqueIdentifier;
     [DataType.LIST]: List;

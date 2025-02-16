@@ -1,4 +1,4 @@
-import { DataType } from "./DataType";
+import type { DataType } from "./DataType";
 import type { Identifier } from "./Identifier";
 
 /** An identifier for an extern closure. */
