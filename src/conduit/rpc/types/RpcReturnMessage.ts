@@ -1,4 +1,4 @@
-import { IRpcMessage } from "./IRpcMessage";
+import type { IRpcMessage } from "./IRpcMessage";
 import { RpcMessageType } from "./RpcMessageType";
 
 export class RpcReturnMessage implements IRpcMessage {

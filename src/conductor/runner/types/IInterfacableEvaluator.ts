@@ -1,4 +1,4 @@
-import { IDataHandler } from "../../types";
-import { IEvaluator } from "./IEvaluator";
+import type { IDataHandler } from "../../types";
+import type { IEvaluator } from "./IEvaluator";
 
 export type IInterfacableEvaluator = IEvaluator & IDataHandler;

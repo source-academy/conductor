@@ -1,4 +1,4 @@
-import { DataType, IDataHandler } from "../types";
+import { DataType } from "../types";
 
 const lookupTable = {
     [DataType.VOID]: false,

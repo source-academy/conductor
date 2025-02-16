@@ -1,4 +1,4 @@
-import { IRunnerPlugin } from "./IRunnerPlugin";
+import type { IRunnerPlugin } from "./IRunnerPlugin";
 
 /**
  * The IEvaluator interface exposes methods used by Conductor to interact with evaluators.

@@ -1,4 +1,4 @@
-import { ConductorError } from "../../common/errors";
+import type { ConductorError } from "../../common/errors";
 
 export interface IErrorMessage {
     error: ConductorError;

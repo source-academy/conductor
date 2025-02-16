@@ -1,4 +1,3 @@
-import { DataType } from "../../conductor/types";
 import { ConductorError } from "./ConductorError";
 import { ErrorType } from "./ErrorType";
 
