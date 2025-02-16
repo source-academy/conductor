@@ -1,5 +1,4 @@
-import type { ArrayIdentifier, ClosureIdentifier, DataType, ExternCallable, ExternTypeOf, ExternValue, Identifier, IFunctionSignature, List, OpaqueIdentifier, PairIdentifier, ReturnValue } from ".";
-import { stdlib } from "../stdlib";
+import type { ArrayIdentifier, ClosureIdentifier, DataType, ExternCallable, ExternTypeOf, ExternValue, Identifier, IFunctionSignature, List, OpaqueIdentifier, PairIdentifier } from ".";
 
 export interface IDataHandler {
     readonly hasDataInterface: true;
