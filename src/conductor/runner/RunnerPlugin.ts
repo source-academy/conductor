@@ -3,9 +3,12 @@ import { ConductorInternalError } from "../../common/errors/ConductorInternalErr
 import { importExternalPlugin } from "../../common/util";
 import { importExternalModule } from "../../common/util/importExternalModule";
 import { IConduit, IChannelQueue, IChannel, ChannelQueue, IPlugin } from "../../conduit";
+import { makeRpc } from "../../conduit/rpc";
+import { Remote } from "../../conduit/rpc/types";
+import { IHostFileRpc } from "../host/types";
 import { IModulePlugin } from "../module";
 import { InternalChannelName, InternalPluginName } from "../strings";
-import { Chunk, IChunkMessage, IFileMessage, IServiceMessage, IIOMessage, IStatusMessage, RunnerStatus, serviceMessages, ServiceMessageType } from "../types";
+import { Chunk, IChunkMessage, IServiceMessage, IIOMessage, IStatusMessage, RunnerStatus, serviceMessages, ServiceMessageType } from "../types";
 import { IRunnerPlugin, IEvaluator, IInterfacableEvaluator } from "./types";
 
 export class RunnerPlugin implements IRunnerPlugin {
@@ -14,7 +17,7 @@ export class RunnerPlugin implements IRunnerPlugin {
     private readonly __evaluator: IEvaluator | IInterfacableEvaluator;
     private readonly __isCompatibleWithModules: boolean;
     private __conduit!: IConduit;
-    private __fileQueue!: IChannelQueue<IFileMessage>;
+    private __fileRpc!: Remote<IHostFileRpc>;
     private __chunkQueue!: IChannelQueue<IChunkMessage>;
     private __serviceChannel!: IChannel<IServiceMessage>;
     private __ioQueue!: IChannelQueue<IIOMessage>;
@@ -23,7 +26,7 @@ export class RunnerPlugin implements IRunnerPlugin {
     readonly channelAttach = [InternalChannelName.FILE, InternalChannelName.CHUNK, InternalChannelName.SERVICE, InternalChannelName.STANDARD_IO, InternalChannelName.STATUS];
     init(conduit: IConduit, [fileChannel, chunkChannel, serviceChannel, ioChannel, statusChannel]: IChannel<any>[]): void {
         this.__conduit = conduit;
-        this.__fileQueue = new ChannelQueue(fileChannel);
+        this.__fileRpc = makeRpc<{}, IHostFileRpc>(fileChannel, {});
         this.__chunkQueue = new ChannelQueue(chunkChannel);
         this.__serviceChannel = serviceChannel;
         this.__ioQueue = new ChannelQueue(ioChannel);
@@ -55,12 +58,8 @@ export class RunnerPlugin implements IRunnerPlugin {
         }]
     ]);
 
-    async requestFile(fileName: string): Promise<string | undefined> {
-        this.__fileQueue.send({ fileName });
-        while (true) {
-            const file = await this.__fileQueue.receive();
-            if (file.fileName === fileName) return file.content;
-        }
+    requestFile(fileName: string): Promise<string | undefined> {
+        return this.__fileRpc.requestFile(fileName);
     }
 
     async requestChunk(): Promise<Chunk> {

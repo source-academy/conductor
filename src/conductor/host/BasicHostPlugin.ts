@@ -2,16 +2,16 @@ import { Constant } from "../../common/Constant";
 import { ConductorInternalError } from "../../common/errors/ConductorInternalError";
 import { importExternalPlugin } from "../../common/util";
 import { ChannelQueue, IChannel, IChannelQueue, IConduit, IPlugin } from "../../conduit";
+import { makeRpc } from "../../conduit/rpc";
 import { InternalChannelName, InternalPluginName } from "../strings";
-import { Chunk, IChunkMessage, IFileMessage, IIOMessage, IServiceMessage, IStatusMessage, RunnerStatus, serviceMessages } from "../types";
+import { Chunk, IChunkMessage, IIOMessage, IServiceMessage, IStatusMessage, RunnerStatus, serviceMessages } from "../types";
 import { ServiceMessageType } from "../types";
-import type { IHostPlugin } from "./types";
+import { IHostFileRpc, IHostPlugin } from "./types";
 
 export abstract class BasicHostPlugin implements IHostPlugin {
     name = InternalPluginName.HOST_MAIN;
 
     private __conduit!: IConduit;
-    private __fileQueue!: IChannelQueue<IFileMessage>;
     private __chunkChannel!: IChannel<IChunkMessage>;
     private __serviceChannel!: IChannel<IServiceMessage>;
     private __ioQueue!: IChannelQueue<IIOMessage>;
@@ -23,12 +23,8 @@ export abstract class BasicHostPlugin implements IHostPlugin {
     init(conduit: IConduit, [fileChannel, chunkChannel, serviceChannel, ioChannel, statusChannel]: IChannel<any>[]): void {
         this.__conduit = conduit;
 
-        this.__fileQueue = new ChannelQueue(fileChannel);
-        fileChannel.subscribe(async (fileMessage: IFileMessage) => {
-            fileChannel.send({
-                content: await this.requestFile(fileMessage.fileName),
-                fileName: fileMessage.fileName
-            });
+        makeRpc<IHostFileRpc, {}>(fileChannel, {
+            requestFile: this.requestFile.bind(this)
         });
 
         this.__chunkChannel = chunkChannel;

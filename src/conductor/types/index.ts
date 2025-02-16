@@ -8,7 +8,6 @@ export type { ExternValue } from "./ExternValue";
 export type { IChunkMessage } from "./IChunkMessage";
 export type { IDataHandler } from "./IDataHandler";
 export type { Identifier } from "./Identifier";
-export type { IFileMessage } from "./IFileMessage";
 export type { IFunctionSignature } from "./IFunctionSignature";
 export type { IIOMessage } from "./IIOMessage";
 export type { IServiceMessage } from "./IServiceMessage";
