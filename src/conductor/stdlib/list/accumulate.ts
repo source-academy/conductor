@@ -1,12 +1,15 @@
 import { ClosureIdentifier, DataType, ExternTypeOf, IDataHandler, List } from "../../types"
 
 /**
- * Accumulate applies given operation op to elements of a list
- * in a right-to-left order, first apply op to the last element
- * and an initial element, resulting in r1, then to the second-last
- * element and r1, resulting in r2, etc, and finally to the first element
- * and r_n-1, where n is the length of the list. `accumulate(op,zero,list(1,2,3))`
- * results in `op(1, op(2, op(3, zero)))`
+ * Accumulates a Closure over a List.
+ * 
+ * The Closure is applied in a right-to-left order - the first application
+ * will be on the last element of the list and the given initial value.
+ * @param op The Closure to use as an accumulator over the List.
+ * @param initial The initial value (that is, the result of accumulating an empty List).
+ * @param sequence The List to be accumulated over.
+ * @param resultType The (expected) type of the result.
+ * @returns The result of accumulating the Closure over the List.
  */
 export function accumulate<T extends Exclude<DataType, DataType.VOID>>(this: IDataHandler, op: ClosureIdentifier<DataType>, initial: ExternTypeOf<T>, sequence: List, resultType: T): ExternTypeOf<T> {
     // Use CPS to prevent stack overflow
