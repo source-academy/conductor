@@ -1,7 +1,7 @@
-import { IServiceMessage } from "../IServiceMessage";
+import type { IServiceMessage } from "../IServiceMessage";
 import { ServiceMessageType } from "../ServiceMessageType";
 
-export class Abort implements IServiceMessage {
+export class AbortServiceMessage implements IServiceMessage {
     type = ServiceMessageType.ABORT;
     data: {minVersion: number};
     constructor(minVersion: number) {

@@ -5,6 +5,5 @@ export type { IServiceMessage } from "./IServiceMessage";
 export type { IStatusMessage } from "./IStatusMessage";
 export { RunnerStatus } from "./RunnerStatus";
 export { ServiceMessageType } from "./ServiceMessageType";
-export type { ArrayIdentifier, ClosureIdentifier, ExternCallable, ExternTypeOf, ExternValue, IDataHandler, Identifier, IFunctionSignature, List, NativeValue, OpaqueIdentifier, PairIdentifier, StdlibFunction } from "./moduleInterface";
-export { DataType } from "./moduleInterface";
-export * as serviceMessages from "./serviceMessages";
+export * from "./moduleInterface";
+export * from "./serviceMessages";

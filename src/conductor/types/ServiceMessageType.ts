@@ -1,10 +1,10 @@
 export const enum ServiceMessageType {
-    /** A handshake message. See `serviceMessages.Hello`. */
+    /** A handshake message. See `HelloServiceMessage`. */
     HELLO = 0,
 
-    /** Abort the connection, due to mismatching protocol versions. See `serviceMessages.Abort`. */
+    /** Abort the connection, due to mismatching protocol versions. See `AbortServiceMessage`. */
     ABORT = 1,
 
-    /** The evaluation entry point, sent from the host. See `serviceMessages.Entry`. */
+    /** The evaluation entry point, sent from the host. See `EntryServiceMessage`. */
     ENTRY = 2,
 };

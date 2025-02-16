@@ -1,3 +1,3 @@
-export { Abort } from "./Abort";
-export { Entry } from "./Entry";
-export { Hello } from "./Hello";
+export { AbortServiceMessage } from "./AbortServiceMessage";
+export { EntryServiceMessage } from "./EntryServiceMessage";
+export { HelloServiceMessage } from "./HelloServiceMessage";

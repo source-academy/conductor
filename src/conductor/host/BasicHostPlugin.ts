@@ -4,7 +4,7 @@ import { importExternalPlugin } from "../../common/util";
 import { ChannelQueue, IChannel, IChannelQueue, IConduit, IPlugin } from "../../conduit";
 import { makeRpc } from "../../conduit/rpc";
 import { InternalChannelName, InternalPluginName } from "../strings";
-import { Chunk, IChunkMessage, IIOMessage, IServiceMessage, IStatusMessage, RunnerStatus, serviceMessages } from "../types";
+import { AbortServiceMessage, Chunk, EntryServiceMessage, HelloServiceMessage, IChunkMessage, IIOMessage, IServiceMessage, IStatusMessage, RunnerStatus } from "../types";
 import { ServiceMessageType } from "../types";
 import { IHostFileRpc, IHostPlugin } from "./types";
 
@@ -38,7 +38,7 @@ export abstract class BasicHostPlugin implements IHostPlugin {
             this.receiveStatusUpdate?.(statusMessage.status, statusMessage.isActive);
         });
 
-        this.__serviceChannel.send(new serviceMessages.Hello());
+        this.__serviceChannel.send(new HelloServiceMessage());
         this.__serviceChannel.subscribe(message => {
             this.__serviceHandlers.get(message.type)?.call(this, message);
         });
@@ -46,15 +46,15 @@ export abstract class BasicHostPlugin implements IHostPlugin {
 
     // @ts-expect-error TODO: figure proper way to typecheck this
     private __serviceHandlers = new Map<ServiceMessageType, (message: IServiceMessage) => void>([
-        [ServiceMessageType.HELLO, function helloServiceHandler(this: BasicHostPlugin, message: serviceMessages.Hello) {
+        [ServiceMessageType.HELLO, function helloServiceHandler(this: BasicHostPlugin, message: HelloServiceMessage) {
             if (message.data.version < Constant.PROTOCOL_MIN_VERSION) {
-                this.__serviceChannel.send(new serviceMessages.Abort(Constant.PROTOCOL_MIN_VERSION));
+                this.__serviceChannel.send(new AbortServiceMessage(Constant.PROTOCOL_MIN_VERSION));
                 console.error(`Runner's protocol version (${message.data.version}) must be at least ${Constant.PROTOCOL_MIN_VERSION}`);
             } else {
                 console.log(`Runner is using protocol version ${message.data.version}`);
             }
         }],
-        [ServiceMessageType.ABORT, function abortServiceHandler(this: BasicHostPlugin, message: serviceMessages.Abort) {
+        [ServiceMessageType.ABORT, function abortServiceHandler(this: BasicHostPlugin, message: AbortServiceMessage) {
             console.error(`Runner expects at least protocol version ${message.data.minVersion}, but we are on version ${Constant.PROTOCOL_VERSION}`);
             this.__conduit.terminate();
         }]
@@ -63,7 +63,7 @@ export abstract class BasicHostPlugin implements IHostPlugin {
     abstract requestFile(fileName: string): Promise<string | undefined>;
 
     startEvaluator(entryPoint: string): void {
-        this.__serviceChannel.send(new serviceMessages.Entry(entryPoint));
+        this.__serviceChannel.send(new EntryServiceMessage(entryPoint));
     }
 
     sendChunk(chunk: Chunk): void {
