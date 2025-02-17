@@ -1,6 +1,8 @@
 import type { ConductorError } from "../../../common/errors";
 import type { IPlugin } from "../../../conduit";
+import { PluginClass } from "../../../conduit/types";
 import type { IModulePlugin } from "../../module";
+import { ModuleClass } from "../../module/types/ModuleClass";
 import type { Chunk, RunnerStatus } from "../../types";
 
 export interface IRunnerPlugin extends IPlugin {
@@ -50,9 +52,10 @@ export interface IRunnerPlugin extends IPlugin {
 
     /**
      * Registers a plugin with the conduit.
-     * @param plugin The plugin to be registered.
+     * @param pluginClass The plugin to be registered.
+     * @param arg Arguments to be passed to pluginClass' constructor.
      */
-    registerPlugin(plugin: IPlugin): void;
+    registerPlugin<Arg extends any[], T extends IPlugin>(pluginClass: PluginClass<Arg, T>, ...arg: Arg): NoInfer<T>;
 
     /**
      * Unregister a plugin from the conduit.
@@ -62,9 +65,9 @@ export interface IRunnerPlugin extends IPlugin {
 
     /**
      * Registers an external module with the conduit, and links it with the evaluator.
-     * @param module The module to be registered.
+     * @param moduleClass The module to be registered.
      */
-    registerModule(module: IModulePlugin): void;
+    registerModule<T extends IModulePlugin>(moduleClass: ModuleClass<T>): T;
 
     /**
      * Unregisters an external module from the conduit, and unlinks it from the evaluator.

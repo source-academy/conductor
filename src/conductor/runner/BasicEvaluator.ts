@@ -2,10 +2,7 @@ import { ConductorInternalError } from "../../common/errors";
 import { IEvaluator, IRunnerPlugin } from "./types";
 
 export abstract class BasicEvaluator implements IEvaluator {
-    conductor!: IRunnerPlugin;
-    init(conductor: IRunnerPlugin): void {
-        this.conductor = conductor;
-    }
+    readonly conductor: IRunnerPlugin;
 
     async startEvaluator(entryPoint: string): Promise<void> {
         const initialChunk = await this.conductor.requestFile(entryPoint);
@@ -33,4 +30,8 @@ export abstract class BasicEvaluator implements IEvaluator {
      * @returns A promise that resolves when the evaluation is complete.
      */
     abstract evaluateChunk(chunk: string): Promise<void>;
+
+    constructor(conductor: IRunnerPlugin) {
+        this.conductor = conductor;
+    }
 }

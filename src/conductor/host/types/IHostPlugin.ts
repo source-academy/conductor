@@ -1,5 +1,6 @@
 import type { ConductorError } from "../../../common/errors";
 import type { IPlugin } from "../../../conduit";
+import { PluginClass } from "../../../conduit/types";
 import type { Chunk, RunnerStatus } from "../../types";
 
 export interface IHostPlugin extends IPlugin {
@@ -80,9 +81,10 @@ export interface IHostPlugin extends IPlugin {
 
     /**
      * Registers a plugin with the conduit.
-     * @param plugin The plugin to be registered.
+     * @param pluginClass The plugin to be registered.
+     * @param arg Arguments to be passed to pluginClass' constructor.
      */
-    registerPlugin(plugin: IPlugin): void;
+    registerPlugin<Arg extends any[], T extends IPlugin>(pluginClass: PluginClass<Arg, T>, ...arg: Arg): NoInfer<T>;
 
     /**
      * Unregister a plugin from the conduit.

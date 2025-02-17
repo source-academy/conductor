@@ -1,32 +1,28 @@
 import { ConductorInternalError } from "../../common/errors/ConductorInternalError";
-import { IConduit, IChannel } from "../../conduit";
-import { IDataHandler } from "../types";
+import { IChannel, IConduit } from "../../conduit";
+import { checkIsPluginClass } from "../../conduit/util";
+import { IInterfacableEvaluator } from "../runner/types";
+import { ExternCallable, IDataHandler, IFunctionSignature } from "../types";
 import { IModulePlugin, IModuleExport } from "./types";
 
+@checkIsPluginClass
 export abstract class BaseModulePlugin implements IModulePlugin {
-    abstract readonly channelAttach: string[];
-    abstract init(conduit: IConduit, channels: IChannel<any>[]): void;
+    readonly exports: IModuleExport[] = [];
+    readonly exportedNames: readonly (keyof this)[] = [];
 
-    abstract exports: IModuleExport[];
+    readonly evaluator: IDataHandler;
 
-    evaluator!: IDataHandler;
-
-    /** Is this module ready for use? */
-    private __hooked: boolean = false;
-
-    hook(evaluator: IDataHandler): void {
-        if (this.__hooked) throw new ConductorInternalError("Module already hooked");
-        this.__hooked = true;
+    static readonly channelAttach: string[];
+    constructor(_conduit: IConduit, _channels: IChannel<any>[], evaluator: IInterfacableEvaluator) {
         this.evaluator = evaluator;
-    }
-    unhook(): void {
-        this.verifyHooked();
-        this.__hooked = false;
-    }
-    isHooked(): boolean {
-        return this.__hooked;
-    }
-    verifyHooked(): void {
-        if (!this.__hooked) throw new ConductorInternalError("Module not hooked");
+        for (const name of this.exportedNames) {
+            const m = this[name] as ExternCallable<IFunctionSignature> & {signature?: IFunctionSignature};
+            if (!m.signature || typeof m !== "function" || typeof name !== "string") throw new ConductorInternalError(`'${String(name)}' is not an exportable method`);
+            this.exports.push({
+                symbol: name,
+                value: m,
+                signature: m.signature
+            });
+        }
     }
 }

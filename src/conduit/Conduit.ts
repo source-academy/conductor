@@ -1,6 +1,6 @@
 import { ConductorInternalError } from "../common/errors/ConductorInternalError";
 import { Channel } from "./Channel";
-import { IConduit, ILink, IPlugin, IChannel } from "./types";
+import { IConduit, ILink, IPlugin, IChannel, PluginClass } from "./types";
 
 export class Conduit implements IConduit {
     private __alive: boolean = true;
@@ -18,19 +18,23 @@ export class Conduit implements IConduit {
     private __verifyAlive() {
         if (!this.__alive) throw new ConductorInternalError("conduit terminated");
     }
-    registerPlugin(plugin: IPlugin): void {
+    registerPlugin<Arg extends any[], T extends IPlugin>(pluginClass: PluginClass<Arg, T>, ...arg: Arg): NoInfer<T> {
         this.__verifyAlive();
+        const attachedChannels: IChannel<any>[] = [];
+        for (const channelName of pluginClass.channelAttach) {
+            if (!this.__channels.has(channelName)) this.__negotiateChannel(channelName);
+            attachedChannels.push(this.__channels.get(channelName)!); // as the Channel has been negotiated
+        }
+        const plugin = new pluginClass(this, attachedChannels, ...arg);
+
         if (plugin.name !== undefined) {
             if (this.__pluginMap.has(plugin.name)) throw new ConductorInternalError(`Plugin ${plugin.name} already registered`);
             this.__pluginMap.set(plugin.name, plugin);
         }
+
         this.__plugins.push(plugin);
-        const attachedChannels: IChannel<any>[] = [];
-        for (const channelName of plugin.channelAttach) {
-            if (!this.__channels.has(channelName)) this.__negotiateChannel(channelName);
-            attachedChannels.push(this.__channels.get(channelName)!); // as the Channel has been negotiated
-        }
-        plugin.init(this, attachedChannels);
+
+        return plugin;
     }
     unregisterPlugin(plugin: IPlugin): void {
         this.__verifyAlive();

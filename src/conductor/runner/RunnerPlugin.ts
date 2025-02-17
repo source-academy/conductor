@@ -1,49 +1,35 @@
 import { Constant } from "../../common/Constant";
 import type { ConductorError } from "../../common/errors";
 import { ConductorInternalError } from "../../common/errors/ConductorInternalError";
-import { importExternalPlugin } from "../../common/util";
-import { importExternalModule } from "../../common/util/importExternalModule";
+import { importExternalModule, importExternalPlugin } from "../../common/util";
 import { IConduit, IChannelQueue, IChannel, ChannelQueue, IPlugin } from "../../conduit";
 import { makeRpc } from "../../conduit/rpc";
 import { Remote } from "../../conduit/rpc/types";
+import { PluginClass } from "../../conduit/types";
+import { checkIsPluginClass } from "../../conduit/util";
 import { IHostFileRpc } from "../host/types";
 import { IModulePlugin } from "../module";
+import { ModuleClass } from "../module/types/ModuleClass";
 import { InternalChannelName, InternalPluginName } from "../strings";
 import { Chunk, IChunkMessage, IServiceMessage, IIOMessage, IStatusMessage, RunnerStatus, ServiceMessageType, HelloServiceMessage, AbortServiceMessage, type EntryServiceMessage, IErrorMessage } from "../types";
-import { IRunnerPlugin, IEvaluator, IInterfacableEvaluator } from "./types";
+import { IRunnerPlugin, IEvaluator, IInterfacableEvaluator, EvaluatorClass } from "./types";
 
+@checkIsPluginClass
 export class RunnerPlugin implements IRunnerPlugin {
     name = InternalPluginName.RUNNER_MAIN;
 
     private readonly __evaluator: IEvaluator | IInterfacableEvaluator;
     private readonly __isCompatibleWithModules: boolean;
-    private __conduit!: IConduit;
-    private __fileRpc!: Remote<IHostFileRpc>;
-    private __chunkQueue!: IChannelQueue<IChunkMessage>;
-    private __serviceChannel!: IChannel<IServiceMessage>;
-    private __ioQueue!: IChannelQueue<IIOMessage>;
-    private __errorChannel!: IChannel<IErrorMessage>;
-    private __statusChannel!: IChannel<IStatusMessage>;
-
-    readonly channelAttach = [InternalChannelName.FILE, InternalChannelName.CHUNK, InternalChannelName.SERVICE, InternalChannelName.STANDARD_IO, InternalChannelName.ERROR, InternalChannelName.STATUS];
-    init(conduit: IConduit, [fileChannel, chunkChannel, serviceChannel, ioChannel, errorChannel, statusChannel]: IChannel<any>[]): void {
-        this.__conduit = conduit;
-        this.__fileRpc = makeRpc<{}, IHostFileRpc>(fileChannel, {});
-        this.__chunkQueue = new ChannelQueue(chunkChannel);
-        this.__serviceChannel = serviceChannel;
-        this.__ioQueue = new ChannelQueue(ioChannel);
-        this.__errorChannel = errorChannel;
-        this.__statusChannel = statusChannel;
-
-        this.__serviceChannel.send(new HelloServiceMessage());
-        this.__serviceChannel.subscribe(message => {
-            this.__serviceHandlers.get(message.type)?.call(this, message);
-        });
-        this.__evaluator.init(this);
-    }
+    private readonly __conduit: IConduit;
+    private readonly __fileRpc: Remote<IHostFileRpc>;
+    private readonly __chunkQueue: IChannelQueue<IChunkMessage>;
+    private readonly __serviceChannel: IChannel<IServiceMessage>;
+    private readonly __ioQueue: IChannelQueue<IIOMessage>;
+    private readonly __errorChannel: IChannel<IErrorMessage>;
+    private readonly __statusChannel: IChannel<IStatusMessage>;
 
     // @ts-expect-error TODO: figure proper way to typecheck this
-    private __serviceHandlers = new Map<ServiceMessageType, (message: IServiceMessage) => void>([
+    private readonly __serviceHandlers = new Map<ServiceMessageType, (message: IServiceMessage) => void>([
         [ServiceMessageType.HELLO, function helloServiceHandler(this: RunnerPlugin, message: HelloServiceMessage) {
             if (message.data.version < Constant.PROTOCOL_MIN_VERSION) {
                 this.__serviceChannel.send(new AbortServiceMessage(Constant.PROTOCOL_MIN_VERSION));
@@ -91,39 +77,53 @@ export class RunnerPlugin implements IRunnerPlugin {
         this.__statusChannel.send({ status, isActive });
     }
 
-    registerPlugin(plugin: IPlugin): void {
-        this.__conduit.registerPlugin(plugin);
+    registerPlugin<Arg extends any[], T extends IPlugin>(pluginClass: PluginClass<Arg, T>, ...arg: Arg): NoInfer<T> {
+        return this.__conduit.registerPlugin(pluginClass, ...arg);
     }
 
     unregisterPlugin(plugin: IPlugin): void {
         this.__conduit.unregisterPlugin(plugin);
     }
 
-    registerModule(module: IModulePlugin): void {
+    registerModule<T extends IModulePlugin>(moduleClass: ModuleClass<T>): NoInfer<T> {
         if (!this.__isCompatibleWithModules) throw new ConductorInternalError("Evaluator has no data interface");
-        this.registerPlugin(module);
-        module.hook(this.__evaluator as IInterfacableEvaluator);
+        return this.registerPlugin(moduleClass, this.__evaluator as IInterfacableEvaluator);
     }
 
     unregisterModule(module: IModulePlugin): void {
-        module.unhook();
         this.unregisterPlugin(module);
     }
 
     async importAndRegisterExternalPlugin(location: string): Promise<IPlugin> {
-        const plugin = await importExternalPlugin(location);
-        this.registerPlugin(plugin);
-        return plugin;
+        const pluginClass = await importExternalPlugin(location);
+        return this.registerPlugin(pluginClass);
     }
 
     async importAndRegisterExternalModule(location: string): Promise<IModulePlugin> {
-        const module = await importExternalModule(location);
-        this.registerModule(module);
-        return module;
+        const moduleClass = await importExternalModule(location);
+        return this.registerModule(moduleClass);
     }
 
-    constructor(evaluator: IEvaluator | IInterfacableEvaluator) {
-        this.__evaluator = evaluator;
+    static readonly channelAttach = [InternalChannelName.FILE, InternalChannelName.CHUNK, InternalChannelName.SERVICE, InternalChannelName.STANDARD_IO, InternalChannelName.ERROR, InternalChannelName.STATUS];
+    constructor(
+        conduit: IConduit,
+        [fileChannel, chunkChannel, serviceChannel, ioChannel, errorChannel, statusChannel]: IChannel<any>[],
+        evaluatorClass: EvaluatorClass
+    ) {
+        this.__conduit = conduit;
+        this.__fileRpc = makeRpc<{}, IHostFileRpc>(fileChannel, {});
+        this.__chunkQueue = new ChannelQueue(chunkChannel);
+        this.__serviceChannel = serviceChannel;
+        this.__ioQueue = new ChannelQueue(ioChannel);
+        this.__errorChannel = errorChannel;
+        this.__statusChannel = statusChannel;
+
+        this.__serviceChannel.send(new HelloServiceMessage());
+        this.__serviceChannel.subscribe(message => {
+            this.__serviceHandlers.get(message.type)?.call(this, message);
+        });
+
+        this.__evaluator = new evaluatorClass(this);
         this.__isCompatibleWithModules = (this.__evaluator as IInterfacableEvaluator).hasDataInterface ?? false;
     }
 }

@@ -1,11 +1,12 @@
 import { globSync } from "glob";
 import nodeResolve from "@rollup/plugin-node-resolve";
+import modify from "rollup-plugin-modify";
 import path from "node:path";
 import terser from "@rollup/plugin-terser";
 import typescript from "@rollup/plugin-typescript";
 
 export default [{
-    plugins: [nodeResolve(), typescript()],
+    plugins: [modify({"@checkIsPluginClass": ""}), nodeResolve(), typescript()],
     input: Object.fromEntries(
         globSync("src/**/index.ts").map(file => [
             path.relative(
