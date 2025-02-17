@@ -28,8 +28,8 @@ to use, implement `evaluateChunk` and override `evaluateFile` if needed.
 ### The entry point
 
 An entry point should be created; this is the file initially executed to start a Runner.
-It should construct an instance of the evaluator, `RunnerPlugin`, and `Conduit`, and link them together.
-`conductor/runner/util/initialise` can help with this (do `initialise(new MyEvaluator())`).
+It should construct an instance of `Conduit`, and register the `RunnerPlugin` with an argument of the evaluator.
+`conductor/runner/util/initialise` can help with this (do `initialise(MyEvaluator)`).
 
 Your implementation should be bundled using this file as the bundler's entry point.
 
