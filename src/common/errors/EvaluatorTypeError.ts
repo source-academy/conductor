@@ -2,8 +2,8 @@ import { ConductorError } from "./ConductorError";
 import { ErrorType } from "./ErrorType";
 
 export class EvaluatorTypeError extends ConductorError {
-    name = "EvaluatorTypeError";
-    readonly errorType = ErrorType.TYPE;
+    override name = "EvaluatorTypeError";
+    override readonly errorType = ErrorType.TYPE;
 
     readonly expected: string;
     readonly actual: string;

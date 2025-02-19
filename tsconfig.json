@@ -1,6 +1,7 @@
 {
     "compilerOptions": {
         "strict": true,
+        "noImplicitOverride": true,
         "module": "ESNext",
         "moduleResolution": "bundler",
         "target": "ESNext",
