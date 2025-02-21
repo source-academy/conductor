@@ -1,4 +1,5 @@
 import { ClosureIdentifier, DataType, ExternTypeOf, IDataHandler, List } from "../../types"
+import { list_to_vec } from "./list_to_vec"
 
 /**
  * Accumulates a Closure over a List.
@@ -11,14 +12,13 @@ import { ClosureIdentifier, DataType, ExternTypeOf, IDataHandler, List } from ".
  * @param resultType The (expected) type of the result.
  * @returns A Promise resolving to the result of accumulating the Closure over the List.
  */
-export function accumulate<T extends Exclude<DataType, DataType.VOID>>(this: IDataHandler, op: ClosureIdentifier<DataType>, initial: ExternTypeOf<T>, sequence: List, resultType: T): Promise<ExternTypeOf<T>> {
-    // Use CPS to prevent stack overflow
-    const $accumulate = (xs: List, cont: (each: ExternTypeOf<T>) => Promise<ExternTypeOf<T>>): Promise<ExternTypeOf<T>> => {
-        if (xs === null) return cont(initial);
-        this.pair_assert(xs, undefined, DataType.LIST);
-        return $accumulate(this.pair_gettail(xs) as List,
-            async x => cont(await this.closure_call(op, [this.pair_gethead(xs), x], resultType)));
+export async function accumulate<T extends Exclude<DataType, DataType.VOID>>(this: IDataHandler, op: ClosureIdentifier<DataType>, initial: ExternTypeOf<T>, sequence: List, resultType: T): Promise<ExternTypeOf<T>> {
+    const vec = this.list_to_vec(sequence);
+    let result = initial;
+    for (let i = vec.length - 1; i >= 0; --i) {
+        const [v, _t] = vec[i];
+        result = await this.closure_call(op, [v, result], resultType);
     }
 
-    return $accumulate(sequence, x => Promise.resolve(x));
+    return result;
 }

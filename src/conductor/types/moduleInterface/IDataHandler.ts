@@ -185,7 +185,9 @@ export interface IDataHandler {
 
     ///// Standard library functions
 
+    list(...elements: [DataType, ExternValue][]): List;
     is_list(xs: List): boolean;
+    list_to_vec(xs: List): [ExternValue, DataType][];
     accumulate<T extends Exclude<DataType, DataType.VOID>>(op: ClosureIdentifier<DataType>, initial: ExternTypeOf<T>, sequence: List, resultType: T): Promise<ExternTypeOf<T>>;
     length(xs: List): number;
 }
