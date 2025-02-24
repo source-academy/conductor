@@ -16,7 +16,7 @@ export class Conduit implements IConduit {
         this.__channels.set(channelName, channel);
     }
     private __verifyAlive() {
-        if (!this.__alive) throw new ConductorInternalError("conduit terminated");
+        if (!this.__alive) throw new ConductorInternalError("Conduit already terminated");
     }
     registerPlugin<Arg extends any[], T extends IPlugin>(pluginClass: PluginClass<Arg, T>, ...arg: Arg): NoInfer<T> {
         this.__verifyAlive();
