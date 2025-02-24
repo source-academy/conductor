@@ -11,7 +11,7 @@ import { IHostFileRpc } from "../host/types";
 import { IModulePlugin } from "../module";
 import { ModuleClass } from "../module/types/ModuleClass";
 import { InternalChannelName, InternalPluginName } from "../strings";
-import { Chunk, IChunkMessage, IServiceMessage, IIOMessage, IStatusMessage, RunnerStatus, ServiceMessageType, HelloServiceMessage, AbortServiceMessage, type EntryServiceMessage, IErrorMessage } from "../types";
+import { Chunk, IChunkMessage, IServiceMessage, IIOMessage, IStatusMessage, RunnerStatus, ServiceMessageType, HelloServiceMessage, AbortServiceMessage, type EntryServiceMessage, IErrorMessage, PluginServiceMessage } from "../types";
 import { IRunnerPlugin, IEvaluator, IInterfacableEvaluator, EvaluatorClass } from "./types";
 
 @checkIsPluginClass
@@ -75,6 +75,10 @@ export class RunnerPlugin implements IRunnerPlugin {
 
     updateStatus(status: RunnerStatus, isActive: boolean): void {
         this.__statusChannel.send({ status, isActive });
+    }
+
+    hostLoadPlugin(pluginName: string): void {
+        this.__serviceChannel.send(new PluginServiceMessage(pluginName));
     }
 
     registerPlugin<Arg extends any[], T extends IPlugin>(pluginClass: PluginClass<Arg, T>, ...arg: Arg): NoInfer<T> {

@@ -6,7 +6,7 @@ import { makeRpc } from "../../conduit/rpc";
 import { PluginClass } from "../../conduit/types";
 import { checkIsPluginClass } from "../../conduit/util";
 import { InternalChannelName, InternalPluginName } from "../strings";
-import { AbortServiceMessage, Chunk, EntryServiceMessage, HelloServiceMessage, IChunkMessage, IErrorMessage, IIOMessage, IServiceMessage, IStatusMessage, RunnerStatus } from "../types";
+import { AbortServiceMessage, Chunk, EntryServiceMessage, HelloServiceMessage, IChunkMessage, IErrorMessage, IIOMessage, IServiceMessage, IStatusMessage, PluginServiceMessage, RunnerStatus } from "../types";
 import { ServiceMessageType } from "../types";
 import { IHostFileRpc, IHostPlugin } from "./types";
 
@@ -36,10 +36,16 @@ export abstract class BasicHostPlugin implements IHostPlugin {
         [ServiceMessageType.ABORT, function abortServiceHandler(this: BasicHostPlugin, message: AbortServiceMessage) {
             console.error(`Runner expects at least protocol version ${message.data.minVersion}, but we are on version ${Constant.PROTOCOL_VERSION}`);
             this.__conduit.terminate();
+        }],
+        [ServiceMessageType.PLUGIN, function pluginServiceHandler(this: BasicHostPlugin, message: PluginServiceMessage) {
+            const pluginName = message.data;
+            this.requestLoadPlugin(pluginName);
         }]
     ]);
 
     abstract requestFile(fileName: string): Promise<string | undefined>;
+
+    abstract requestLoadPlugin(pluginName: string): void;
 
     startEvaluator(entryPoint: string): void {
         this.__serviceChannel.send(new EntryServiceMessage(entryPoint));

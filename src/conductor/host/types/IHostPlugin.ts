@@ -12,6 +12,12 @@ export interface IHostPlugin extends IPlugin {
     requestFile(fileName: string): Promise<string | undefined>;
 
     /**
+     * Request to load a plugin.
+     * @param pluginName The name of the plugin to request loading.
+     */
+    requestLoadPlugin(pluginName: string): void;
+
+    /**
      * Starts the evaluator.
      * @param entryPoint The entry point file to start running from.
      */

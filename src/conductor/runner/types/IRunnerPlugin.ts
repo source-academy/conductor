@@ -51,6 +51,12 @@ export interface IRunnerPlugin extends IPlugin {
     updateStatus(status: RunnerStatus, isActive: boolean): void;
 
     /**
+     * Informs the host to load a plugin.
+     * @param pluginName The name of the plugin to load.
+     */
+    hostLoadPlugin(pluginName: string): void;
+
+    /**
      * Registers a plugin with the conduit.
      * @param pluginClass The plugin to be registered.
      * @param arg Arguments to be passed to pluginClass' constructor.
