@@ -14,9 +14,9 @@ export function makeRpc<ISelf, IOther>(channel: IChannel<IRpcMessage>, self: ISe
                     try {
                         // @ts-expect-error
                         const res = await self[fn as keyof ISelf](...args);
-                        channel.send(new RpcReturnMessage(invokeId, res));
+                        if (invokeId > 0) channel.send(new RpcReturnMessage(invokeId, res));
                     } catch (err) {
-                        channel.send(new RpcErrorMessage(invokeId, err));
+                        if (invokeId > 0) channel.send(new RpcErrorMessage(invokeId, err));
                     }
                     break;
                 }
@@ -37,17 +37,21 @@ export function makeRpc<ISelf, IOther>(channel: IChannel<IRpcMessage>, self: ISe
         }
     });
 
-    return new Proxy(otherCallbacks, {
+    return new Proxy(otherCallbacks, { // TODO: transferring functions
         get(target, p, receiver) {
             const cb = Reflect.get(target, p, receiver);
             if (cb) return cb;
-            const newCallback = async (...args: any[]) => {
-                const invokeId = invocations++;
-                channel.send(new RpcCallMessage(p, args, invokeId));
-                return new Promise((resolve, reject) => {
-                    waiting[invokeId] = [resolve, reject];
-                });
-            }
+            const newCallback = typeof p === "string" && p.charAt(0) === "$"
+                ? (...args: any[]) => {
+                    channel.send(new RpcCallMessage(p, args, 0));
+                }
+                : (...args: any[]) => {
+                    const invokeId = ++invocations;
+                    channel.send(new RpcCallMessage(p, args, invokeId));
+                    return new Promise((resolve, reject) => {
+                        waiting[invokeId] = [resolve, reject];
+                    });
+                }
             Reflect.set(target, p, newCallback, receiver);
             return newCallback;
         },
