@@ -1,4 +1,4 @@
-# sa-conductor
+# conductor
 
 Source Academy standard communication interface for languages
 
