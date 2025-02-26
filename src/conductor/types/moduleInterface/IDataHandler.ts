@@ -158,16 +158,25 @@ export interface IDataHandler {
     /**
      * Makes a new Opaque object.
      * @param v The value to be stored under this Opaque object.
+     * @param immutable Mark this Opaque object as immutable. Mutable Opaque objects are not rollback-friendly,
+     * and evaluators should disable any rollback functionality upon receiving such an object.
      * @returns An identifier to the new Opaque object.
      */
-    opaque_make(v: any): OpaqueIdentifier;
+    opaque_make(v: any, immutable?: boolean): OpaqueIdentifier;
 
     /**
      * Gets the value stored under an Opaque object.
-     * @param o The identifier to the new Opaque object.
+     * @param o The identifier to the Opaque object.
      * @returns The value stored under this new Opaque object.
      */
     opaque_get(o: OpaqueIdentifier): any;
+
+    /**
+     * Update the value stored under an Opaque object.
+     * @param o The identifier to the Opaque object.
+     * @param v The new value to store under this Opaque object.
+     */
+    opaque_update(o: OpaqueIdentifier, v: any): void;
 
     /**
      * Ties the lifetime of the dependee to the dependent.
