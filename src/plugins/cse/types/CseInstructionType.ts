@@ -1,0 +1,16 @@
+export const enum CseInstructionType {
+    FRAGMENT,
+    ASSIGN,
+    UNARY_OP,
+    BINARY_OP,
+    POP,
+    APPLY,
+    BRANCH,
+    ARRAY_LITERAL,
+    ARRAY_INDEX,
+    ARRAY_ASSIGN,
+    ARRAY_LENGTH,
+    EXTERNAL,
+    LOOKUP,
+    RESTORE,
+};
