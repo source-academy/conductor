@@ -1,17 +1,21 @@
-import { current, Immer } from "immer";
+import { current, Draft, Immer } from "immer";
 
 import { CsePlugin } from "./CsePlugin";
-import { CseInstructionType, ICseInstrHandler, ICseInstruction, ICseMachineState, ICsePlugin, IFragment, ITypedValue } from "./types";
+import { CseInstructionType, dtMap, hdtMap, HeapDataType, HeapValue, ICseInstrHandler, ICseInstruction, ICseMachineState, ICsePlugin, IFragment, IHeapArray, IHeapClosure, IHeapExtClosure, IHeapOpaque, IHeapPair, ITypedValue } from "./types";
 import { BasicEvaluator } from "../../conductor/runner/BasicEvaluator";
 import { IEvaluator, IRunnerPlugin } from "../../conductor/runner/types";
 import { CseMachineState } from "./CseMachineState";
-import { applyHandler, arrayAssignHandler, arrayIndexHandler, arrayLengthHandler, arrayLiteralHandler, assignHandler, branchHandler, IBinaryOpIns, IFragmentIns, IUnaryOpIns, lookupHandler, makeFragmentIns, popHandler, restoreHandler } from "./instructions";
+import { applyHandler, arrayAssignHandler, arrayIndexHandler, arrayLengthHandler, arrayLiteralHandler, assignHandler, branchHandler, IBinaryOpIns, IFragmentIns, IUnaryOpIns, lookupHandler, makeApplyIns, makeFragmentIns, popHandler, pushHandler, restoreHandler } from "./instructions";
 import { ConductorInternalError } from "../../common/errors";
+import { ArrayIdentifier, ClosureIdentifier, DataType, ExternCallable, ExternTypeOf, ExternValue, IDataHandler, Identifier, IFunctionSignature, OpaqueIdentifier, PairIdentifier } from "../../conductor/types";
+import { array_assert, closure_arity_assert, pair_assert } from "../../conductor/stdlib/util";
+import { accumulate, is_list, length, list, list_to_vec } from "../../conductor/stdlib/list";
+import { assertDataType } from "./util";
 
 // construct own version of immer API to keep framework's purity
 const { createDraft, finishDraft, produce } = /*#__PURE__*/ new Immer({autoFreeze: false});
 
-export abstract class BasicCseEvaluator<F> extends BasicEvaluator implements IEvaluator {
+export abstract class BasicCseEvaluator<F> extends BasicEvaluator implements IEvaluator, IDataHandler {
     static readonly instructionHandlers: ICseInstrHandler<any>[] = [
         applyHandler,
         arrayAssignHandler,
@@ -22,8 +26,11 @@ export abstract class BasicCseEvaluator<F> extends BasicEvaluator implements IEv
         branchHandler,
         lookupHandler,
         popHandler,
+        pushHandler,
         restoreHandler,
     ];
+
+    readonly hasDataInterface = true;
 
     /** Conductor CSE plugin to send CSE-related data to host. */
     private readonly __csePlugin: ICsePlugin;
@@ -33,6 +40,9 @@ export abstract class BasicCseEvaluator<F> extends BasicEvaluator implements IEv
 
     /** The current CSE machine state. */
     private __cseState: ICseMachineState;
+
+    /** The current CSE machine state draft. */
+    private __cseDraft?: Draft<ICseMachineState>;
 
     /** CSE instruction handlers. Fragment, BinaryOp and UnaryOp instructions are handled separately. */
     private __handlers: Map<CseInstructionType, ICseInstrHandler<any>[1]>;
@@ -52,11 +62,19 @@ export abstract class BasicCseEvaluator<F> extends BasicEvaluator implements IEv
     /** A list of saved previous states. */
     private __previousStates: ICseMachineState[][] = [];
 
+    /**
+     * Verifies that we are currently drafting.
+     */
+    private __verifyHasDraft() {
+        if (!this.__cseDraft) throw new ConductorInternalError("Not currently drafting");
+    }
+
     /** Processes one step of the CSE machine from the current state. */
     private async __step(): Promise<void> {
         const nextInstr = this.__cseState.controlTop();
         if (!nextInstr) return;
         const draft = createDraft(this.__cseState);
+        this.__cseDraft = draft;
         draft.controlPop();
         if (nextInstr.type === CseInstructionType.FRAGMENT) {
             const newInstructions = await this.evaluateFragment((nextInstr as IFragmentIns).fragment, current(draft));
@@ -74,6 +92,7 @@ export abstract class BasicCseEvaluator<F> extends BasicEvaluator implements IEv
             await this.__handlers.get(nextInstr.type)!(draft, nextInstr);
         }
         draft.processStepDerefs();
+        delete this.__cseDraft;
         this.__cseState = finishDraft(draft);
         this.__pushState();
         if (!this.__cseState.controlTop()) this.__resolve(this.__cseState.stashTop());
@@ -117,6 +136,196 @@ export abstract class BasicCseEvaluator<F> extends BasicEvaluator implements IEv
         }
     }
 
+    ///// Module Interface
+
+    pair_make(): PairIdentifier {
+        this.__verifyHasDraft();
+        return this.__cseDraft!.alloc(HeapDataType.PAIR, {
+            pair: [
+                {datatype: HeapDataType.UNASSIGNED, value: undefined},
+                {datatype: HeapDataType.UNASSIGNED, value: undefined}
+            ]
+        } satisfies IHeapPair) as any;
+    }
+
+    pair_gethead(p: PairIdentifier): ExternValue {
+        this.__verifyHasDraft();
+        const pair = this.__cseDraft!.heapGet(p) as IHeapPair;
+        return pair.pair[0].value;
+    }
+
+    pair_typehead(p: PairIdentifier): DataType {
+        this.__verifyHasDraft();
+        const pair = this.__cseDraft!.heapGet(p) as IHeapPair;
+        return dtMap[pair.pair[0].datatype];
+    }
+
+    pair_sethead<T extends DataType>(p: PairIdentifier, t: T, v: ExternTypeOf<NoInfer<T>>): void {
+        this.__verifyHasDraft();
+        const pair = this.__cseDraft!.heapGet(p) as IHeapPair;
+        const newValue = {datatype: hdtMap[t], value: v as HeapValue};
+        this.__cseDraft!.replace(p, pair.pair[0], newValue);
+        pair.pair[0] = newValue;
+    }
+
+    pair_gettail(p: PairIdentifier): ExternValue {
+        this.__verifyHasDraft();
+        const pair = this.__cseDraft!.heapGet(p) as IHeapPair;
+        return pair.pair[1].value;
+    }
+
+    pair_typetail(p: PairIdentifier): DataType {
+        this.__verifyHasDraft();
+        const pair = this.__cseDraft!.heapGet(p) as IHeapPair;
+        return dtMap[pair.pair[1].datatype];
+    }
+
+    pair_settail<T extends DataType>(p: PairIdentifier, t: T, v: ExternTypeOf<NoInfer<T>>): void {
+        this.__verifyHasDraft();
+        const pair = this.__cseDraft!.heapGet(p) as IHeapPair;
+        const newValue = {datatype: hdtMap[t], value: v as HeapValue};
+        this.__cseDraft!.replace(p, pair.pair[1], newValue);
+        pair.pair[1] = newValue;
+    }
+
+    pair_assert = pair_assert;
+
+    array_make<T extends DataType>(t: T, len: number, init?: ExternTypeOf<NoInfer<T>>): ArrayIdentifier<NoInfer<T>> {
+        this.__verifyHasDraft();
+        const datatype = hdtMap[t];
+        return this.__cseDraft!.alloc(HeapDataType.ARRAY, {
+            type: datatype,
+            array: Array(len).fill({
+                datatype,
+                value: init as any
+            } satisfies ITypedValue)
+        } satisfies IHeapArray) as any;
+    }
+
+    array_length(a: ArrayIdentifier<DataType>): number {
+        this.__verifyHasDraft();
+        const arr = this.__cseDraft!.heapGet(a) as IHeapArray;
+        return arr.array.length;
+    }
+
+    array_get<T extends DataType>(a: ArrayIdentifier<T>, idx: number): ExternTypeOf<NoInfer<T>> {
+        this.__verifyHasDraft();
+        const arr = this.__cseDraft!.heapGet(a) as IHeapArray;
+        return arr.array[idx].value as any;
+    }
+
+    array_type<T extends DataType>(a: ArrayIdentifier<T>): NoInfer<T> {
+        this.__verifyHasDraft();
+        const arr = this.__cseDraft!.heapGet(a) as IHeapArray;
+        if (arr.type === undefined) return DataType.VOID as T;
+        return dtMap[arr.type] as T;
+    }
+
+    array_type_at(a: ArrayIdentifier<DataType>, idx: number): DataType {
+        this.__verifyHasDraft();
+        const arr = this.__cseDraft!.heapGet(a) as IHeapArray;
+        return dtMap[arr.array[idx].datatype];
+    }
+
+    array_set<T extends DataType>(a: ArrayIdentifier<T>, idx: number, t: DataType, v: ExternTypeOf<NoInfer<T>>): void {
+        this.__verifyHasDraft();
+        const arr = this.__cseDraft!.heapGet(a) as IHeapArray;
+        const newValue = {
+            datatype: hdtMap[t],
+            value: v as any
+        } satisfies ITypedValue;
+        if (arr.type !== undefined) assertDataType("Cannot modify array - mismatching data type", newValue, arr.type);
+        arr.array[idx] = newValue;
+    }
+
+    array_assert = array_assert;
+
+    closure_make<const T extends IFunctionSignature>(sig: T, func: ExternCallable<T>, dependsOn?: (Identifier | null)[]): ClosureIdentifier<T["returnType"]> {
+        this.__verifyHasDraft();
+        return this.__cseDraft!.alloc(HeapDataType.CLOSURE, {
+            arity: sig.args.length,
+            paramType: sig.args.map(t => hdtMap[t]),
+            returnType: hdtMap[sig.returnType],
+            closureName: sig.name,
+            parentFrame: 0,
+            callback: func
+        } satisfies IHeapExtClosure) as any;
+    }
+
+    closure_is_vararg(c: ClosureIdentifier<DataType>): boolean {
+        return false; // TODO: varargs
+    }
+
+    closure_arity(c: ClosureIdentifier<DataType>): number {
+        this.__verifyHasDraft();
+        const closure = this.__cseDraft!.heapGet(c) as IHeapClosure | IHeapExtClosure;
+        return closure.arity;
+    }
+
+    private async __closure_call(c: ClosureIdentifier<DataType>, args: ExternValue[]): Promise<ITypedValue> {
+        this.__verifyHasDraft();
+        const draft = this.__cseDraft!;
+        draft.stashPush({datatype: HeapDataType.CLOSURE, value: c});
+        draft.stashPush(args.map(value => ({datatype: HeapDataType.UNASSIGNED, value}))); // TODO datatypes
+        draft.controlPush(makeApplyIns(args.length));
+        // TODO finalise draft...
+        // TODO then do steps...
+        throw new Error("unimplemented");
+        // TODO start new draft?
+        return this.__cseDraft!.stashPop();
+    }
+
+    async closure_call<T extends DataType>(c: ClosureIdentifier<DataType>, args: ExternValue[], returnType: T): Promise<ExternTypeOf<NoInfer<T>>> {
+        const res = await this.__closure_call(c, args);
+        assertDataType("Closure return value type mismatch", res, hdtMap[returnType]);
+        return res.value as any;
+    }
+
+    async closure_call_unchecked<T extends DataType>(c: ClosureIdentifier<T>, args: ExternValue[]): Promise<ExternTypeOf<NoInfer<T>>> {
+        return (await this.__closure_call(c, args)).value as any;
+    }
+
+    closure_arity_assert = closure_arity_assert;
+
+    opaque_make(v: any, immutable: boolean = false): OpaqueIdentifier {
+        this.__verifyHasDraft();
+        return this.__cseDraft!.alloc(HeapDataType.OPAQUE, {
+            value: v,
+            immutable
+        } satisfies IHeapOpaque) as any;
+    }
+
+    opaque_get(o: OpaqueIdentifier): any {
+        this.__verifyHasDraft();
+        const opaque = this.__cseDraft!.heapGet(o) as IHeapOpaque;
+        return opaque.value;
+    }
+
+    opaque_update(o: OpaqueIdentifier, v: any): void {
+        this.__verifyHasDraft();
+        const opaque = this.__cseDraft!.heapGet(o) as IHeapOpaque;
+        opaque.value = v;
+    }
+
+    tie(dependent: Identifier, dependee: Identifier | null): void {
+        this.__verifyHasDraft();
+        if (dependee === null) return;
+        this.__cseDraft!.tie(dependent, dependee);
+    }
+
+    untie(dependent: Identifier, dependee: Identifier | null): void {
+        this.__verifyHasDraft();
+        if (dependee === null) return;
+        this.__cseDraft!.untie(dependent, dependee);
+    }
+
+    list = list;
+    is_list = is_list;
+    list_to_vec = list_to_vec;
+    accumulate = accumulate;
+    length = length;
+
+    // impl BasicEvaluator#evaluateChunk
     async evaluateChunk(chunk: string): Promise<void> {
         const f = await this.processChunk(chunk);
         const ins = makeFragmentIns(f);

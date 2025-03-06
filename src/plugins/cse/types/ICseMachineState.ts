@@ -176,6 +176,14 @@ export interface ICseMachineState {
     untie(dependent: HeapIdentifier, dependee: HeapIdentifier): void;
 
     /**
+     * Replaces an object that a dependent is holding a reference to with a new one.
+     * @param dependent The dependent object.
+     * @param originalValue The original object that the dependent is holding a reference to.
+     * @param newValue The new object that the dependent should hold a reference to.
+     */
+    replace(dependent: HeapIdentifier, originalValue: ITypedValue, newValue: ITypedValue): void;
+
+    /**
      * Frees the given objects, if their reference counter is zero.
      * 
      * If an object would no longer be depended on to as a result of freeing

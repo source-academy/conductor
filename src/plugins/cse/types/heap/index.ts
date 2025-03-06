@@ -1,3 +1,4 @@
+export { dtMap, hdtMap } from "./dtMap";
 export type { HeapData } from "./HeapData";
 export { HeapDataType } from "./HeapDataType";
 export type { HeapIdentifier } from "./HeapIdentifier";

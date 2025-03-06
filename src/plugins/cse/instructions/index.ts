@@ -9,5 +9,6 @@ export { type IBranchIns, makeBranchIns, branchHandler } from "./branch";
 export { type IFragmentIns, makeFragmentIns } from "./fragment";
 export { type ILookupIns, makeLookupIns, lookupHandler } from "./lookup";
 export { type IPopIns, makePopIns, popHandler } from "./pop";
+export { type IPushIns, makePushIns, pushHandler } from "./push";
 export { type IRestoreIns, makeRestoreIns, restoreHandler } from "./restore";
 export { type IUnaryOpIns, makeUnaryOpIns } from "./unaryOp";

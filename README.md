@@ -55,7 +55,7 @@ Note that all identifiers across data types must be unique - in other words, a r
 | const string | JS value   | Strings are immutable                                         |
 | empty list   | none\*     | The empty-list value                                          |
 | pair         | Identifier |                                                               |
-| array        | Identifier | Arrays are singly-typed                                       |
+| array        | Identifier | Arrays may be typed or untyped                                |
 | closure      | Identifier | Closures have fixed arity                                     |
 | opaque       | Identifier | For values that can manipulated only by modules (e.g. a Rune) |
 | list         | see notes  | Either a Pair (passed by identifier) or empty list (null\*)   |

@@ -226,6 +226,17 @@ export class CseMachineState implements ICseMachineState {
     }
 
     @verifyDraft
+    replace(dependent: HeapIdentifier, originalValue: ITypedValue, newValue: ITypedValue): void {
+        const draft = castDraft(this);
+        if (isIdentifierType(originalValue)) {
+            draft.untie(dependent, originalValue.value);
+        }
+        if (isIdentifierType(newValue)) {
+            draft.tie(dependent, newValue.value);
+        }
+    }
+
+    @verifyDraft
     clean(toClean?: HeapIdentifier[]): void {
         const draft = castDraft(this);
         if (toClean === undefined) {
