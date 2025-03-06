@@ -63,13 +63,6 @@ export interface ICseMachineState {
      */
     controlClear(): void;
 
-    /**
-     * Sets an instruction as the current instruction.
-     * @param instr The instruction to be set as the current instruction.
-     * @throws If not called on a Draft.
-     */
-    setCurrentInstr(instr: ICseInstruction | undefined): void;
-
     ///// STASH
 
     /**
