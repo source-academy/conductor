@@ -1,10 +1,10 @@
 import { castDraft, immerable } from "immer";
-import { ITypedValue, IHeapEnvFrame, IHeapNode, HeapIdentifier, HeapData, ICseInstruction, Control, Stash, ICseMachineState } from "./types";
+import { IHeapTypedValue, IHeapEnvFrame, IHeapNode, HeapIdentifier, HeapData, ICseInstruction, Control, Stash, ICseMachineState } from "./types";
 import { HeapDataType } from "./types/heap/HeapDataType";
 import { ConductorInternalError } from "../../common/errors";
 import { isIdentifierType, verifyDraft } from "./util";
 
-function makeFrame(label: string, parent?: number, names?: string[], bindings?: Record<string, ITypedValue>, constant?: Record<string, boolean>): IHeapEnvFrame {
+function makeFrame(label: string, parent?: number, names?: string[], bindings?: Record<string, IHeapTypedValue>, constant?: Record<string, boolean>): IHeapEnvFrame {
     return Object.freeze({
         label: label,
         parent: parent,
@@ -109,7 +109,7 @@ export class CseMachineState implements ICseMachineState {
     ///// STASH
 
     @verifyDraft
-    stashPush(items: ITypedValue | ITypedValue[]): void {
+    stashPush(items: IHeapTypedValue | IHeapTypedValue[]): void {
         const draft = castDraft(this);
         if (!Array.isArray(items)) {
             items = [items];
@@ -122,18 +122,18 @@ export class CseMachineState implements ICseMachineState {
         }
     }
 
-    stashTop(): ITypedValue | undefined;
-    stashTop(numItems: number): ITypedValue[];
-    stashTop(numItems?: number): ITypedValue | undefined | ITypedValue[] {
+    stashTop(): IHeapTypedValue | undefined;
+    stashTop(numItems: number): IHeapTypedValue[];
+    stashTop(numItems?: number): IHeapTypedValue | undefined | IHeapTypedValue[] {
         if (numItems === undefined) return this.stash[this.stash.length - 1];
         if (this.stash.length > numItems) throw new ConductorInternalError("Not enough items in stash!");
         return this.stash.slice(-numItems);
     }
 
-    stashPop(): ITypedValue;
-    stashPop(numItems: number): ITypedValue[];
+    stashPop(): IHeapTypedValue;
+    stashPop(numItems: number): IHeapTypedValue[];
     @verifyDraft
-    stashPop(numItems?: number): ITypedValue | ITypedValue[] {
+    stashPop(numItems?: number): IHeapTypedValue | IHeapTypedValue[] {
         const draft = castDraft(this);
         if (numItems === undefined) {
             if (draft.stash.length === 0) throw new ConductorInternalError("Stash is empty!");
@@ -226,6 +226,17 @@ export class CseMachineState implements ICseMachineState {
     }
 
     @verifyDraft
+    replace(dependent: HeapIdentifier, originalValue: IHeapTypedValue, newValue: IHeapTypedValue): void {
+        const draft = castDraft(this);
+        if (isIdentifierType(originalValue)) {
+            draft.untie(dependent, originalValue.value);
+        }
+        if (isIdentifierType(newValue)) {
+            draft.tie(dependent, newValue.value);
+        }
+    }
+
+    @verifyDraft
     clean(toClean?: HeapIdentifier[]): void {
         const draft = castDraft(this);
         if (toClean === undefined) {
@@ -274,7 +285,7 @@ export class CseMachineState implements ICseMachineState {
     }
 
     @verifyDraft
-    makeFrame(label: string, names?: string[], bindings?: Record<string, ITypedValue>, parent: HeapIdentifier = this.currentFrame): void {
+    makeFrame(label: string, names?: string[], bindings?: Record<string, IHeapTypedValue>, parent: HeapIdentifier = this.currentFrame): void {
         const draft = castDraft(this);
         const frameId = draft.alloc(HeapDataType.FRAME, makeFrame(label, parent, names, bindings));
         draft.tie(frameId, parent);
@@ -292,14 +303,14 @@ export class CseMachineState implements ICseMachineState {
         draft.currentFrame = frameId;
     }
 
-    lookup(name: string, frameId: HeapIdentifier = this.currentFrame): ITypedValue {
+    lookup(name: string, frameId: HeapIdentifier = this.currentFrame): IHeapTypedValue {
         const targetFrameId = this.findFrame(name, frameId);
         if (targetFrameId === undefined) throw new Error("can't find name!"); // TODO lookup error
         return this.getFrame(targetFrameId).bindings[name];
     }
 
     @verifyDraft
-    modify(name: string, newValue: ITypedValue, frameId: HeapIdentifier = this.currentFrame): void {
+    modify(name: string, newValue: IHeapTypedValue, frameId: HeapIdentifier = this.currentFrame): void {
         const draft = castDraft(this);
         const targetFrameId = draft.findFrame(name, frameId);
         if (targetFrameId === undefined) throw new Error("can't find name!"); // TODO lookup error

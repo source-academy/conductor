@@ -1,6 +1,6 @@
-import { type ITypedValue, type HeapIdentifier, HeapDataType } from "../types";
+import { type IHeapTypedValue, type HeapIdentifier, HeapDataType } from "../types";
 
-export function isIdentifierType(typedValue: ITypedValue): typedValue is ITypedValue & {value: HeapIdentifier} {
+export function isIdentifierType(typedValue: IHeapTypedValue): typedValue is IHeapTypedValue & {value: HeapIdentifier} {
     switch (typedValue.datatype) {
         case HeapDataType.ARRAY:
         case HeapDataType.CLOSURE:

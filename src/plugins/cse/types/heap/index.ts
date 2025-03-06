@@ -1,3 +1,4 @@
+export { dtMap, hdtMap } from "./dtMap";
 export type { HeapData } from "./HeapData";
 export { HeapDataType } from "./HeapDataType";
 export type { HeapIdentifier } from "./HeapIdentifier";
@@ -9,4 +10,4 @@ export type { IHeapExtClosure } from "./IHeapExtClosure";
 export type { IHeapNode } from "./IHeapNode";
 export type { IHeapOpaque } from "./IHeapOpaque";
 export type { IHeapPair } from "./IHeapPair";
-export type { ITypedValue } from "./ITypedValue";
+export type { IHeapTypedValue } from "./IHeapTypedValue";

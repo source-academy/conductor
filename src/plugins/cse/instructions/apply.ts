@@ -1,4 +1,4 @@
-import { CseInstructionType, ICseInstrHandler, ICseInstruction, ICseMachineState, IHeapClosure, IHeapExtClosure, ITypedValue } from "../types";
+import { CseInstructionType, ICseInstrHandler, ICseInstruction, ICseMachineState, IHeapClosure, IHeapExtClosure, IHeapTypedValue } from "../types";
 import { HeapDataType } from "../types/heap/HeapDataType";
 import { assertDataType } from "../util";
 
@@ -15,8 +15,8 @@ export function makeApplyIns(arity: number): IApplyIns {
 }
 
 export const applyHandler: ICseInstrHandler<IApplyIns> = [CseInstructionType.APPLY, function applyHandler(state: ICseMachineState, instr: IApplyIns) {
-    const cId = state.stashPop();
     const args = state.stashPop(instr.arity);
+    const cId = state.stashPop();
     assertDataType("Cannot apply", cId, HeapDataType.CLOSURE);
     const closure = state.heapGet(cId.value) as IHeapClosure | IHeapExtClosure;
     if (closure.paramType) {
@@ -25,15 +25,16 @@ export const applyHandler: ICseInstrHandler<IApplyIns> = [CseInstructionType.APP
         }
     }
     if ("instructions" in closure) {
-        const bindings: Record<string, ITypedValue> = {};
+        const bindings: Record<string, IHeapTypedValue> = {};
         for (let i = 0; i < closure.paramName.length; ++i) {
             bindings[closure.paramName[i]] = args[i];
         }
         state.makeFrame(closure.closureName ?? "closure", closure.paramName, bindings, closure.parentFrame);
         state.controlPush(closure.instructions);
     } else {
+        // TODO finalise draft first...
         const value = closure.callback(...args.map(v => v.value));
-        if (closure.returnType === HeapDataType.UNASSIGNED) return;
+        // TODO then start a new draft...
         state.stashPush({datatype: closure.returnType, value});
     }
 }];

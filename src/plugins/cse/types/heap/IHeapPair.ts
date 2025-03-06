@@ -1,5 +1,5 @@
-import { ITypedValue } from "./ITypedValue";
+import { IHeapTypedValue } from "./IHeapTypedValue";
 
 export type IHeapPair = {
-    pair: [ITypedValue, ITypedValue];
+    pair: [IHeapTypedValue, IHeapTypedValue];
 };

@@ -26,6 +26,9 @@ export enum HeapDataType {
     /** An opaque value that cannot be manipulated from user code. */
     OPAQUE = 8,
 
+    /** A list (either a pair or the empty list). */
+    LIST = 9,
+
     /** An environment frame. */
-    FRAME = 9,
+    FRAME = 10,
 };

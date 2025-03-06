@@ -1,7 +1,7 @@
 import type { HeapDataType } from "./HeapDataType";
-import type { ITypedValue } from "./ITypedValue";
+import type { IHeapTypedValue } from "./IHeapTypedValue";
 
 export type IHeapArray = {
     type?: HeapDataType;
-    array: ITypedValue[];
+    array: IHeapTypedValue[];
 }

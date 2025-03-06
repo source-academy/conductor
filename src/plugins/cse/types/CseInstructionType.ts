@@ -4,6 +4,7 @@ export const enum CseInstructionType {
     UNARY_OP,
     BINARY_OP,
     POP,
+    PUSH,
     APPLY,
     BRANCH,
     ARRAY_LITERAL,

@@ -1,5 +1,5 @@
 import type { Control } from "./Control";
-import type { IHeapNode, HeapIdentifier, ITypedValue, HeapData, IHeapEnvFrame, HeapDataType } from "./heap";
+import type { IHeapNode, HeapIdentifier, IHeapTypedValue, HeapData, IHeapEnvFrame, HeapDataType } from "./heap";
 import type { ICseInstruction } from "./ICseInstruction";
 import type { Stash } from "./Stash";
 
@@ -69,13 +69,13 @@ export interface ICseMachineState {
      * Adds items to the Stash.
      * @param items The items to add to the Stash.
      */
-    stashPush(items: ITypedValue[]): void;
+    stashPush(items: IHeapTypedValue[]): void;
 
     /**
      * Adds an item to the Stash.
      * @param item The item to add to the Stash.
      */
-    stashPush(item: ITypedValue): void;
+    stashPush(item: IHeapTypedValue): void;
 
     /**
      * Gets the next `numItems` items in the Stash, in the order they were inserted.
@@ -83,13 +83,13 @@ export interface ICseMachineState {
      * @returns The next `numItems` items in the Stash.
      * @throws If there are insufficient items in the Stash.
      */
-    stashTop(numItems: number): ITypedValue[];
+    stashTop(numItems: number): IHeapTypedValue[];
 
     /**
      * Gets the next item in the Stash.
      * @returns The next item in the Stash.
      */
-    stashTop(): ITypedValue | undefined;
+    stashTop(): IHeapTypedValue | undefined;
 
     /**
      * Removes the next `numItems` items from the Stash, and returns them.
@@ -98,7 +98,7 @@ export interface ICseMachineState {
      * @throws If there are insufficient items in the Stash.
      * @throws If not called on a Draft.
      */
-    stashPop(numItems: number): ITypedValue[];
+    stashPop(numItems: number): IHeapTypedValue[];
 
     /**
      * Removes the next item from the Stash, and returns it.
@@ -106,7 +106,7 @@ export interface ICseMachineState {
      * @throws If the Stash is empty.
      * @throws If not called on a Draft.
      */
-    stashPop(): ITypedValue;
+    stashPop(): IHeapTypedValue;
 
     /**
      * Clears the Stash.
@@ -176,6 +176,14 @@ export interface ICseMachineState {
     untie(dependent: HeapIdentifier, dependee: HeapIdentifier): void;
 
     /**
+     * Replaces an object that a dependent is holding a reference to with a new one.
+     * @param dependent The dependent object.
+     * @param originalValue The original object that the dependent is holding a reference to.
+     * @param newValue The new object that the dependent should hold a reference to.
+     */
+    replace(dependent: HeapIdentifier, originalValue: IHeapTypedValue, newValue: IHeapTypedValue): void;
+
+    /**
      * Frees the given objects, if their reference counter is zero.
      * 
      * If an object would no longer be depended on to as a result of freeing
@@ -243,7 +251,7 @@ export interface ICseMachineState {
      * @param parent The parent of the new frame.
      * @throws If not called on a Draft.
      */
-    makeFrame(label: string, names?: string[], bindings?: Record<string, ITypedValue>, parent?: HeapIdentifier): void;
+    makeFrame(label: string, names?: string[], bindings?: Record<string, IHeapTypedValue>, parent?: HeapIdentifier): void;
 
     /**
      * Sets a given frame as the current frame.
@@ -256,21 +264,21 @@ export interface ICseMachineState {
      * Looks up the value of a given symbol, starting from the current frame.
      * @param name The symbol to lookup the value of.
      */
-    lookup(name: string): ITypedValue;
+    lookup(name: string): IHeapTypedValue;
 
     /**
      * Looks up the value of a given symbol, starting from a given frame.
      * @param name The symbol to lookup the value of.
      * @param frameId The identifier pointing to the frame to commence the search from.
      */
-    lookup(name: string, frameId: HeapIdentifier): ITypedValue;
+    lookup(name: string, frameId: HeapIdentifier): IHeapTypedValue;
 
     /**
      * Modifies the value of a given symbol, resolving the symbol starting from the current frame.
      * @param name The symbol to modify the value of.
      * @param newValue The new value to be taken by the symbol.
      */
-    modify(name: string, newValue: ITypedValue): void;
+    modify(name: string, newValue: IHeapTypedValue): void;
 
     /**
      * Modifies the value of a given symbol, resolving the symbol starting from the given frame.
@@ -278,5 +286,5 @@ export interface ICseMachineState {
      * @param newValue The new value to be taken by the symbol.
      * @param frameId The identifier pointing to the frame to commence the search from.
      */
-    modify(name: string, newValue: ITypedValue, frameId: HeapIdentifier): void;
+    modify(name: string, newValue: IHeapTypedValue, frameId: HeapIdentifier): void;
 }

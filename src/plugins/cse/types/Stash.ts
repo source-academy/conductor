@@ -1,3 +1,3 @@
-import type { ITypedValue } from "./heap/ITypedValue";
+import type { IHeapTypedValue } from "./heap/IHeapTypedValue";
 
-export type Stash = readonly ITypedValue[];
+export type Stash = readonly IHeapTypedValue[];
