@@ -1,4 +1,4 @@
-import { Immer } from "immer";
+import { current, Immer } from "immer";
 
 import { CsePlugin } from "./CsePlugin";
 import { CseInstructionType, ICseInstrHandler, ICseInstruction, ICseMachineState, ICsePlugin, IFragment, ITypedValue } from "./types";
@@ -57,10 +57,9 @@ export abstract class BasicCseEvaluator<F> extends BasicEvaluator implements IEv
         const nextInstr = this.__cseState.controlTop();
         if (!nextInstr) return;
         const draft = createDraft(this.__cseState);
-        draft.setCurrentInstr(nextInstr);
         draft.controlPop();
         if (nextInstr.type === CseInstructionType.FRAGMENT) {
-            const newInstructions = await this.evaluateFragment((nextInstr as IFragmentIns).fragment);
+            const newInstructions = await this.evaluateFragment((nextInstr as IFragmentIns).fragment, current(draft));
             draft.controlPush(newInstructions);
         } else if (nextInstr.type === CseInstructionType.BINARY_OP) {
             const instr = nextInstr as IBinaryOpIns;
@@ -150,9 +149,10 @@ export abstract class BasicCseEvaluator<F> extends BasicEvaluator implements IEv
      * Evaluates a Fragment (AST node) by emitting an array of CSE machine instructions.
      * The instructions will be inserted into the Control in the given order, i.e. the next instruction to be processed is the last item in the array.
      * @param fragment The fragment to be evaluated.
+     * @param state The current CSE machine state.
      * @returns An array of CSE machine instructions.
      */
-    abstract evaluateFragment(fragment: IFragment<F>): ICseInstruction[] | Promise<ICseInstruction[]>;
+    abstract evaluateFragment(fragment: IFragment<F>, state: ICseMachineState): ICseInstruction[] | Promise<ICseInstruction[]>;
 
     /**
      * Invokes a binary operator on two values from the Stash.

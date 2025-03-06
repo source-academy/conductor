@@ -106,22 +106,6 @@ export class CseMachineState implements ICseMachineState {
         draft.control = [];
     }
 
-    @verifyDraft
-    setCurrentInstr(instr: ICseInstruction | undefined): void {
-        const draft = castDraft(this);
-        if (draft.currentInstr && draft.currentInstr.ref) {
-            for (const i of draft.currentInstr.ref) {
-                this.decrementRef(i);
-            }
-        }
-        draft.currentInstr = instr;
-        if (instr && instr.ref) {
-            for (const i of instr.ref) {
-                this.incrementRef(i);
-            }
-        }
-    }
-
     ///// STASH
 
     @verifyDraft

@@ -1,5 +1,5 @@
 export enum HeapDataType {
-    /** A variable that hasn't been assigned to. */
+    /** A variable that hasn't been assigned to, or the return type of external functions that don't produce a value. */
     UNASSIGNED = 0,
 
     /** A Boolean value. */

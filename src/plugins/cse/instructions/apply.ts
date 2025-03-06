@@ -1,4 +1,4 @@
-import { CseInstructionType, ICseInstrHandler, ICseInstruction, ICseMachineState, IHeapClosure } from "../types";
+import { CseInstructionType, ICseInstrHandler, ICseInstruction, ICseMachineState, IHeapClosure, IHeapExtClosure, ITypedValue } from "../types";
 import { HeapDataType } from "../types/heap/HeapDataType";
 import { assertDataType } from "../util";
 
@@ -18,8 +18,22 @@ export const applyHandler: ICseInstrHandler<IApplyIns> = [CseInstructionType.APP
     const cId = state.stashPop();
     const args = state.stashPop(instr.arity);
     assertDataType("Cannot apply", cId, HeapDataType.CLOSURE);
-    const closure = state.heapGet(cId.value) as IHeapClosure;
-    if (closure.paramName) {
-        // TODO
+    const closure = state.heapGet(cId.value) as IHeapClosure | IHeapExtClosure;
+    if (closure.paramType) {
+        for (let i = 0; i < closure.paramType.length; ++i) {
+            assertDataType("Cannot apply - argument type mismatch", args[i], closure.paramType[i]);
+        }
+    }
+    if ("instructions" in closure) {
+        const bindings: Record<string, ITypedValue> = {};
+        for (let i = 0; i < closure.paramName.length; ++i) {
+            bindings[closure.paramName[i]] = args[i];
+        }
+        state.makeFrame(closure.closureName ?? "closure", closure.paramName, bindings, closure.parentFrame);
+        state.controlPush(closure.instructions);
+    } else {
+        const value = closure.callback(...args.map(v => v.value));
+        if (closure.returnType === HeapDataType.UNASSIGNED) return;
+        state.stashPush({datatype: closure.returnType, value});
     }
 }];

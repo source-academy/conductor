@@ -5,6 +5,7 @@ export type { HeapValue } from "./HeapValue";
 export type { IHeapArray } from "./IHeapArray";
 export type { IHeapClosure } from "./IHeapClosure";
 export type { IHeapEnvFrame } from "./IHeapEnvFrame";
+export type { IHeapExtClosure } from "./IHeapExtClosure";
 export type { IHeapNode } from "./IHeapNode";
 export type { IHeapOpaque } from "./IHeapOpaque";
 export type { IHeapPair } from "./IHeapPair";
