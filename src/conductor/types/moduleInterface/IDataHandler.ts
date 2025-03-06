@@ -62,10 +62,12 @@ export interface IDataHandler {
      * @param tailType The expected type of the tail of the Pair.
      * @throws If the Pair's type is not as expected.
      */
-    pair_assert(p: PairIdentifier, headType?: DataType, tailType?: DataType): boolean;
+    pair_assert(p: PairIdentifier, headType?: DataType, tailType?: DataType): void;
 
     /**
      * Makes a new Array.
+     * 
+     * Creation of untyped arrays (with type `VOID`) should be avoided.
      * @param t The type of the elements of the Array
      * @param len The length of the Array
      * @param init An optional initial value for the elements of the Array
@@ -87,23 +89,39 @@ export interface IDataHandler {
      * @param idx The index of the value wanted.
      * @returns The value at the given index of the given Array.
      */
+    array_get(a: ArrayIdentifier<DataType.VOID>, idx: number): ExternValue;
     array_get<T extends DataType>(a: ArrayIdentifier<T>, idx: number): ExternTypeOf<NoInfer<T>>;
 
     /**
      * Gets the type of the elements of an Array.
+     * 
+     * If the Array is untyped, `VOID` is returned.
      * @param a The Array to retrieve the element type of.
      * @returns The type of the elements of the Array.
      */
     array_type<T extends DataType>(a: ArrayIdentifier<T>): NoInfer<T>;
 
     /**
+     * Gets the type at a specific index of an Array.
+     * 
+     * This is most useful in untyped Arrays.
+     * @param a The Array to retrieve the element type of.
+     * @param idx The index of the type wanted.
+     * @returns The type at the given index of the given Array.
+     */
+    array_type_at(a: ArrayIdentifier<DataType>, idx: number): DataType;
+
+    /**
      * Sets a value at a specific index of an Array.
      * Arrays are 0-indexed.
      * @param a The Array to be modified.
      * @param idx The index to be modified.
+     * @param t The type of the value to be set.
      * @param v The new value at the given index of the given Array.
+     * @throws If the array is typed and t does not match the Array's type.
      */
-    array_set<T extends DataType>(a: ArrayIdentifier<T>, idx: number, v: ExternTypeOf<NoInfer<T>>): void;
+    array_set(a: ArrayIdentifier<DataType.VOID>, idx: number, t: DataType, v: ExternValue): void;
+    array_set<T extends DataType>(a: ArrayIdentifier<T>, idx: number, t: T, v: ExternTypeOf<NoInfer<T>>): void;
 
     /**
      * Asserts the type of an Array.
@@ -112,7 +130,7 @@ export interface IDataHandler {
      * @param length The expected length of the Array.
      * @throws If the Array's type is not as expected.
      */
-    array_assert(a: ArrayIdentifier<DataType>, type?: DataType, length?: number): boolean;
+    array_assert<T extends DataType>(a: ArrayIdentifier<DataType>, type?: T, length?: number): asserts a is ArrayIdentifier<T>;
 
     /**
      * Makes a new Closure.
@@ -124,7 +142,15 @@ export interface IDataHandler {
     closure_make<const T extends IFunctionSignature>(sig: T, func: ExternCallable<T>, dependsOn?: (Identifier | null)[]): ClosureIdentifier<T["returnType"]>;
 
     /**
+     * Checks if a Closure accepts variable number of arguments.
+     * @param c The Closure to check.
+     * @returns `true` if the Closure accepts variable number of arguments.
+     */
+    closure_is_vararg(c: ClosureIdentifier<DataType>): boolean;
+
+    /**
      * Gets the arity (number of parameters) of a Closure.
+     * For vararg Closures, the arity is the minimum number of parameters required.
      * @param c The Closure to get the arity of.
      * @returns The arity of the Closure.
      */
@@ -153,7 +179,7 @@ export interface IDataHandler {
      * @param arity The expected arity of the Closure.
      * @throws If the Closure's arity is not as expected.
      */
-    closure_arity_assert(c: ClosureIdentifier<DataType>, arity: number): boolean;
+    closure_arity_assert(c: ClosureIdentifier<DataType>, arity: number): void;
 
     /**
      * Makes a new Opaque object.
