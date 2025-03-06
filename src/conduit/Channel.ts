@@ -5,7 +5,7 @@ export class Channel<T> implements IChannel<T> {
     readonly name: string;
 
     /** The underlying MessagePort of this Channel. */
-    private __port?: MessagePort;
+    private __port!: MessagePort; // replacePort assigns this in the constructor
 
     /** The callbacks subscribed to this Channel. */
     private readonly __subscribers: Set<Subscriber<T>> = new Set(); // TODO: use WeakRef? but callbacks tend to be thrown away and leaking is better than incorrect behaviour
@@ -13,14 +13,21 @@ export class Channel<T> implements IChannel<T> {
     /** Is the Channel allowed to be used? */
     private __isAlive: boolean = true;
 
+    private __waitingMessages?: T[] = [];
+
     send(message: T, transfer?: Transferable[]): void {
         this.__verifyAlive();
-        this.__port!.postMessage(message, transfer ?? []);
+        this.__port.postMessage(message, transfer ?? []);
     }
     subscribe(subscriber: Subscriber<T>): void {
         this.__verifyAlive();
-        this.__port?.start();
         this.__subscribers.add(subscriber);
+        if (this.__waitingMessages) {
+            for (const data of this.__waitingMessages) {
+                subscriber(data);
+            }
+            delete this.__waitingMessages;
+        }
     }
     unsubscribe(subscriber: Subscriber<T>): void {
         this.__verifyAlive();
@@ -46,18 +53,23 @@ export class Channel<T> implements IChannel<T> {
      */
     private __dispatch(data: T): void {
         this.__verifyAlive();
-        for (const subscriber of this.__subscribers) {
-            subscriber(data);
+        if (this.__waitingMessages) {
+            this.__waitingMessages.push(data);
+        } else {
+            for (const subscriber of this.__subscribers) {
+                subscriber(data);
+            }
         }
     }
 
     /**
-     * Listens to the port's message event, and starts the port if there are subscribers (otherwise it will be started in the subscribe method).
+     * Listens to the port's message event, and starts the port.
+     * Messages will be buffered until the first subscriber listens to the Channel.
      * @param port The MessagePort to listen to.
      */
     listenToPort(port: MessagePort): void {
         port.addEventListener("message", e => this.__dispatch(e.data));
-        if (this.__subscribers.size > 0) port.start();
+        port.start();
     }
 
     /**
