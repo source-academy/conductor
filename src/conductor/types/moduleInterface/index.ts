@@ -12,3 +12,4 @@ export type { NativeValue } from "./NativeValue";
 export type { OpaqueIdentifier } from "./OpaqueIdentifier";
 export type { PairIdentifier } from "./PairIdentifier";
 export type { StdlibFunction } from "./StdlibFunction";
+export type { TypedValue } from "./TypedValue";

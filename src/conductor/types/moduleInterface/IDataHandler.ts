@@ -1,4 +1,4 @@
-import type { ArrayIdentifier, ClosureIdentifier, DataType, ExternCallable, ExternTypeOf, ExternValue, Identifier, IFunctionSignature, List, OpaqueIdentifier, PairIdentifier } from ".";
+import type { ArrayIdentifier, ClosureIdentifier, DataType, ExternCallable, ExternTypeOf, ExternValue, Identifier, IFunctionSignature, List, OpaqueIdentifier, PairIdentifier, TypedValue } from ".";
 
 export interface IDataHandler {
     readonly hasDataInterface: true;
@@ -7,53 +7,39 @@ export interface IDataHandler {
 
     /**
      * Makes a new Pair.
+     * @param head The typed value to be the head of the new Pair.
+     * @param tail The typed value to be the tail of the new Pair.
      * @returns An identifier to the new Pair.
      */
-    pair_make(): PairIdentifier;
+    pair_make(head: TypedValue<DataType>, tail: TypedValue<DataType>): PairIdentifier;
 
     /**
-     * Gets the value in the head of a Pair.
+     * Gets the typed value in the head of a Pair.
      * @param p The Pair to retrieve the head of.
-     * @returns The value in the head of the Pair.
+     * @returns The typed value in the head of the Pair.
      */
-    pair_gethead(p: PairIdentifier): ExternValue;
-
-    /**
-     * Gets the type of the head of a Pair.
-     * @param p The Pair to retrieve the head type of.
-     * @returns The type of the head of the Pair.
-     */
-    pair_typehead(p: PairIdentifier): DataType;
+    pair_head(p: PairIdentifier): TypedValue<DataType>;
 
     /**
      * Sets the head of a Pair.
      * @param p The Pair to set the head of.
-     * @param t The type of the value to be set.
-     * @param v The value to set the head of the Pair to.
+     * @param v The typed value to set the head of the Pair to.
      */
-    pair_sethead<T extends DataType>(p: PairIdentifier, t: T, v: ExternTypeOf<NoInfer<T>>): void;
+    pair_sethead(p: PairIdentifier, v: TypedValue<DataType>): void;
 
     /**
-     * Gets the value in the tail of a Pair.
+     * Gets the typed value in the tail of a Pair.
      * @param p The Pair to retrieve the tail of.
-     * @returns The value in the tail of the Pair.
+     * @returns The typed value in the tail of the Pair.
      */
-    pair_gettail(p: PairIdentifier): ExternValue;
-
-    /**
-     * Gets the type of the tail of a Pair.
-     * @param p The Pair to retrieve the tail type of.
-     * @returns The type of the tail of the Pair.
-     */
-    pair_typetail(p: PairIdentifier): DataType;
+    pair_tail(p: PairIdentifier): TypedValue<DataType>;
 
     /**
      * Sets the tail of a Pair.
      * @param p The Pair to set the tail of.
-     * @param t The type of the value to be set.
-     * @param v The value to set the tail of the Pair to.
+     * @param v The typed value to set the tail of the Pair to.
      */
-    pair_settail<T extends DataType>(p: PairIdentifier, t: T, v: ExternTypeOf<NoInfer<T>>): void;
+    pair_settail(p: PairIdentifier, v: TypedValue<DataType>): void;
 
     /**
      * Asserts the type of a Pair.
@@ -70,10 +56,10 @@ export interface IDataHandler {
      * Creation of untyped arrays (with type `VOID`) should be avoided.
      * @param t The type of the elements of the Array
      * @param len The length of the Array
-     * @param init An optional initial value for the elements of the Array
+     * @param init An optional initial typed value for the elements of the Array
      * @returns An identifier to the new Array.
      */
-    array_make<T extends DataType>(t: T, len: number, init?: ExternTypeOf<NoInfer<T>>): ArrayIdentifier<NoInfer<T>>;
+    array_make<T extends DataType>(t: T, len: number, init?: TypedValue<NoInfer<T>>): ArrayIdentifier<NoInfer<T>>;
 
     /**
      * Gets the length of an Array.
@@ -83,14 +69,14 @@ export interface IDataHandler {
     array_length(a: ArrayIdentifier<DataType>): number;
 
     /**
-     * Gets the value at a specific index of an Array.
+     * Gets the typed value at a specific index of an Array.
      * Arrays are 0-indexed.
      * @param a The Array to retrieve the value from.
      * @param idx The index of the value wanted.
-     * @returns The value at the given index of the given Array.
+     * @returns The typed value at the given index of the given Array.
      */
-    array_get(a: ArrayIdentifier<DataType.VOID>, idx: number): ExternValue;
-    array_get<T extends DataType>(a: ArrayIdentifier<T>, idx: number): ExternTypeOf<NoInfer<T>>;
+    array_get(a: ArrayIdentifier<DataType.VOID>, idx: number): TypedValue<DataType>;
+    array_get<T extends DataType>(a: ArrayIdentifier<T>, idx: number): TypedValue<NoInfer<T>>;
 
     /**
      * Gets the type of the elements of an Array.
@@ -102,35 +88,24 @@ export interface IDataHandler {
     array_type<T extends DataType>(a: ArrayIdentifier<T>): NoInfer<T>;
 
     /**
-     * Gets the type at a specific index of an Array.
-     * 
-     * This is most useful in untyped Arrays.
-     * @param a The Array to retrieve the element type of.
-     * @param idx The index of the type wanted.
-     * @returns The type at the given index of the given Array.
-     */
-    array_type_at(a: ArrayIdentifier<DataType>, idx: number): DataType;
-
-    /**
      * Sets a value at a specific index of an Array.
      * Arrays are 0-indexed.
      * @param a The Array to be modified.
      * @param idx The index to be modified.
-     * @param t The type of the value to be set.
-     * @param v The new value at the given index of the given Array.
-     * @throws If the array is typed and t does not match the Array's type.
+     * @param v The new typed value at the given index of the given Array.
+     * @throws If the array is typed and v's type does not match the Array's type.
      */
-    array_set(a: ArrayIdentifier<DataType.VOID>, idx: number, t: DataType, v: ExternValue): void;
-    array_set<T extends DataType>(a: ArrayIdentifier<T>, idx: number, t: T, v: ExternTypeOf<NoInfer<T>>): void;
+    array_set(a: ArrayIdentifier<DataType.VOID>, idx: number, v: TypedValue<DataType>): void;
+    array_set<T extends DataType>(a: ArrayIdentifier<T>, idx: number, v: TypedValue<NoInfer<T>>): void;
 
     /**
-     * Asserts the type of an Array.
-     * @param a The Array to assert the type of.
+     * Asserts the type and/or length of an Array.
+     * @param a The Array to assert.
      * @param type The expected type of the elements of the Array.
      * @param length The expected length of the Array.
      * @throws If the Array's type is not as expected.
      */
-    array_assert<T extends DataType>(a: ArrayIdentifier<DataType>, type?: T, length?: number): asserts a is ArrayIdentifier<T>;
+    array_assert<T extends DataType>(a: ArrayIdentifier<DataType>, type?: T, length?: number): asserts a is ArrayIdentifier<NoInfer<T>>;
 
     /**
      * Makes a new Closure.
@@ -159,19 +134,19 @@ export interface IDataHandler {
     /**
      * Calls a Closure and checks the type of the returned value.
      * @param c The Closure to be called.
-     * @param args An array of arguments to be passed to the Closure.
+     * @param args An array of typed arguments to be passed to the Closure.
      * @param returnType The expected type of the returned value.
-     * @returns The returned value.
+     * @returns The returned typed value.
      */
-    closure_call<T extends DataType>(c: ClosureIdentifier<DataType>, args: ExternValue[], returnType: T): Promise<ExternTypeOf<NoInfer<T>>>;
+    closure_call<T extends DataType>(c: ClosureIdentifier<DataType>, args: TypedValue<DataType>[], returnType: T): Promise<TypedValue<NoInfer<T>>>;
 
     /**
      * Calls a Closure of known return type.
      * @param c The Closure to be called.
-     * @param args An array of arguments to be passed to the Closure.
-     * @returns The returned value.
+     * @param args An array of typed arguments to be passed to the Closure.
+     * @returns The returned typed value.
      */
-    closure_call_unchecked<T extends DataType>(c: ClosureIdentifier<T>, args: ExternValue[]): Promise<ExternTypeOf<NoInfer<T>>>;
+    closure_call_unchecked<T extends DataType>(c: ClosureIdentifier<T>, args: TypedValue<DataType>[]): Promise<TypedValue<NoInfer<T>>>;
 
     /**
      * Asserts the arity of a Closure.
@@ -220,9 +195,9 @@ export interface IDataHandler {
 
     ///// Standard library functions
 
-    list(...elements: [DataType, ExternValue][]): List;
+    list(...elements: TypedValue<DataType>[]): TypedValue<DataType.LIST>;
     is_list(xs: List): boolean;
-    list_to_vec(xs: List): [ExternValue, DataType][];
-    accumulate<T extends Exclude<DataType, DataType.VOID>>(op: ClosureIdentifier<DataType>, initial: ExternTypeOf<T>, sequence: List, resultType: T): Promise<ExternTypeOf<T>>;
+    list_to_vec(xs: List): TypedValue<DataType>[];
+    accumulate<T extends Exclude<DataType, DataType.VOID>>(op: ClosureIdentifier<DataType>, initial: TypedValue<T>, sequence: List, resultType: T): Promise<TypedValue<T>>;
     length(xs: List): number;
 }

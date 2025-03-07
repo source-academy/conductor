@@ -1,5 +1,5 @@
 import { EvaluatorTypeError } from "../../../common/errors";
-import { DataType, IDataHandler, List, PairIdentifier } from "../../types"
+import { DataType, IDataHandler, List } from "../../types"
 
 /**
  * Gets the length of a List.
@@ -11,9 +11,9 @@ export function length(this: IDataHandler, xs: List): number {
     if (xs === null) return length; // TODO: figure out some way to avoid JS value comparison
     while (true) {
         length++;
-        const t = this.pair_typetail(xs);
-        if (t === DataType.EMPTY_LIST) return length;
-        if (t !== DataType.PAIR) throw new EvaluatorTypeError("Input is not a list", DataType[DataType.LIST], DataType[t]);
-        xs = this.pair_gettail(xs) as PairIdentifier;
+        const tail = this.pair_tail(xs);
+        if (tail.type === DataType.EMPTY_LIST) return length;
+        if (tail.type !== DataType.PAIR) throw new EvaluatorTypeError("Input is not a list", DataType[DataType.LIST], DataType[tail.type]);
+        xs = tail.value;
     }
 }

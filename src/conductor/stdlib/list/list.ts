@@ -1,16 +1,15 @@
-import { DataType, ExternValue, IDataHandler, List } from "../../types";
+import { DataType, IDataHandler, TypedValue } from "../../types";
+import { mList } from "../../util/mList";
 
 /**
  * Creates a new List from given elements.
- * @param elements The elements of the List, given as a tuple of [type, value].
+ * @param elements The elements of the List, given as typed values.
  * @returns The newly created List.
  */
-export function list(this: IDataHandler, ...elements: [DataType, ExternValue][]): List {
-    let theList: List = null;
+export function list(this: IDataHandler, ...elements: TypedValue<DataType>[]): TypedValue<DataType.LIST> {
+    let theList: TypedValue<DataType.LIST> = mList(null);
     for (let i = elements.length - 1; i >= 0; --i) {
-        const p = this.pair_make();
-        this.pair_sethead(p, ...elements[i]);
-        this.pair_settail(p, theList === null ? DataType.EMPTY_LIST : DataType.PAIR, theList);
+        const p = mList(this.pair_make(elements[i], theList));
         theList = p;
     }
     return theList;

@@ -1,4 +1,4 @@
-import { DataType, IDataHandler, List, PairIdentifier } from "../../types"
+import { DataType, IDataHandler, List } from "../../types"
 
 /**
  * Checks if a List is a true list (`tail(tail...(xs))` is empty-list).
@@ -8,9 +8,9 @@ import { DataType, IDataHandler, List, PairIdentifier } from "../../types"
 export function is_list(this: IDataHandler, xs: List): boolean {
     if (xs === null) return true; // TODO: figure out some way to avoid JS value comparison
     while (true) {
-        const t = this.pair_typetail(xs);
-        if (t === DataType.EMPTY_LIST) return true;
-        if (t !== DataType.PAIR) return false;
-        xs = this.pair_gettail(xs) as PairIdentifier;
+        const tail = this.pair_tail(xs);
+        if (tail.type === DataType.EMPTY_LIST) return true;
+        if (tail.type !== DataType.PAIR) return false;
+        xs = tail.value;
     }
 }
