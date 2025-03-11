@@ -1,4 +1,4 @@
-import type { ArrayIdentifier, ClosureIdentifier, DataType, ExternCallable, ExternTypeOf, ExternValue, Identifier, IFunctionSignature, List, OpaqueIdentifier, PairIdentifier, TypedValue } from ".";
+import type { ArrayIdentifier, ClosureIdentifier, DataType, ExternCallable, Identifier, IFunctionSignature, List, OpaqueIdentifier, PairIdentifier, TypedValue } from ".";
 
 export interface IDataHandler {
     readonly hasDataInterface: true;
@@ -23,9 +23,9 @@ export interface IDataHandler {
     /**
      * Sets the head of a Pair.
      * @param p The Pair to set the head of.
-     * @param v The typed value to set the head of the Pair to.
+     * @param tv The typed value to set the head of the Pair to.
      */
-    pair_sethead(p: PairIdentifier, v: TypedValue<DataType>): void;
+    pair_sethead(p: PairIdentifier, tv: TypedValue<DataType>): void;
 
     /**
      * Gets the typed value in the tail of a Pair.
@@ -37,9 +37,9 @@ export interface IDataHandler {
     /**
      * Sets the tail of a Pair.
      * @param p The Pair to set the tail of.
-     * @param v The typed value to set the tail of the Pair to.
+     * @param tv The typed value to set the tail of the Pair to.
      */
-    pair_settail(p: PairIdentifier, v: TypedValue<DataType>): void;
+    pair_settail(p: PairIdentifier, tv: TypedValue<DataType>): void;
 
     /**
      * Asserts the type of a Pair.
@@ -92,11 +92,11 @@ export interface IDataHandler {
      * Arrays are 0-indexed.
      * @param a The Array to be modified.
      * @param idx The index to be modified.
-     * @param v The new typed value at the given index of the given Array.
+     * @param tv The new typed value at the given index of the given Array.
      * @throws If the array is typed and v's type does not match the Array's type.
      */
-    array_set(a: ArrayIdentifier<DataType.VOID>, idx: number, v: TypedValue<DataType>): void;
-    array_set<T extends DataType>(a: ArrayIdentifier<T>, idx: number, v: TypedValue<NoInfer<T>>): void;
+    array_set(a: ArrayIdentifier<DataType.VOID>, idx: number, tv: TypedValue<DataType>): void;
+    array_set<T extends DataType>(a: ArrayIdentifier<T>, idx: number, tv: TypedValue<NoInfer<T>>): void;
 
     /**
      * Asserts the type and/or length of an Array.
