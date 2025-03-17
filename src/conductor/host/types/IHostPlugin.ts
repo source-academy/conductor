@@ -87,8 +87,9 @@ export interface IHostPlugin extends IPlugin {
 
     /**
      * Registers a plugin with the conduit.
-     * @param pluginClass The plugin to be registered.
+     * @param pluginClass The plugin class to be registered.
      * @param arg Arguments to be passed to pluginClass' constructor.
+     * @returns The registered plugin.
      */
     registerPlugin<Arg extends any[], T extends IPlugin>(pluginClass: PluginClass<Arg, T>, ...arg: Arg): NoInfer<T>;
 
@@ -101,7 +102,8 @@ export interface IHostPlugin extends IPlugin {
     /**
      * Imports an external plugin and registers it with the conduit.
      * @param location The location of the external plugin.
+     * @param arg Arguments to be passed to the external plugin's constructor.
      * @returns The imported plugin.
      */
-    importAndRegisterExternalPlugin(location: string): Promise<IPlugin>;
+    importAndRegisterExternalPlugin(location: string, ...arg: any[]): Promise<IPlugin>;
 }

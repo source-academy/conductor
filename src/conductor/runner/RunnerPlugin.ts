@@ -98,9 +98,9 @@ export class RunnerPlugin implements IRunnerPlugin {
         this.unregisterPlugin(module);
     }
 
-    async importAndRegisterExternalPlugin(location: string): Promise<IPlugin> {
+    async importAndRegisterExternalPlugin(location: string, ...arg: any[]): Promise<IPlugin> {
         const pluginClass = await importExternalPlugin(location);
-        return this.registerPlugin(pluginClass);
+        return this.registerPlugin(pluginClass as any, ...arg);
     }
 
     async importAndRegisterExternalModule(location: string): Promise<IModulePlugin> {

@@ -58,8 +58,9 @@ export interface IRunnerPlugin extends IPlugin {
 
     /**
      * Registers a plugin with the conduit.
-     * @param pluginClass The plugin to be registered.
+     * @param pluginClass The plugin class to be registered.
      * @param arg Arguments to be passed to pluginClass' constructor.
+     * @returns The registered plugin.
      */
     registerPlugin<Arg extends any[], T extends IPlugin>(pluginClass: PluginClass<Arg, T>, ...arg: Arg): NoInfer<T>;
 
@@ -71,7 +72,8 @@ export interface IRunnerPlugin extends IPlugin {
 
     /**
      * Registers an external module with the conduit, and links it with the evaluator.
-     * @param moduleClass The module to be registered.
+     * @param moduleClass The module class to be registered.
+     * @returns The registered module.
      */
     registerModule<T extends IModulePlugin>(moduleClass: ModuleClass<T>): T;
 
@@ -84,12 +86,15 @@ export interface IRunnerPlugin extends IPlugin {
     /**
      * Imports an external plugin and registers it with the conduit.
      * @param location The location of the external plugin.
+     * @param arg Arguments to be passed to the external plugin's constructor.
+     * @returns The imported plugin.
      */
-    importAndRegisterExternalPlugin(location: string): Promise<IPlugin>;
+    importAndRegisterExternalPlugin(location: string, ...arg: any[]): Promise<IPlugin>;
 
     /**
      * Imports an external module and registers it with the conduit.
      * @param location The location of the external module.
+     * @returns The imported module.
      */
     importAndRegisterExternalModule(location: string): Promise<IModulePlugin>;
 }

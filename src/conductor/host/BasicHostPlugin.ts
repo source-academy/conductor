@@ -77,12 +77,11 @@ export abstract class BasicHostPlugin implements IHostPlugin {
         this.__conduit.unregisterPlugin(plugin);
     }
 
-    async importAndRegisterExternalPlugin(location: string): Promise<IPlugin> {
-        const plugin = await importExternalPlugin(location);
-        return this.registerPlugin(plugin);
+    async importAndRegisterExternalPlugin(location: string, ...arg: any[]): Promise<IPlugin> {
+        const pluginClass = await importExternalPlugin(location);
+        return this.registerPlugin(pluginClass as any, ...arg);
     }
 
-    
     static readonly channelAttach = [InternalChannelName.FILE, InternalChannelName.CHUNK, InternalChannelName.SERVICE, InternalChannelName.STANDARD_IO, InternalChannelName.ERROR, InternalChannelName.STATUS];
     constructor(conduit: IConduit, [fileChannel, chunkChannel, serviceChannel, ioChannel, errorChannel, statusChannel]: IChannel<any>[]) {
         this.__conduit = conduit;
