@@ -1,5 +1,6 @@
+import { Constant } from "../common/Constant";
 import { ConductorInternalError } from "../common/errors/ConductorInternalError";
-import { IChannel, Subscriber } from "./types";
+import type { IChannel, Subscriber } from "./types";
 
 export class Channel<T> implements IChannel<T> {
     readonly name: string;
@@ -8,11 +9,12 @@ export class Channel<T> implements IChannel<T> {
     private __port!: MessagePort; // replacePort assigns this in the constructor
 
     /** The callbacks subscribed to this Channel. */
-    private readonly __subscribers: Set<Subscriber<T>> = new Set(); // TODO: use WeakRef? but callbacks tend to be thrown away and leaking is better than incorrect behaviour
+    private readonly __subscribers: Set<Subscriber<T>> = new Set();
 
-    /** Is the Channel allowed to be used? */
+    /** Is the Channel in a valid state? */
     private __isAlive: boolean = true;
 
+    /** Messages held temporarily while waiting for a listener. */
     private __waitingMessages?: T[] = [];
 
     send(message: T, transfer?: Transferable[]): void {
@@ -54,6 +56,12 @@ export class Channel<T> implements IChannel<T> {
     private __dispatch(data: T): void {
         this.__verifyAlive();
         if (this.__waitingMessages) {
+            // set a limit on how many setup messages to hold
+            // this prevents unlimited memory leak if the channel will never be listened to
+            if (this.__waitingMessages.length >= Constant.SETUP_MESSAGES_BUFFER_SIZE) {
+                // not an error, since non-listening of channel is allowed by design
+                return console.warn("Channel buffer full; message dropped (no subscribers on channel)", data);
+            }
             this.__waitingMessages.push(data);
         } else {
             for (const subscriber of this.__subscribers) {
