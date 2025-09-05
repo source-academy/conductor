@@ -15,12 +15,16 @@ export abstract class BaseModulePlugin implements IModulePlugin {
     static readonly channelAttach: string[];
     constructor(_conduit: IConduit, _channels: IChannel<any>[], evaluator: IInterfacableEvaluator) {
         this.evaluator = evaluator;
+    }
+
+    async initialise() {
         for (const name of this.exportedNames) {
-            const m = this[name] as ExternCallable<IFunctionSignature> & {signature?: IFunctionSignature};
+            const m = this[name] as ExternCallable<any, any> & {signature?: IFunctionSignature<any, any>};
             if (!m.signature || typeof m !== "function" || typeof name !== "string") throw new ConductorInternalError(`'${String(name)}' is not an exportable method`);
+            const c = await this.evaluator.closure_make(m.signature, m);
             this.exports.push({
                 symbol: name,
-                value: m,
+                value: c,
                 signature: m.signature
             });
         }

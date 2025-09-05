@@ -6,4 +6,6 @@ export interface IModulePlugin extends IPlugin {
     readonly exports: IModuleExport[];
 
     readonly evaluator: IDataHandler;
+
+    initialise(): void | Promise<void>;
 }
