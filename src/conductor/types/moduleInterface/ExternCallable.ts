@@ -1,10 +1,8 @@
 import type { DataType } from "./DataType";
-import type { ExternTypeOf } from "./ExternTypeOf";
-import type { IFunctionSignature } from "./IFunctionSignature";
+import type { TypedValue } from "./TypedValue";
 
 type DataTypeMap<T extends readonly [...DataType[]]> = {
-    [Idx in keyof T]: ExternTypeOf<T[Idx]>
+    [Idx in keyof T]: TypedValue<T[Idx]>
 };
 
-/** The expected function type based on an IFunctionSignature. */
-export type ExternCallable<T extends IFunctionSignature> = (...args: DataTypeMap<T["args"]>) => ExternTypeOf<T["returnType"]> | Promise<ExternTypeOf<T["returnType"]>>;
+export type ExternCallable<Arg extends readonly DataType[], Ret extends DataType> = (...args: DataTypeMap<Arg>) => TypedValue<Ret> | Promise<TypedValue<Ret>>;

@@ -1,12 +1,12 @@
-import type { ExternCallable, IFunctionSignature, NativeValue } from "../../types";
+import type { DataType, IFunctionSignature, TypedValue } from "../../types";
 
 export interface IModuleExport {
     /** The symbol referencing the export. */
     symbol: string;
 
-    /** The exported value. Can be JS-native values or a function. */
-    value: NativeValue | ExternCallable<any>;
+    /** The exported value. */
+    value: TypedValue<DataType>;
 
     /** If value is a function, provides its function signature. */
-    signature?: IFunctionSignature; // TODO: allow richer typing somehow?
+    signature?: IFunctionSignature<any, any>; // TODO: allow richer typing somehow?
 }

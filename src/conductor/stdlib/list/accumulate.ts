@@ -1,4 +1,4 @@
-import { ClosureIdentifier, DataType, IDataHandler, TypedValue, List } from "../../types"
+import { DataType, IDataHandler, TypedValue } from "../../types"
 
 /**
  * Accumulates a Closure over a List.
@@ -11,8 +11,8 @@ import { ClosureIdentifier, DataType, IDataHandler, TypedValue, List } from "../
  * @param resultType The (expected) type of the result.
  * @returns A Promise resolving to the result of accumulating the Closure over the List.
  */
-export async function accumulate<T extends Exclude<DataType, DataType.VOID>>(this: IDataHandler, op: ClosureIdentifier<DataType>, initial: TypedValue<T>, sequence: List, resultType: T): Promise<TypedValue<T>> {
-    const vec = this.list_to_vec(sequence);
+export async function accumulate<T extends Exclude<DataType, DataType.VOID>>(this: IDataHandler, op: TypedValue<DataType.CLOSURE, T>, initial: TypedValue<T>, sequence: TypedValue<DataType.LIST>, resultType: T): Promise<TypedValue<T>> {
+    const vec = await this.list_to_vec(sequence);
     let result = initial;
     for (let i = vec.length - 1; i >= 0; --i) {
         result = await this.closure_call(op, [vec[i], result], resultType);
