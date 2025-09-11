@@ -1,6 +1,5 @@
 import type { ConductorError } from "../../../common/errors";
-import type { IPlugin } from "../../../conduit";
-import { PluginClass } from "../../../conduit/types";
+import type { IPlugin, PluginClass } from "../../../conduit";
 import type { Chunk, RunnerStatus } from "../../types";
 
 export interface IHostPlugin extends IPlugin {

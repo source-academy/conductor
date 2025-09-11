@@ -1,7 +1,6 @@
-import { ConductorInternalError } from "../../common/errors/ConductorInternalError";
-import { IChannel, IConduit } from "../../conduit";
-import { checkIsPluginClass } from "../../conduit/util";
-import { IInterfacableEvaluator } from "../runner/types";
+import { ConductorInternalError } from "../../common/errors";
+import { checkIsPluginClass, IChannel, IConduit } from "../../conduit";
+import { IInterfacableEvaluator } from "../runner";
 import { ExternCallable, IDataHandler, IFunctionSignature } from "../types";
 import { IModulePlugin, IModuleExport } from "./types";
 

@@ -1,2 +1,2 @@
-export { Remote } from "./types";
+export * from "./types";
 export { makeRpc } from "./makeRpc";

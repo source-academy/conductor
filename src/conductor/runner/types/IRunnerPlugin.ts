@@ -1,8 +1,6 @@
 import type { ConductorError } from "../../../common/errors";
-import type { IPlugin } from "../../../conduit";
-import { PluginClass } from "../../../conduit/types";
-import type { IModulePlugin } from "../../module";
-import { ModuleClass } from "../../module/types/ModuleClass";
+import type { IPlugin, PluginClass } from "../../../conduit";
+import type { IModulePlugin, ModuleClass } from "../../module";
 import type { Chunk, RunnerStatus } from "../../types";
 
 export interface IRunnerPlugin extends IPlugin {
