@@ -8,7 +8,6 @@ export * from "./conductor/types";
 export * from "./conductor/module";
 export * from "./conductor/runner";
 export * from "./conductor/stdlib";
-export * from "./conductor/strings";
 
 // Export common modules
 export * from "./common/errors";
