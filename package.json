@@ -5,9 +5,45 @@
   "description": "",
   "type": "module",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./conduit": {
+      "types": "./dist/conduit/index.d.ts",
+      "import": "./dist/conduit/index.js"
+    },
+    "./host": {
+      "types": "./dist/conductor/host/index.d.ts",
+      "import": "./dist/conductor/host/index.js"
+    },
+    "./util": {
+      "types": "./dist/conductor/util/index.d.ts",
+      "import": "./dist/conductor/util/index.js"
+    },
+    "./module": {
+      "types": "./dist/conductor/module/index.d.ts",
+      "import": "./dist/conductor/module/index.js"
+    },
+    "./types": {
+      "types": "./dist/conductor/types/index.d.ts",
+      "import": "./dist/conductor/types/index.js"
+    },
+    "./runner": {
+      "types": "./dist/conductor/runner/index.d.ts",
+      "import": "./dist/conductor/runner/index.js"
+    },
+    "./stdlib": {
+      "types": "./dist/conductor/stdlib/index.d.ts",
+      "import": "./dist/conductor/stdlib/index.js"
+    }
+  },
   "scripts": {
     "build": "rollup -c",
-    "prepack": "yarn build",
+    "prepare": "rollup -c",
+    "prepack": "rollup -c",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
