@@ -1,2 +1,2 @@
-export type { IHostPlugin } from "./types";
+export * from "./types";
 export { BasicHostPlugin } from "./BasicHostPlugin";

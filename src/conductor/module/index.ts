@@ -1,2 +1,3 @@
-export type { IModuleExport, IModulePlugin } from "./types";
+export * from "./types";
+export * from "./util";
 export { BaseModulePlugin } from "./BaseModulePlugin";

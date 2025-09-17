@@ -1,10 +1,7 @@
 import { Constant } from "../../common/Constant";
 import type { ConductorError } from "../../common/errors";
 import { importExternalPlugin } from "../../common/util";
-import { IChannel, IConduit, IPlugin } from "../../conduit";
-import { makeRpc } from "../../conduit/rpc";
-import { PluginClass } from "../../conduit/types";
-import { checkIsPluginClass } from "../../conduit/util";
+import { checkIsPluginClass, IChannel, IConduit, IPlugin, makeRpc, PluginClass } from "../../conduit";
 import { InternalChannelName, InternalPluginName } from "../strings";
 import { AbortServiceMessage, Chunk, EntryServiceMessage, HelloServiceMessage, IChunkMessage, IErrorMessage, IIOMessage, IServiceMessage, IStatusMessage, PluginServiceMessage, RunnerStatus } from "../types";
 import { ServiceMessageType } from "../types";
