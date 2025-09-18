@@ -7,9 +7,9 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+    "./common": {
+      "types": "./dist/common/index.d.ts",
+      "import": "./dist/common/index.js"
     },
     "./conduit": {
       "types": "./dist/conduit/index.d.ts",
@@ -42,8 +42,8 @@
   },
   "scripts": {
     "build": "rollup -c",
-    "prepare": "rollup -c",
-    "prepack": "rollup -c",
+    "prepare": "npm run build",
+    "prepack": "npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
