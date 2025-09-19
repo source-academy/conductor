@@ -1,4 +1,4 @@
-import { RunnerPlugin } from "..";
+import { RunnerPlugin } from "../RunnerPlugin";
 import { Conduit, IConduit, ILink } from "../../../conduit";
 import { EvaluatorClass, IRunnerPlugin } from "../types";
 
