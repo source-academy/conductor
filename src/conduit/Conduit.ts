@@ -1,6 +1,6 @@
 import { ConductorInternalError } from "../common/errors/ConductorInternalError";
 import { Channel } from "./Channel";
-import { IConduit, ILink, IPlugin, IChannel, PluginClass } from "./types";
+import type { IConduit, ILink, IPlugin, IChannel, PluginClass } from "./types";
 
 export class Conduit implements IConduit {
     private __alive: boolean = true;

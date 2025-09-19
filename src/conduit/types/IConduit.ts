@@ -5,6 +5,7 @@ export interface IConduit {
     /**
      * Register a plugin with the conduit.
      * @param pluginClass The plugin to be registered.
+     * @param arg Arguments to be passed to pluginClass' constructor.
      */
     registerPlugin<Arg extends any[], T extends IPlugin>(pluginClass: PluginClass<Arg, T>, ...arg: Arg): NoInfer<T>;
 

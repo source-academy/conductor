@@ -1,11 +1,10 @@
 import { Constant } from "../../common/Constant";
 import type { ConductorError } from "../../common/errors";
 import { importExternalPlugin } from "../../common/util";
-import { checkIsPluginClass, IChannel, IConduit, IPlugin, makeRpc, PluginClass } from "../../conduit";
-import { InternalChannelName, InternalPluginName } from "../strings";
-import { AbortServiceMessage, Chunk, EntryServiceMessage, HelloServiceMessage, IChunkMessage, IErrorMessage, IIOMessage, IServiceMessage, IStatusMessage, PluginServiceMessage, RunnerStatus } from "../types";
-import { ServiceMessageType } from "../types";
-import { IHostFileRpc, IHostPlugin } from "./types";
+import { checkIsPluginClass, type PluginClass, makeRpc, type IChannel, type IConduit, type IPlugin } from "../../conduit";
+import { InternalPluginName, InternalChannelName } from "../strings";
+import { type IChunkMessage, type IServiceMessage, RunnerStatus, ServiceMessageType, HelloServiceMessage, AbortServiceMessage, PluginServiceMessage, EntryServiceMessage, type Chunk, type IErrorMessage, type IStatusMessage, type IIOMessage } from "../types";
+import type { IHostPlugin, IHostFileRpc } from "./types";
 
 @checkIsPluginClass
 export abstract class BasicHostPlugin implements IHostPlugin {

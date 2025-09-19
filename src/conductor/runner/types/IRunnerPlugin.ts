@@ -36,6 +36,12 @@ export interface IRunnerPlugin extends IPlugin {
     sendOutput(message: string): void;
 
     /**
+     * Sends an evaluation result.
+     * @param result The result to send.
+     */
+    sendResult(result: any): void;
+
+    /**
      * Sends an error.
      * @param error The error to send.
      */
