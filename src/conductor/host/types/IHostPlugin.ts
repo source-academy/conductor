@@ -17,6 +17,13 @@ export interface IHostPlugin extends IPlugin {
     requestLoadPlugin(pluginName: string): void;
 
     /**
+     * Queries for plugin resolutions.
+     * @param pluginName The name of the plugin to query.
+     * @returns The resolutions for that plugin.
+     */
+    queryPluginResolutions(pluginName: string): Record<string, string>;
+
+    /**
      * Starts the evaluator.
      * @param entryPoint The entry point file to start running from.
      */

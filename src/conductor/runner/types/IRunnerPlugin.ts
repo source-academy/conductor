@@ -61,6 +61,13 @@ export interface IRunnerPlugin extends IPlugin {
     hostLoadPlugin(pluginName: string): void;
 
     /**
+     * Queries the host for plugin resolutions.
+     * @param pluginName The name of the plugin to query.
+     * @returns A promise that resolves to the resolutions for that plugin.
+     */
+    hostQueryPluginResolutions(pluginName: string): Promise<Record<string, string>>;
+
+    /**
      * Registers a plugin with the conduit.
      * @param pluginClass The plugin class to be registered.
      * @param arg Arguments to be passed to pluginClass' constructor.

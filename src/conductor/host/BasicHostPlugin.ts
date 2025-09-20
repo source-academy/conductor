@@ -3,8 +3,8 @@ import type { ConductorError } from "../../common/errors";
 import { importExternalPlugin } from "../../common/util";
 import { checkIsPluginClass, type PluginClass, makeRpc, type IChannel, type IConduit, type IPlugin } from "../../conduit";
 import { InternalPluginName, InternalChannelName } from "../strings";
-import { type IChunkMessage, type IServiceMessage, RunnerStatus, ServiceMessageType, HelloServiceMessage, AbortServiceMessage, PluginServiceMessage, EntryServiceMessage, type Chunk, type IErrorMessage, type IStatusMessage, type IIOMessage } from "../types";
-import type { IHostPlugin, IHostFileRpc } from "./types";
+import { type IChunkMessage, type IServiceMessage, RunnerStatus, ServiceMessageType, HelloServiceMessage, AbortServiceMessage, EntryServiceMessage, type Chunk, type IErrorMessage, type IStatusMessage, type IIOMessage } from "../types";
+import type { IHostFileRpc, IHostPlugin, IHostPluginRpc } from "./types";
 
 @checkIsPluginClass
 export abstract class BasicHostPlugin implements IHostPlugin {
@@ -32,16 +32,14 @@ export abstract class BasicHostPlugin implements IHostPlugin {
         [ServiceMessageType.ABORT, function abortServiceHandler(this: BasicHostPlugin, message: AbortServiceMessage) {
             console.error(`Runner expects at least protocol version ${message.data.minVersion}, but we are on version ${Constant.PROTOCOL_VERSION}`);
             this.__conduit.terminate();
-        }],
-        [ServiceMessageType.PLUGIN, function pluginServiceHandler(this: BasicHostPlugin, message: PluginServiceMessage) {
-            const pluginName = message.data;
-            this.requestLoadPlugin(pluginName);
         }]
     ]);
 
     abstract requestFile(fileName: string): Promise<string | undefined>;
 
     abstract requestLoadPlugin(pluginName: string): void;
+
+    abstract queryPluginResolutions(pluginName: string): Record<string, string>;
 
     startEvaluator(entryPoint: string): void {
         this.__serviceChannel.send(new EntryServiceMessage(entryPoint));
@@ -78,8 +76,8 @@ export abstract class BasicHostPlugin implements IHostPlugin {
         return this.registerPlugin(pluginClass as any, ...arg);
     }
 
-    static readonly channelAttach = [InternalChannelName.FILE, InternalChannelName.CHUNK, InternalChannelName.SERVICE, InternalChannelName.STANDARD_IO, InternalChannelName.ERROR, InternalChannelName.STATUS];
-    constructor(conduit: IConduit, [fileChannel, chunkChannel, serviceChannel, ioChannel, errorChannel, statusChannel]: IChannel<any>[]) {
+    static readonly channelAttach = [InternalChannelName.FILE, InternalChannelName.CHUNK, InternalChannelName.SERVICE, InternalChannelName.STANDARD_IO, InternalChannelName.ERROR, InternalChannelName.STATUS, InternalChannelName.PLUGIN];
+    constructor(conduit: IConduit, [fileChannel, chunkChannel, serviceChannel, ioChannel, errorChannel, statusChannel, pluginChannel]: IChannel<any>[]) {
         this.__conduit = conduit;
 
         makeRpc<IHostFileRpc, {}>(fileChannel, {
@@ -98,6 +96,11 @@ export abstract class BasicHostPlugin implements IHostPlugin {
             const {status, isActive} = statusMessage;
             this.__status.set(status, isActive);
             this.receiveStatusUpdate?.(status, isActive);
+        });
+
+        makeRpc<IHostPluginRpc, {}>(pluginChannel, {
+            $requestLoadPlugin: this.requestLoadPlugin.bind(this),
+            queryPluginResolutions: this.queryPluginResolutions.bind(this)
         });
 
         this.__serviceChannel.send(new HelloServiceMessage());

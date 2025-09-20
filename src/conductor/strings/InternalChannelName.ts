@@ -6,4 +6,5 @@ export const enum InternalChannelName {
     RESULT = "__result",
     ERROR = "__error",
     STATUS = "__status",
+    PLUGIN = "__plugin",
 };
