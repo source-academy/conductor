@@ -16,10 +16,10 @@ export interface IConduit {
     unregisterPlugin(plugin: IPlugin): void;
 
     /**
-     * Look for a plugin with the given name.
-     * @param pluginName The name of the plugin to be searched for.
+     * Look for a plugin with the given ID.
+     * @param pluginId The ID of the plugin to be searched for.
      */
-    lookupPlugin(pluginName: string): IPlugin;
+    lookupPlugin(pluginId: string): IPlugin;
 
     /**
      * Shuts down the conduit.

@@ -1,4 +1,4 @@
 export interface IHostPluginRpc {
-    $requestLoadPlugin(pluginName: string): void;
-    queryPluginResolutions(pluginName: string): Record<string, string>;
+    $requestLoadPlugin(pluginId: string): void;
+    queryPluginResolutions(pluginId: string): Record<string, string>;
 }

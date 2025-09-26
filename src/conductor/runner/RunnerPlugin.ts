@@ -5,13 +5,13 @@ import { importExternalPlugin, importExternalModule } from "../../common/util";
 import { type IConduit, type IChannelQueue, ChannelQueue, makeRpc, checkIsPluginClass, type IChannel, type IPlugin, type PluginClass, type Remote } from "../../conduit";
 import type { IHostFileRpc, IHostPluginRpc } from "../host";
 import type { IModulePlugin, ModuleClass } from "../module";
-import { InternalChannelName, InternalPluginName } from "../strings";
+import { InternalChannelName, InternalPluginId } from "../strings";
 import { RunnerStatus, ServiceMessageType, HelloServiceMessage, AbortServiceMessage, type EntryServiceMessage, type Chunk, type IChunkMessage, type IErrorMessage, type IIOMessage, type IResultMessage, type IServiceMessage, type IStatusMessage, } from "../types";
 import { type EvaluatorClass, type IEvaluator, type IInterfacableEvaluator, type IRunnerPlugin } from "./types";
 
 @checkIsPluginClass
 export class RunnerPlugin implements IRunnerPlugin {
-    name = InternalPluginName.RUNNER_MAIN;
+    id = InternalPluginId.RUNNER_MAIN;
 
     private readonly __evaluator: IEvaluator | IInterfacableEvaluator;
     private readonly __isCompatibleWithModules: boolean;
@@ -78,12 +78,12 @@ export class RunnerPlugin implements IRunnerPlugin {
         this.__statusChannel.send({ status, isActive });
     }
 
-    hostLoadPlugin(pluginName: string): void {
-        this.__pluginRpc.$requestLoadPlugin(pluginName);
+    hostLoadPlugin(pluginId: string): void {
+        this.__pluginRpc.$requestLoadPlugin(pluginId);
     }
 
-    async hostQueryPluginResolutions(pluginName: string): Promise<Record<string, string>> {
-        return this.__pluginRpc.queryPluginResolutions(pluginName);
+    async hostQueryPluginResolutions(pluginId: string): Promise<Record<string, string>> {
+        return this.__pluginRpc.queryPluginResolutions(pluginId);
     }
 
     registerPlugin<Arg extends any[], T extends IPlugin>(pluginClass: PluginClass<Arg, T>, ...arg: Arg): NoInfer<T> {
