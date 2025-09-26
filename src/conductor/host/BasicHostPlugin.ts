@@ -2,13 +2,13 @@ import { Constant } from "../../common/Constant";
 import type { ConductorError } from "../../common/errors";
 import { importExternalPlugin } from "../../common/util";
 import { checkIsPluginClass, type PluginClass, makeRpc, type IChannel, type IConduit, type IPlugin } from "../../conduit";
-import { InternalPluginName, InternalChannelName } from "../strings";
+import { InternalPluginId, InternalChannelName } from "../strings";
 import { type IChunkMessage, type IServiceMessage, RunnerStatus, ServiceMessageType, HelloServiceMessage, AbortServiceMessage, EntryServiceMessage, type Chunk, type IErrorMessage, type IStatusMessage, type IIOMessage } from "../types";
 import type { IHostFileRpc, IHostPlugin, IHostPluginRpc } from "./types";
 
 @checkIsPluginClass
 export abstract class BasicHostPlugin implements IHostPlugin {
-    name = InternalPluginName.HOST_MAIN;
+    id = InternalPluginId.HOST_MAIN;
 
     private readonly __conduit: IConduit;
     private readonly __chunkChannel: IChannel<IChunkMessage>;
@@ -37,9 +37,9 @@ export abstract class BasicHostPlugin implements IHostPlugin {
 
     abstract requestFile(fileName: string): Promise<string | undefined>;
 
-    abstract requestLoadPlugin(pluginName: string): void;
+    abstract requestLoadPlugin(pluginId: string): void;
 
-    abstract queryPluginResolutions(pluginName: string): Record<string, string>;
+    abstract queryPluginResolutions(pluginId: string): Record<string, string>;
 
     startEvaluator(entryPoint: string): void {
         this.__serviceChannel.send(new EntryServiceMessage(entryPoint));

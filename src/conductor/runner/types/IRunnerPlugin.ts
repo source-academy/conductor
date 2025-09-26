@@ -56,16 +56,16 @@ export interface IRunnerPlugin extends IPlugin {
 
     /**
      * Informs the host to load a plugin.
-     * @param pluginName The name of the plugin to load.
+     * @param pluginId The ID of the plugin to load.
      */
-    hostLoadPlugin(pluginName: string): void;
+    hostLoadPlugin(pluginId: string): void;
 
     /**
      * Queries the host for plugin resolutions.
-     * @param pluginName The name of the plugin to query.
+     * @param pluginId The ID of the plugin to query.
      * @returns A promise that resolves to the resolutions for that plugin.
      */
-    hostQueryPluginResolutions(pluginName: string): Promise<Record<string, string>>;
+    hostQueryPluginResolutions(pluginId: string): Promise<Record<string, string>>;
 
     /**
      * Registers a plugin with the conduit.

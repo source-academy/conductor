@@ -6,6 +6,7 @@ import type { IModulePlugin, IModuleExport } from "./types";
 
 @checkIsPluginClass
 export abstract class BaseModulePlugin implements IModulePlugin {
+    abstract id: string;
     readonly exports: IModuleExport[] = [];
     readonly exportedNames: readonly (keyof this)[] = [];
 
