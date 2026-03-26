@@ -29,7 +29,7 @@ If your evaluator has not been deployed to the [`language-directory`](https://gi
 2. In the top right dropdown of the frontend UI, click Settings > Feature Flags
 3. Enable the conductor.enable feature flag
 4. If your evaluator is hosted remotely, in the conductor.evaluator.url flag, input your evaluator's URL
-5. If your evaluator is hosted locally, place your evaluator in `public/evaluators`. in the conductor.evaluator.url flag, input `/evaluators/YOUR_EVALUATOR.js`
+5. If your evaluator is hosted locally, place your evaluator in `public/evaluators`. In the `conductor.evaluator.url` flag, input `/evaluators/YOUR_EVALUATOR.js`
 6. The front end REPL will now run your evaluator using conductor
 
 
