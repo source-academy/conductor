@@ -72,11 +72,26 @@ Consult [`language-directory` repository](https://github.com/source-academy/lang
 ### Sending messages
 To send messages between the runner and host, use these methods:
 
-- `sendResult(result)` — sends evaluation results over the `__result` channel.
-- `sendError(error)` — sends errors over the `__error` channel.
-- `sendOutput(message)` — sends standard output/log messages over the `__stdio` channel.
+- `sendResult(result: string)` — sends evaluation results as a string over the `__result` channel.
+- `sendError(error: ConductorError)` — sends errors over the `__error` channel.
+- `sendOutput(message: string)` — sends standard output/log messages over the `__stdio` channel.
 
 These methods are available on the relevant runner plugin classes. Call the messaging methods on the plugin instance you receive in your evaluator or plugin code.
+
+### Updating status
+Evaluators should send status updates through the runner plugin to indicate changes to the program lifecycle.
+Use the method `updateStatus(status: RunnerStatus, isActive: boolean)` to set the status flags accordingly. 
+
+- `RunnerStatus`: The various statuses can be viewed in [`RunnerStatus.ts`](src/conductor/types/RunnerStatus.ts)
+- `isActive`: toggles an individual status flag on or off. 
+
+For example, an evaluator that has finished its current evaluation should call 
+```ts
+updateStatus(RunnerStatus.RUNNING, false)
+```
+
+Statuses will be sent over the `__status` channel.
+
 
 ## Module interface
 
@@ -142,3 +157,10 @@ The host (i.e., the frontend REPL) formats messages differently depending on the
 - Results (from `__result`) appear in the default color. Used to display program return results.
 
 If you are implementing your own `RunnerPlugin` (or similar plugin), you should use the `__result`, `__error`, and `__stdio` channels for results, errors, and output respectively to ensure compatibility with the host and consistent REPL formatting.
+
+
+## Status Channels
+
+Statuses are sent as status objects over the `__status` channel. If more statuses are required in the future, they can be added to `src/conductor/types/RunnerStatus.ts`.
+
+While not all statuses are supported by the frontend yet, they can be used to format REPL output, dispatch completion actions, or stop the run button spinner. This means that sending correct status updates is important for protocol correctness and future frontend support.
