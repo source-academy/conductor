@@ -47,7 +47,7 @@ Load conductor from the GitHub repository rather than from npm. The GitHub sourc
 
 To get started, use the `conductor-runner-example` template. It contains a basic evaluator that calls Javascript's `eval` on the provided chunks.
 
-### The IEvaluator interface
+### The `IEvaluator` interface
 
 To implement a new language using Conductor, implement the `conductor/runner/types/IEvaluator` interface.
 This allows Conductor to interact with the language's implementation in a standard manner.
