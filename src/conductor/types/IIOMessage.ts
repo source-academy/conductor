@@ -1,4 +1,5 @@
+import type { ChannelValue } from "./ChannelValue";
+
 export interface IIOMessage {
-    // stream: number;
-    message: string;
+    message: ChannelValue;
 }
