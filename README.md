@@ -38,7 +38,7 @@ Load conductor from the GitHub repository rather than from npm. The GitHub sourc
 ```json
   "dependencies": {
     ...
-    "conductor": "https://github.com/source-academy/conductor.git#0.3.0",
+    "conductor": "https://github.com/source-academy/conductor.git#0.4.0",
      ...
   }, ...
 ```
@@ -72,9 +72,37 @@ Consult [`language-directory` repository](https://github.com/source-academy/lang
 ### Sending messages
 To send messages between the runner and host, use these methods:
 
-- `sendResult(result: string)` — sends evaluation results as a string over the `__result` channel.
+- `sendResult(result: ChannelValue)` — sends evaluation results over the `__result` channel.
 - `sendError(error: ConductorError)` — sends errors over the `__error` channel.
-- `sendOutput(message: string)` — sends standard output/log messages over the `__stdio` channel.
+- `sendOutput(message: ChannelValue)` — sends standard output/log messages over the `__stdio` channel.
+
+A `ChannelValue` carries a mandatory `replString` for display and an optional `payload` for rich rendering:
+
+```ts
+interface ChannelValue {
+    replString: string;        // always displayable as text
+    payload?: ResultPayload;   // optional typed data for rich rendering
+}
+
+interface ResultPayload {
+    type: string;              // discriminant for frontend renderers
+}
+```
+
+For example, an evaluator that produces a numeric result:
+```ts
+sendResult({ replString: "42" });
+```
+
+Or a result with a rich payload that the frontend can render specially:
+```ts
+sendResult({
+    replString: "[Rune]",
+    payload: { type: "rune", rune: runeObject }
+});
+```
+
+If the frontend does not have a renderer for the payload type, it falls back to displaying `replString`.
 
 These methods are available on the relevant runner plugin classes. Call the messaging methods on the plugin instance you receive in your evaluator or plugin code.
 
@@ -155,6 +183,8 @@ The host (i.e., the frontend REPL) formats messages differently depending on the
 - Errors (from `__error`) appear in red. Used to send error messages.
 - Output (from `__stdio`) appear in orange. Used to send IO messages (e.g. display calls).
 - Results (from `__result`) appear in the default color. Used to display program return results.
+
+The `__result` and `__stdio` channels carry `ChannelValue` objects, which always include a `replString` for text display and may include a typed `payload` for rich rendering (e.g. interactive visualizations, media controls). The `__error` channel carries `ConductorError` objects.
 
 If you are implementing your own `RunnerPlugin` (or similar plugin), you should use the `__result`, `__error`, and `__stdio` channels for results, errors, and output respectively to ensure compatibility with the host and consistent REPL formatting.
 
