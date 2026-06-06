@@ -130,6 +130,8 @@ Thus, evaluators are responsible for providing functions to allow modules to rea
 Each of the data types passed as identifier have functions to create an instance of that data type,
 as well as read and write data to it (or call it, in the case of closures). See `conductor/types/IDataHandler`.
 
+In the case of closures, the `closure_call` and `closure_call_unchecked` return `AsyncGenerator`s. In the case of CSE machines, yielding a closure call to a CSE closure would allow the module function to defer the execution until the closure is executed and its return value is available.
+
 ### Standard library
 
 A standard library of functions must be made available to modules. See `conductor/stdlib` for sample implementations.
