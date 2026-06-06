@@ -9,7 +9,7 @@ import { DataType, type IDataHandler, type TypedValue } from "../../types"
  * @param initial The initial typed value (that is, the result of accumulating an empty List).
  * @param sequence The List to be accumulated over.
  * @param resultType The (expected) type of the result.
- * @returns A Promise resolving to the result of accumulating the Closure over the List.
+ * @returns An AsyncGenerator resolving to the result of accumulating the Closure over the List.
  */
 export async function* accumulate<T extends Exclude<DataType, DataType.VOID>>(this: IDataHandler, op: TypedValue<DataType.CLOSURE, T>, initial: TypedValue<T>, sequence: TypedValue<DataType.LIST>, resultType: T): AsyncGenerator<void, TypedValue<T>, undefined> {
     const vec = await this.list_to_vec(sequence);

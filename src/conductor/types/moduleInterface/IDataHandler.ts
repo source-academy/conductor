@@ -143,7 +143,7 @@ export interface IDataHandler {
      * @param c The Closure to be called.
      * @param args An array of typed arguments to be passed to the Closure.
      * @param returnType The expected type of the returned value.
-     * @returns A promise to the returned typed value.
+     * @returns An AsyncGenerator which returns the returned typed value.
      */
     closure_call<T extends DataType>(c: TypedValue<DataType.CLOSURE, T>, args: TypedValue<DataType>[], returnType: T): AsyncGenerator<void, TypedValue<NoInfer<T>>, undefined>;
 
@@ -151,7 +151,7 @@ export interface IDataHandler {
      * Calls a Closure of known return type.
      * @param c The Closure to be called.
      * @param args An array of typed arguments to be passed to the Closure.
-     * @returns A promise to the returned typed value.
+     * @returns An AsyncGenerator which returns the returned typed value.
      */
     closure_call_unchecked<T extends DataType>(c: TypedValue<DataType.CLOSURE, T>, args: TypedValue<DataType>[]): AsyncGenerator<void, TypedValue<NoInfer<T>>, undefined>;
 
