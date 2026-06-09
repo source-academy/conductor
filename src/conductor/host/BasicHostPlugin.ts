@@ -3,7 +3,7 @@ import type { ConductorError } from "../../common/errors";
 import { importExternalPlugin } from "../../common/util";
 import { checkIsPluginClass, type PluginClass, makeRpc, type IChannel, type IConduit, type IPlugin } from "../../conduit";
 import { InternalPluginId, InternalChannelName } from "../strings";
-import { type IChunkMessage, type IServiceMessage, RunnerStatus, ServiceMessageType, HelloServiceMessage, AbortServiceMessage, EntryServiceMessage, type Chunk, type IErrorMessage, type IStatusMessage, type IIOMessage } from "../types";
+import { type ChannelValue, type IChunkMessage, type IServiceMessage, RunnerStatus, ServiceMessageType, HelloServiceMessage, AbortServiceMessage, EntryServiceMessage, type Chunk, type IErrorMessage, type IStatusMessage, type IIOMessage } from "../types";
 import type { IHostFileRpc, IHostPlugin, IHostPluginRpc } from "./types";
 
 @checkIsPluginClass
@@ -49,11 +49,11 @@ export abstract class BasicHostPlugin implements IHostPlugin {
         this.__chunkChannel.send({ id: this.__chunkCount++, chunk });
     }
 
-    sendInput(message: string): void {
+    sendInput(message: ChannelValue): void {
         this.__ioChannel.send({ message });
     }
 
-    receiveOutput?(message: string): void;
+    receiveOutput?(message: ChannelValue): void;
 
     receiveError?(message: ConductorError): void;
 

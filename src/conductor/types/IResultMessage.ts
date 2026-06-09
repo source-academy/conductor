@@ -1,3 +1,5 @@
+import type { ChannelValue } from "./ChannelValue";
+
 export interface IResultMessage {
-    result: any;
+    result: ChannelValue;
 }

@@ -1,7 +1,7 @@
 import type { ConductorError } from "../../../common/errors";
 import type { IPlugin, PluginClass } from "../../../conduit";
 import type { IModulePlugin, ModuleClass } from "../../module";
-import type { Chunk, RunnerStatus } from "../../types";
+import type { ChannelValue, Chunk, RunnerStatus } from "../../types";
 
 export interface IRunnerPlugin extends IPlugin {
     /**
@@ -21,25 +21,25 @@ export interface IRunnerPlugin extends IPlugin {
      * Request for some input on standard-input.
      * @returns A promise resolving to the input received.
      */
-    requestInput(): Promise<string>;
+    requestInput(): Promise<ChannelValue>;
 
     /**
      * Try to request for some input on standard-input.
      * @returns The input received, or undefined if there is currently no input.
      */
-    tryRequestInput(): string | undefined;
+    tryRequestInput(): ChannelValue | undefined;
 
     /**
      * Sends a message on standard-output.
      * @param message The output message to send.
      */
-    sendOutput(message: string): void;
+    sendOutput(message: ChannelValue): void;
 
     /**
      * Sends an evaluation result.
      * @param result The result to send.
      */
-    sendResult(result: any): void;
+    sendResult(result: ChannelValue): void;
 
     /**
      * Sends an error.

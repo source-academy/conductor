@@ -6,7 +6,7 @@ import { type IConduit, type IChannelQueue, ChannelQueue, makeRpc, checkIsPlugin
 import type { IHostFileRpc, IHostPluginRpc } from "../host";
 import type { IModulePlugin, ModuleClass } from "../module";
 import { InternalChannelName, InternalPluginId } from "../strings";
-import { RunnerStatus, ServiceMessageType, HelloServiceMessage, AbortServiceMessage, type EntryServiceMessage, type Chunk, type IChunkMessage, type IErrorMessage, type IIOMessage, type IResultMessage, type IServiceMessage, type IStatusMessage, } from "../types";
+import { RunnerStatus, ServiceMessageType, HelloServiceMessage, AbortServiceMessage, type EntryServiceMessage, type ChannelValue, type Chunk, type IChunkMessage, type IErrorMessage, type IIOMessage, type IResultMessage, type IServiceMessage, type IStatusMessage, } from "../types";
 import { type EvaluatorClass, type IEvaluator, type IInterfacableEvaluator, type IRunnerPlugin } from "./types";
 
 @checkIsPluginClass
@@ -52,21 +52,21 @@ export class RunnerPlugin implements IRunnerPlugin {
         return (await this.__chunkQueue.receive()).chunk;
     }
 
-    async requestInput(): Promise<string> {
+    async requestInput(): Promise<ChannelValue> {
         const { message } = await this.__ioQueue.receive();
         return message;
     }
 
-    tryRequestInput(): string | undefined {
+    tryRequestInput(): ChannelValue | undefined {
         const out = this.__ioQueue.tryReceive();
         return out?.message;
     }
 
-    sendOutput(message: string): void {
+    sendOutput(message: ChannelValue): void {
         this.__ioQueue.send({ message });
     }
 
-    sendResult(result: any): void {
+    sendResult(result: ChannelValue): void {
         this.__resultChannel.send({ result });
     }
 

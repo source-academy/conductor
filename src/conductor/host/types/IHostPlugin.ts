@@ -1,6 +1,6 @@
 import type { ConductorError } from "../../../common/errors";
 import type { IPlugin, PluginClass } from "../../../conduit";
-import type { Chunk, RunnerStatus } from "../../types";
+import type { ChannelValue, Chunk, RunnerStatus } from "../../types";
 
 export interface IHostPlugin extends IPlugin {
     /**
@@ -39,25 +39,25 @@ export interface IHostPlugin extends IPlugin {
      * Send an input on standard-input.
      * @param input The input to be sent on standard-input.
      */
-    sendInput(input: string): void;
+    sendInput(input: ChannelValue): void;
 
     // /**
     //  * Request for some output on standard-output.
     //  * @returns A promise resolving to the output received.
     //  */
-    // requestOutput(): Promise<string>;
+    // requestOutput(): Promise<ChannelValue>;
 
     // /**
     //  * Try to request for some output on standard-output.
     //  * @returns The output received, or undefined if there is currently no output.
     //  */
-    // tryRequestOutput(): string | undefined;
+    // tryRequestOutput(): ChannelValue | undefined;
 
     /**
      * An event handler called when an output is received.
      * @param message The output received.
      */
-    receiveOutput?(message: string): void;
+    receiveOutput?(message: ChannelValue): void;
 
     // /**
     //  * Request for some output on standard-error.
