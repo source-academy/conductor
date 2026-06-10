@@ -1,16 +1,25 @@
 import { ConductorInternalError } from "../../common/errors";
+import { RunnerStatus } from "../types";
 import type { IEvaluator, IRunnerPlugin } from "./types";
 
 export abstract class BasicEvaluator implements IEvaluator {
     readonly conductor: IRunnerPlugin;
 
     async startEvaluator(entryPoint: string): Promise<void> {
-        const initialChunk = await this.conductor.requestFile(entryPoint);
-        if (!initialChunk) throw new ConductorInternalError("Cannot load entrypoint file");
-        this.conductor.sendResult(await this.evaluateFile(entryPoint, initialChunk));
-        while (true) {
-            const chunk = await this.conductor.requestChunk();
-            this.conductor.sendResult(await this.evaluateChunk(chunk));
+        try {
+            const initialChunk = await this.conductor.requestFile(entryPoint);
+            if (!initialChunk) throw new ConductorInternalError("Cannot load entrypoint file");
+            this.conductor.sendResult(await this.evaluateFile(entryPoint, initialChunk));
+            while (true) {
+                const chunk = await this.conductor.requestChunk();
+                this.conductor.sendResult(await this.evaluateChunk(chunk));
+            }
+            // The REPL loop only exits if the conduit is terminated externally.
+            this.conductor.updateStatus(RunnerStatus.STOPPED, true);
+        } catch (e) {
+            // Always notify the host so it can unblock its own REPL loop.
+            this.conductor.updateStatus(RunnerStatus.ERROR, true);
+            throw e;
         }
     }
 
