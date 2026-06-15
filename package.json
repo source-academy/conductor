@@ -1,7 +1,7 @@
 {
   "name": "conductor",
   "packageManager": "yarn@4.6.0",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "",
   "type": "module",
   "main": "dist/index.js",
@@ -9,35 +9,43 @@
   "exports": {
     "./common": {
       "types": "./dist/common/index.d.ts",
-      "import": "./dist/common/index.js"
+      "import": "./dist/common/index.js",
+      "require": "./dist/common/index.cjs"
     },
     "./conduit": {
       "types": "./dist/conduit/index.d.ts",
-      "import": "./dist/conduit/index.js"
+      "import": "./dist/conduit/index.js",
+      "require": "./dist/conduit/index.cjs"
     },
     "./host": {
       "types": "./dist/conductor/host/index.d.ts",
-      "import": "./dist/conductor/host/index.js"
+      "import": "./dist/conductor/host/index.js",
+      "require": "./dist/conductor/host/index.cjs"
     },
     "./util": {
       "types": "./dist/conductor/util/index.d.ts",
-      "import": "./dist/conductor/util/index.js"
+      "import": "./dist/conductor/util/index.js",
+      "require": "./dist/conductor/util/index.cjs"
     },
     "./module": {
       "types": "./dist/conductor/module/index.d.ts",
-      "import": "./dist/conductor/module/index.js"
+      "import": "./dist/conductor/module/index.js",
+      "require": "./dist/conductor/module/index.cjs"
     },
     "./types": {
       "types": "./dist/conductor/types/index.d.ts",
-      "import": "./dist/conductor/types/index.js"
+      "import": "./dist/conductor/types/index.js",
+      "require": "./dist/conductor/types/index.cjs"
     },
     "./runner": {
       "types": "./dist/conductor/runner/index.d.ts",
-      "import": "./dist/conductor/runner/index.js"
+      "import": "./dist/conductor/runner/index.js",
+      "require": "./dist/conductor/runner/index.cjs"
     },
     "./stdlib": {
       "types": "./dist/conductor/stdlib/index.d.ts",
-      "import": "./dist/conductor/stdlib/index.js"
+      "import": "./dist/conductor/stdlib/index.js",
+      "require": "./dist/conductor/stdlib/index.cjs"
     }
   },
   "scripts": {

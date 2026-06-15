@@ -16,7 +16,7 @@ export default [{
             file
         ])
     ),
-    output: {
+    output: [{
         plugins: [terser({
             module: true,
             ecma: 2015,
@@ -33,5 +33,22 @@ export default [{
         dir: "dist",
         format: "es",
         sourcemap: true,
-    }
+    }, {
+        plugins: [terser({
+            module: false,
+            format: {
+                comments: /webpackIgnore/,
+                preserve_annotations: true
+            },
+            mangle: {
+                properties: {
+                    regex: /^__/
+                }
+            }
+        })],
+        dir: "dist",
+        format: "cjs",
+        entryFileNames: "[name].cjs",
+        sourcemap: true,
+    }]
 }];
