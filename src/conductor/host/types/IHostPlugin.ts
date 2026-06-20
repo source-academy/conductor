@@ -92,6 +92,12 @@ export interface IHostPlugin extends IPlugin {
     receiveStatusUpdate?(status: RunnerStatus, isActive: boolean): void;
 
     /**
+     * An event handler called when an evaluation result is received.
+     * @param result The result of the evaluation.
+     */
+    receiveResult?(result: any): void;
+
+    /**
      * Registers a plugin with the conduit.
      * @param pluginClass The plugin class to be registered.
      * @param arg Arguments to be passed to pluginClass' constructor.
