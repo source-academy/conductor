@@ -100,7 +100,7 @@ export abstract class BasicHostPlugin implements IHostPlugin {
             this.receiveStatusUpdate?.(status, isActive);
         });
 
-        resultChannel.subscribe((resultMessage: IResultMessage) => this.receiveResult?.(resultMessage.result));
+        resultChannel?.subscribe((resultMessage: IResultMessage) => this.receiveResult?.(resultMessage.result));
 
         makeRpc<IHostPluginRpc, {}>(pluginChannel, {
             $requestLoadPlugin: this.requestLoadPlugin.bind(this),
