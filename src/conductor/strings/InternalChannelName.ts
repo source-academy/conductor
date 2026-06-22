@@ -1,4 +1,4 @@
-export const enum InternalChannelName {
+export enum InternalChannelName {
     CHUNK = "__chunk",
     FILE = "__file_rpc",
     SERVICE = "__service",
