@@ -1,4 +1,4 @@
-export const enum ErrorType {
+export enum ErrorType {
     UNKNOWN = "__unknown",
     INTERNAL = "__internal",
     EVALUATOR = "__evaluator",

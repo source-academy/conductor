@@ -3,7 +3,7 @@ import type { ConductorError } from "../../common/errors";
 import { importExternalPlugin } from "../../common/util";
 import { checkIsPluginClass, type PluginClass, makeRpc, type IChannel, type IConduit, type IPlugin } from "../../conduit";
 import { InternalPluginId, InternalChannelName } from "../strings";
-import { type IChunkMessage, type IServiceMessage, RunnerStatus, ServiceMessageType, HelloServiceMessage, AbortServiceMessage, EntryServiceMessage, type Chunk, type IErrorMessage, type IStatusMessage, type IIOMessage } from "../types";
+import { type IChunkMessage, type IServiceMessage, RunnerStatus, ServiceMessageType, HelloServiceMessage, AbortServiceMessage, EntryServiceMessage, type Chunk, type IErrorMessage, type IResultMessage, type IStatusMessage, type IIOMessage } from "../types";
 import type { IHostFileRpc, IHostPlugin, IHostPluginRpc } from "./types";
 
 @checkIsPluginClass
@@ -63,6 +63,8 @@ export abstract class BasicHostPlugin implements IHostPlugin {
 
     receiveStatusUpdate?(status: RunnerStatus, isActive: boolean): void;
 
+    receiveResult?(result: any): void;
+
     registerPlugin<Arg extends any[], T extends IPlugin>(pluginClass: PluginClass<Arg, T>, ...arg: Arg): NoInfer<T> {
         return this.__conduit.registerPlugin(pluginClass, ...arg);
     }
@@ -76,8 +78,8 @@ export abstract class BasicHostPlugin implements IHostPlugin {
         return this.registerPlugin(pluginClass as any, ...arg);
     }
 
-    static readonly channelAttach = [InternalChannelName.FILE, InternalChannelName.CHUNK, InternalChannelName.SERVICE, InternalChannelName.STANDARD_IO, InternalChannelName.ERROR, InternalChannelName.STATUS, InternalChannelName.PLUGIN];
-    constructor(conduit: IConduit, [fileChannel, chunkChannel, serviceChannel, ioChannel, errorChannel, statusChannel, pluginChannel]: IChannel<any>[]) {
+    static readonly channelAttach = [InternalChannelName.FILE, InternalChannelName.CHUNK, InternalChannelName.SERVICE, InternalChannelName.STANDARD_IO, InternalChannelName.ERROR, InternalChannelName.STATUS, InternalChannelName.PLUGIN, InternalChannelName.RESULT];
+    constructor(conduit: IConduit, [fileChannel, chunkChannel, serviceChannel, ioChannel, errorChannel, statusChannel, pluginChannel, resultChannel]: IChannel<any>[]) {
         this.__conduit = conduit;
 
         makeRpc<IHostFileRpc, {}>(fileChannel, {
@@ -97,6 +99,8 @@ export abstract class BasicHostPlugin implements IHostPlugin {
             this.__status.set(status, isActive);
             this.receiveStatusUpdate?.(status, isActive);
         });
+
+        resultChannel?.subscribe((resultMessage: IResultMessage) => this.receiveResult?.(resultMessage.result));
 
         makeRpc<IHostPluginRpc, {}>(pluginChannel, {
             $requestLoadPlugin: this.requestLoadPlugin.bind(this),
