@@ -39,8 +39,15 @@ export class RunnerPlugin implements IRunnerPlugin {
             console.error(`Host expects at least protocol version ${message.data.minVersion}, but we are on version ${Constant.PROTOCOL_VERSION}`);
             this.__conduit.terminate();
         }],
-        [ServiceMessageType.ENTRY, function entryServiceHandler(this: RunnerPlugin, message: EntryServiceMessage) {
-            this.__evaluator.startEvaluator(message.data);
+        [ServiceMessageType.ENTRY, async function entryServiceHandler(this: RunnerPlugin, message: EntryServiceMessage) {
+            try {
+                await this.__evaluator.startEvaluator(message.data);
+            } catch (e) {
+                console.error("Evaluator error:", e);
+                // BasicEvaluator already sends RunnerStatus.ERROR; this is a safety net for
+                // evaluator subclasses that override startEvaluator without the same guarantee.
+                this.updateStatus(RunnerStatus.ERROR, true);
+            }
         }]
     ]);
 
