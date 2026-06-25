@@ -143,17 +143,17 @@ export interface IDataHandler {
      * @param c The Closure to be called.
      * @param args An array of typed arguments to be passed to the Closure.
      * @param returnType The expected type of the returned value.
-     * @returns A promise to the returned typed value.
+     * @returns An AsyncGenerator which returns the returned typed value.
      */
-    closure_call<T extends DataType>(c: TypedValue<DataType.CLOSURE, T>, args: TypedValue<DataType>[], returnType: T): Promise<TypedValue<NoInfer<T>>>;
+    closure_call<T extends DataType>(c: TypedValue<DataType.CLOSURE, T>, args: TypedValue<DataType>[], returnType: T): AsyncGenerator<void, TypedValue<NoInfer<T>>, undefined>;
 
     /**
      * Calls a Closure of known return type.
      * @param c The Closure to be called.
      * @param args An array of typed arguments to be passed to the Closure.
-     * @returns A promise to the returned typed value.
+     * @returns An AsyncGenerator which returns the returned typed value.
      */
-    closure_call_unchecked<T extends DataType>(c: TypedValue<DataType.CLOSURE, T>, args: TypedValue<DataType>[]): Promise<TypedValue<NoInfer<T>>>;
+    closure_call_unchecked<T extends DataType>(c: TypedValue<DataType.CLOSURE, T>, args: TypedValue<DataType>[]): AsyncGenerator<void, TypedValue<NoInfer<T>>, undefined>;
 
     /**
      * Asserts the arity of a Closure.
@@ -208,6 +208,6 @@ export interface IDataHandler {
     list(...elements: TypedValue<DataType>[]): Promise<TypedValue<DataType.LIST>>;
     is_list(xs: TypedValue<DataType.LIST>): Promise<boolean>;
     list_to_vec(xs: TypedValue<DataType.LIST>): Promise<TypedValue<DataType>[]>;
-    accumulate<T extends Exclude<DataType, DataType.VOID>>(op: TypedValue<DataType.CLOSURE, T>, initial: TypedValue<T>, sequence: TypedValue<DataType.LIST>, resultType: T): Promise<TypedValue<T>>;
+    accumulate<T extends Exclude<DataType, DataType.VOID>>(op: TypedValue<DataType.CLOSURE, T>, initial: TypedValue<T>, sequence: TypedValue<DataType.LIST>, resultType: T): AsyncGenerator<void, TypedValue<T>, undefined>;
     length(xs: TypedValue<DataType.LIST>): Promise<number>;
 }

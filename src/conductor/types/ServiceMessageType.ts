@@ -1,4 +1,4 @@
-export const enum ServiceMessageType {
+export enum ServiceMessageType {
     /** A handshake message. See `HelloServiceMessage`. */
     HELLO = 0,
 
