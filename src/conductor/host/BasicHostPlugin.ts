@@ -55,6 +55,8 @@ export abstract class BasicHostPlugin implements IHostPlugin {
 
     receiveOutput?(message: string): void;
 
+    receiveInputRequest?(prompt: string): void;
+
     receiveError?(message: ConductorError): void;
 
     isStatusActive(status: RunnerStatus): boolean {
@@ -90,7 +92,15 @@ export abstract class BasicHostPlugin implements IHostPlugin {
         this.__serviceChannel = serviceChannel;
 
         this.__ioChannel = ioChannel;
-        ioChannel.subscribe((ioMessage: IIOMessage) => this.receiveOutput?.(ioMessage.message));
+        ioChannel.subscribe((ioMessage: IIOMessage) => {
+            // Fall back to receiveOutput for hosts that don't implement receiveInputRequest, so
+            // the prompt is still surfaced somewhere instead of being silently dropped.
+            if (ioMessage.kind === "inputRequest" && this.receiveInputRequest) {
+                this.receiveInputRequest(ioMessage.message);
+            } else {
+                this.receiveOutput?.(ioMessage.message);
+            }
+        });
 
         errorChannel.subscribe((errorMessage: IErrorMessage) => this.receiveError?.(errorMessage.error));
 
