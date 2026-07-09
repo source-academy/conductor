@@ -93,8 +93,10 @@ export abstract class BasicHostPlugin implements IHostPlugin {
 
         this.__ioChannel = ioChannel;
         ioChannel.subscribe((ioMessage: IIOMessage) => {
-            if (ioMessage.kind === "inputRequest") {
-                this.receiveInputRequest?.(ioMessage.message);
+            // Fall back to receiveOutput for hosts that don't implement receiveInputRequest, so
+            // the prompt is still surfaced somewhere instead of being silently dropped.
+            if (ioMessage.kind === "inputRequest" && this.receiveInputRequest) {
+                this.receiveInputRequest(ioMessage.message);
             } else {
                 this.receiveOutput?.(ioMessage.message);
             }

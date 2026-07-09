@@ -60,9 +60,9 @@ export class RunnerPlugin implements IRunnerPlugin {
     }
 
     async requestInput(prompt?: string): Promise<string> {
-        if (prompt !== undefined) {
-            this.__ioQueue.send({ message: prompt, kind: "inputRequest" });
-        }
+        // Always notify the host that input is being requested, even with no prompt text -
+        // otherwise the runner blocks with no signal at all reaching the host.
+        this.__ioQueue.send({ message: prompt ?? "", kind: "inputRequest" });
         const { message } = await this.__ioQueue.receive();
         return message;
     }
