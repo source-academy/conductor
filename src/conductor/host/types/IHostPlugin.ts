@@ -59,6 +59,12 @@ export interface IHostPlugin extends IPlugin {
      */
     receiveOutput?(message: string): void;
 
+    /**
+     * An event handler called when the runner requests input on standard-input.
+     * @param prompt The prompt to show the user requesting the input, if any.
+     */
+    receiveInputRequest?(prompt: string): void;
+
     // /**
     //  * Request for some output on standard-error.
     //  * @returns A promise resolving to the error received.

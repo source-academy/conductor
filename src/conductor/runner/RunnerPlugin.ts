@@ -59,7 +59,10 @@ export class RunnerPlugin implements IRunnerPlugin {
         return (await this.__chunkQueue.receive()).chunk;
     }
 
-    async requestInput(): Promise<string> {
+    async requestInput(prompt?: string): Promise<string> {
+        if (prompt !== undefined) {
+            this.__ioQueue.send({ message: prompt, kind: "inputRequest" });
+        }
         const { message } = await this.__ioQueue.receive();
         return message;
     }

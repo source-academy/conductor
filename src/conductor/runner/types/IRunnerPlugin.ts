@@ -19,9 +19,10 @@ export interface IRunnerPlugin extends IPlugin {
 
     /**
      * Request for some input on standard-input.
+     * @param prompt An optional prompt to show the user requesting the input.
      * @returns A promise resolving to the input received.
      */
-    requestInput(): Promise<string>;
+    requestInput(prompt?: string): Promise<string>;
 
     /**
      * Try to request for some input on standard-input.
