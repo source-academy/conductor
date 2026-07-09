@@ -369,6 +369,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@sourceacademy/conductor@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "@sourceacademy/conductor@workspace:."
+  dependencies:
+    "@rollup/plugin-node-resolve": "npm:^16.0.0"
+    "@rollup/plugin-terser": "npm:^0.4.4"
+    "@rollup/plugin-typescript": "npm:^12.1.2"
+    glob: "npm:^11.0.1"
+    rollup: "npm:^4.34.1"
+    rollup-plugin-modify: "npm:^3.0.0"
+    tslib: "npm:^2.8.1"
+    typescript: "npm:^5.5.3"
+  languageName: unknown
+  linkType: soft
+
 "@types/estree@npm:1.0.8":
   version: 1.0.8
   resolution: "@types/estree@npm:1.0.8"
@@ -532,21 +547,6 @@ __metadata:
   checksum: 10c0/c996b1cfdf95b6c90fee4dae37e332c8b6eb7d106430c17d538034c0ad9a1630cb194d2ab37293b1bdd4d779494beee7786d586a50bd9376fd6f7bcc2bd4c98f
   languageName: node
   linkType: hard
-
-"conductor@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "conductor@workspace:."
-  dependencies:
-    "@rollup/plugin-node-resolve": "npm:^16.0.0"
-    "@rollup/plugin-terser": "npm:^0.4.4"
-    "@rollup/plugin-typescript": "npm:^12.1.2"
-    glob: "npm:^11.0.1"
-    rollup: "npm:^4.34.1"
-    rollup-plugin-modify: "npm:^3.0.0"
-    tslib: "npm:^2.8.1"
-    typescript: "npm:^5.5.3"
-  languageName: unknown
-  linkType: soft
 
 "cross-spawn@npm:^7.0.0, cross-spawn@npm:^7.0.6":
   version: 7.0.6
@@ -1526,15 +1526,15 @@ __metadata:
   linkType: hard
 
 "tar@npm:^7.4.3":
-  version: 7.5.11
-  resolution: "tar@npm:7.5.11"
+  version: 7.5.16
+  resolution: "tar@npm:7.5.16"
   dependencies:
     "@isaacs/fs-minipass": "npm:^4.0.0"
     chownr: "npm:^3.0.0"
     minipass: "npm:^7.1.2"
     minizlib: "npm:^3.1.0"
     yallist: "npm:^5.0.0"
-  checksum: 10c0/b6bb420550ef50ef23356018155e956cd83282c97b6128d8d5cfe5740c57582d806a244b2ef0bf686a74ce526babe8b8b9061527623e935e850008d86d838929
+  checksum: 10c0/4f37f3c4bd2ca2755fd736a5df1d573c1a868ec1b1e893346aeafa95ac510f9e2fd1469420bd866cc7904799e5bd4ac62b5d4f03fe27747d6e1e373b44505c5c
   languageName: node
   linkType: hard
 
