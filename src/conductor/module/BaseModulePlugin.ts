@@ -21,7 +21,12 @@ export abstract class BaseModulePlugin implements IModulePlugin {
         for (const name of this.exportedNames) {
             const m = this[name] as ExternCallable<any, any> & {signature?: IFunctionSignature<any, any>};
             if (!m.signature || typeof m !== "function" || typeof name !== "string") throw new ConductorInternalError(`'${String(name)}' is not an exportable method`);
-            const c = await this.evaluator.closure_make(m.signature, m);
+            // Evaluators invoke the registered closure as a bare function (e.g.
+            // `closure.func(...args)`), so `m` must be bound to this instance here —
+            // otherwise `this` inside the method body is undefined the moment it's called.
+            const boundMethod = m.bind(this) as typeof m;
+            boundMethod.signature = m.signature;
+            const c = await this.evaluator.closure_make(m.signature, boundMethod);
             this.exports.push({
                 symbol: name,
                 value: c,
