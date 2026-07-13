@@ -148,7 +148,9 @@ Errors thrown by modules and evaluators should use the classes in `conductor/com
 - `EvaluatorCallbackError(expected, actual, funcName, paramName?)` — extends `EvaluatorParameterTypeError` for callback arguments that aren't a function, or don't have the expected arity. Use the paired helpers `isFunctionOfLength`/`assertFunctionOfLength`.
 - `ConductorInternalError(message)` — reserved for bugs in the plugin/framework code itself (i.e. code that should be unreachable given well-formed input), not for anything a user's program can trigger.
 
-These mirror js-slang's `InvalidParameterTypeError`/`InvalidNumberParameterError`/`InvalidCallbackError` (as re-exported by `modules-lib/errors`) closely enough that a module moving off js-slang can generally swap one for the other with the same message text, which matters for any existing tests asserting on error messages.
+`conductor/common` also has `isTupleOfLength`/`assertTupleOfLength` (throws `EvaluatorParameterTypeError`) for validating fixed-length array arguments.
+
+These mirror js-slang's `InvalidParameterTypeError`/`InvalidNumberParameterError`/`InvalidCallbackError` and the `utils/rttc.ts` validation helpers (as re-exported by `modules-lib`) closely enough that a module moving off js-slang can generally swap one for the other with the same message text, which matters for any existing tests asserting on error messages. `RuntimeTypeError` and `utils/operators.ts` are intentionally not mirrored — both are tied to js-slang's own AST-based expression evaluator, with no analogous concept in Conductor's language-agnostic module model.
 
 ## Plugins
 
