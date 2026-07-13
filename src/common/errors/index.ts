@@ -1,7 +1,11 @@
 export { ConductorError } from "./ConductorError";
 export { ConductorInternalError } from "./ConductorInternalError";
 export { ErrorType } from "./ErrorType";
+export { EvaluatorCallbackError } from "./EvaluatorCallbackError";
 export { EvaluatorError } from "./EvaluatorError";
+export { EvaluatorNumberRangeError } from "./EvaluatorNumberRangeError";
+export type { NumberRangeOptions } from "./EvaluatorNumberRangeError";
+export { EvaluatorParameterTypeError } from "./EvaluatorParameterTypeError";
 export { EvaluatorRuntimeError } from "./EvaluatorRuntimeError";
 export { EvaluatorSyntaxError } from "./EvaluatorSyntaxError";
 export { EvaluatorTypeError } from "./EvaluatorTypeError";

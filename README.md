@@ -136,6 +136,22 @@ In the case of closures, the `closure_call` and `closure_call_unchecked` return 
 
 A standard library of functions must be made available to modules. See `conductor/stdlib` for sample implementations.
 
+### Errors
+
+Errors thrown by modules and evaluators should use the classes in `conductor/common` rather than plain `Error`, so hosts can recognise and format them consistently. See `conductor/common/errors` for the full hierarchy.
+
+- `EvaluatorRuntimeError(message)` — a plain runtime error, no special structure.
+- `EvaluatorSyntaxError(message)` — the user code does not follow the evaluator's syntax.
+- `EvaluatorTypeError(message, expected, actual)` — a free-form type-error message, with `expected`/`actual` appended automatically as `(expected X, got Y)`.
+- `EvaluatorParameterTypeError(funcName, paramName, expected, actual)` — for the common case of "this function received an argument of the wrong type." Builds a standardised message (`` `${funcName}: Expected ${expected}${paramName ? ` for ${paramName}` : ''}, got ${stringifyValue(actual)}.` ``) from structured fields instead of requiring every module to hand-write that template themselves. Prefer this over `EvaluatorTypeError` when validating a specific named parameter.
+- `EvaluatorNumberRangeError(value, {min, max, integer}, funcName, paramName?)` — extends `EvaluatorParameterTypeError` for numeric range/integer checks (e.g. "expects an integer ≥ 0"). Use the paired helpers `isNumberWithinRange`/`assertNumberWithinRange` from `conductor/common` rather than constructing this directly.
+- `EvaluatorCallbackError(expected, actual, funcName, paramName?)` — extends `EvaluatorParameterTypeError` for callback arguments that aren't a function, or don't have the expected arity. Use the paired helpers `isFunctionOfLength`/`assertFunctionOfLength`.
+- `ConductorInternalError(message)` — reserved for bugs in the plugin/framework code itself (i.e. code that should be unreachable given well-formed input), not for anything a user's program can trigger.
+
+`conductor/common` also has `isTupleOfLength`/`assertTupleOfLength` (throws `EvaluatorParameterTypeError`) for validating fixed-length array arguments.
+
+These mirror js-slang's `InvalidParameterTypeError`/`InvalidNumberParameterError`/`InvalidCallbackError` and the `utils/rttc.ts` validation helpers (as re-exported by `modules-lib`) closely enough that a module moving off js-slang can generally swap one for the other with the same message text, which matters for any existing tests asserting on error messages. `RuntimeTypeError` and `utils/operators.ts` are intentionally not mirrored — both are tied to js-slang's own AST-based expression evaluator, with no analogous concept in Conductor's language-agnostic module model.
+
 ## Plugins
 
 Plugins provide additional functionality not provided by the base Conductor framework.
