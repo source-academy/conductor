@@ -8,7 +8,7 @@ export class EvaluatorCallbackError extends EvaluatorParameterTypeError {
     override name = "EvaluatorCallbackError";
 
     constructor(expected: number | string, actual: unknown, funcName: string, paramName?: string, line?: number, column?: number, fileName?: string) {
-        const expectedDescription = typeof expected === "number" ? `function with ${expected} parameter(s)` : expected;
+        const expectedDescription = typeof expected === "number" ? `function with ${expected} parameter${expected === 1 ? "" : "s"}` : expected;
         super(funcName, paramName, expectedDescription, actual, line, column, fileName);
     }
 }
