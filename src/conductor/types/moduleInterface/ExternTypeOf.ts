@@ -16,6 +16,8 @@ type typeMap<U extends DataType> = {
     [DataType.CLOSURE]: ClosureIdentifier<U>;
     [DataType.OPAQUE]: OpaqueIdentifier;
     [DataType.LIST]: List;
+    [DataType.INTEGER]: bigint;
+    [DataType.ANY]: unknown;
 }
 
 /** Maps the Conductor DataTypes to their corresponding native types. */

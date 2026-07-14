@@ -28,4 +28,10 @@ export enum DataType {
 
     /** A list (either a pair or the empty list). */
     LIST = 9,
+
+    /** An integer value. */
+    INTEGER = 10,
+
+    /** A type that can represent any value. */
+    ANY = 11
 };
