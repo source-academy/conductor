@@ -1,6 +1,6 @@
 import { DataType } from "../types";
 
-const lookupTable = {
+const lookupTable: Record<DataType, boolean> = {
     [DataType.VOID]: false,
     [DataType.BOOLEAN]: false,
     [DataType.NUMBER]: false,
@@ -11,6 +11,7 @@ const lookupTable = {
     [DataType.CLOSURE]: true,
     [DataType.OPAQUE]: true,
     [DataType.LIST]: true, // technically not, but easier to do this due to pair being so
+    [DataType.ANY]: false, // never a value's own type tag; only ever a declared parameter type
 }
 
 export function isReferenceType(type: DataType): boolean {
