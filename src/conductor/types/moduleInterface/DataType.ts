@@ -28,4 +28,11 @@ export enum DataType {
 
     /** A list (either a pair or the empty list). */
     LIST = 9,
+
+    /**
+     * A value of any type - matches whatever DataType the caller actually supplies. Intended for
+     * declaring the argument types of predicates (e.g. `is_tree`) that must accept a value of any
+     * DataType and answer based on its shape, rather than throwing on a mismatched type.
+     */
+    ANY = 10,
 };
