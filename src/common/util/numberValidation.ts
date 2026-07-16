@@ -19,11 +19,11 @@ export function isNumberWithinRange(
         typeof minOrOptions === "number" || minOrOptions === undefined
             ? { min: minOrOptions, max: legacyMax, integer: legacyInteger }
             : minOrOptions;
-    const { min, max, minExclusive = false, maxExclusive = false, integer = true } = options;
+    const { min, max, minExclusive, maxExclusive, integer = true } = options;
     if (typeof value !== "number" || Number.isNaN(value)) return false;
     if (integer && !Number.isInteger(value)) return false;
-    if (min !== undefined && (minExclusive ? value <= min : value < min)) return false;
-    if (max !== undefined && (maxExclusive ? value >= max : value > max)) return false;
+    if (minExclusive !== undefined ? value <= minExclusive : min !== undefined && value < min) return false;
+    if (maxExclusive !== undefined ? value >= maxExclusive : max !== undefined && value > max) return false;
     return true;
 }
 
