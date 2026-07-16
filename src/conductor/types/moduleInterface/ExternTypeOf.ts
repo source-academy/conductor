@@ -16,6 +16,10 @@ type typeMap<U extends DataType> = {
     [DataType.CLOSURE]: ClosureIdentifier<U>;
     [DataType.OPAQUE]: OpaqueIdentifier;
     [DataType.LIST]: List;
+    // Unreachable in practice - TypedValue<DataType.ANY, U> is special-cased to expand to the
+    // union of all concrete TypedValues instead of ever indexing this map with DataType.ANY, but
+    // typeMap must still have an entry for every DataType member to stay soundly typed.
+    [DataType.ANY]: unknown;
 }
 
 /** Maps the Conductor DataTypes to their corresponding native types. */
