@@ -17,6 +17,9 @@ type typeMap<U extends DataType> = {
     [DataType.OPAQUE]: OpaqueIdentifier;
     [DataType.LIST]: List;
     [DataType.INTEGER]: bigint;
+    // Unreachable in practice - TypedValue<DataType.ANY, U> is special-cased to expand to the
+    // union of all concrete TypedValues instead of ever indexing this map with DataType.ANY, but
+    // typeMap must still have an entry for every DataType member to stay soundly typed.
     [DataType.ANY]: unknown;
 }
 

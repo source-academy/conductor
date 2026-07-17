@@ -7,4 +7,4 @@ interface ITypedValue<T extends DataType, U extends DataType = DataType> {
 }
 
 // export a type instead to benefit from distributive conditional type
-export type TypedValue<T extends DataType, U extends DataType = DataType> = T extends DataType ? T extends DataType.LIST ? ITypedValue<DataType.PAIR> | ITypedValue<DataType.EMPTY_LIST> : T extends DataType.ANY ? ITypedValue<DataType, U> : ITypedValue<T, U> : never;
+export type TypedValue<T extends DataType, U extends DataType = DataType> = T extends DataType ? T extends DataType.LIST ? ITypedValue<DataType.PAIR> | ITypedValue<DataType.EMPTY_LIST> : T extends DataType.ANY ? TypedValue<Exclude<DataType, DataType.ANY>, U> : ITypedValue<T, U> : never;
