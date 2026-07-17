@@ -1,7 +1,7 @@
 import { ConductorInternalError } from "../../common/errors";
 import { checkIsPluginClass, type IConduit, type IChannel } from "../../conduit";
 import type { IInterfacableEvaluator } from "../runner";
-import type { IDataHandler, ExternCallable, IFunctionSignature } from "../types";
+import type { IDataHandler, ExternCallable, IFunctionSignature, TypedValue, DataType } from "../types";
 import type { IModulePlugin, IModuleExport } from "./types";
 
 @checkIsPluginClass
@@ -19,7 +19,17 @@ export abstract class BaseModulePlugin implements IModulePlugin {
 
     async initialise() {
         for (const name of this.exportedNames) {
-            const m = this[name] as ExternCallable<any, any> & {signature?: IFunctionSignature<any, any>};
+            const m = this[name] as (ExternCallable<any, any> & {signature?: IFunctionSignature<any, any>}) | TypedValue<DataType>;
+            if (typeof name !== "string") throw new ConductorInternalError(`'${String(name)}' is not an exportable value`);
+            if ("type" in m) {
+                // If the exported member is a TypedValue, we can export it directly without needing to wrap it in a closure.
+                this.exports.push({
+                    symbol: name,
+                    value: m,
+                });    
+                return;
+            }
+            
             if (!m.signature || typeof m !== "function" || typeof name !== "string") throw new ConductorInternalError(`'${String(name)}' is not an exportable method`);
             // Evaluators invoke the registered closure as a bare function (e.g.
             // `closure.func(...args)`), so `m` must be bound to this instance here —

@@ -65,6 +65,16 @@ export interface IDataHandler {
     array_make<T extends DataType>(t: T, len: number, init?: TypedValue<NoInfer<T>>): Promise<TypedValue<DataType.ARRAY, NoInfer<T>>>;
 
     /**
+     * Creates a new Array from an existing set of elements.    
+     * 
+     * Creation of untyped arrays (with type `VOID`) should be avoided.
+     * @param t The type of the elements of the Array.
+     * @param elements An array of typed values to be the elements of the Array.
+     * @returns A promise to a typed value to the new Array.
+     */
+    array_from<T extends DataType>(t: T, elements: TypedValue<NoInfer<T>>[]): Promise<TypedValue<DataType.ARRAY, NoInfer<T>>>;
+
+    /**
      * Gets the length of an Array.
      * @param a The Array to retrieve the length of.
      * @returns A promise to the length of the given Array.
