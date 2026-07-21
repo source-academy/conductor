@@ -35,7 +35,7 @@ export enum DataType {
      * DataType and answer based on its shape, rather than throwing on a mismatched type.
      */
     ANY = 10,
-        
+
     /** An integer value. */
     INTEGER = 11,
 };
