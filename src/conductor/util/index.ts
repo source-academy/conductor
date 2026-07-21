@@ -4,6 +4,7 @@ export { mArray } from "./mArray";
 export { mBoolean } from "./mBoolean";
 export { mClosure } from "./mClosure";
 export { mEmptyList } from "./mEmptyList";
+export { mInteger } from "./mInteger";
 export { mNumber } from "./mNumber";
 export { mOpaque } from "./mOpaque";
 export { mPair } from "./mPair";
