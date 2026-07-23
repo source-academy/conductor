@@ -106,6 +106,7 @@ Note that all identifiers across data types must be unique - in other words, a r
 | void         | none\*     | The return type for functions with no return value            |
 | boolean      | JS value   |                                                               |
 | number       | JS value   | Per JS limitations, this is IEEE754 binary64 (`double` in C)  |
+| integer      | JS BigInt   | This type represents an integer construct (`int64_t` in C)\*\* |
 | const string | JS value   | Strings are immutable                                         |
 | empty list   | none\*     | The empty-list value                                          |
 | pair         | Identifier |                                                               |
@@ -118,6 +119,9 @@ Note that all identifiers across data types must be unique - in other words, a r
 though it is always better to check the data type to be retrieved using the `*_type` functions than to test for equality using the JS values.
 Currently, an equality comparison with null is required to distinguish between a `Pair` and the empty list when accepting a parameter of the type List,
 though it is hoped that an alternative can be found soon.
+
+\*\* Note that current module functions may not operate beyond the range of `-(2^53 - 1)` to `2^53 - 1` due to a lack of support for BigIntegers.
+
 
 Note that language implementations **are expected to verify that the types of arguments to external closures are correct**,
 as it is not possible for the data type to be retrieved from a raw Identifier.
