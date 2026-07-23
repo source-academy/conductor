@@ -59,7 +59,7 @@ export interface IRunnerPlugin extends IPlugin {
      * Informs the host to load a plugin.
      * @param pluginId The ID of the plugin to load.
      */
-    hostLoadPlugin(pluginId: string): void;
+    hostLoadPlugin(pluginId: string): Promise<void>;
 
     /**
      * Queries the host for plugin resolutions.

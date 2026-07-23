@@ -37,7 +37,7 @@ export abstract class BasicHostPlugin implements IHostPlugin {
 
     abstract requestFile(fileName: string): Promise<string | undefined>;
 
-    abstract requestLoadPlugin(pluginId: string): void;
+    abstract requestLoadPlugin(pluginId: string): Promise<void>;
 
     abstract queryPluginResolutions(pluginId: string): Record<string, string>;
 
@@ -113,7 +113,7 @@ export abstract class BasicHostPlugin implements IHostPlugin {
         resultChannel?.subscribe((resultMessage: IResultMessage) => this.receiveResult?.(resultMessage.result));
 
         makeRpc<IHostPluginRpc, {}>(pluginChannel, {
-            $requestLoadPlugin: this.requestLoadPlugin.bind(this),
+            requestLoadPlugin: this.requestLoadPlugin.bind(this),
             queryPluginResolutions: this.queryPluginResolutions.bind(this)
         });
 
