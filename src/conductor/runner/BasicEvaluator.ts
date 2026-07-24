@@ -33,6 +33,9 @@ export abstract class BasicEvaluator implements IEvaluator {
 
     /** Matches a prior beginPendingWork() call. See its doc comment for nesting semantics. */
     protected endPendingWork(): void {
+        if (this.pendingWork === 0) {
+            throw new ConductorInternalError("endPendingWork() called without a matching beginPendingWork()");
+        }
         this.pendingWork--;
         if (this.pendingWork === 0) {
             this.onPendingWorkSettled?.();
