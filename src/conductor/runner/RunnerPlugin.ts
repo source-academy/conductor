@@ -88,8 +88,8 @@ export class RunnerPlugin implements IRunnerPlugin {
         this.__statusChannel.send({ status, isActive });
     }
 
-    hostLoadPlugin(pluginId: string): void {
-        this.__pluginRpc.$requestLoadPlugin(pluginId);
+    async hostLoadPlugin(pluginId: string): Promise<void> {
+        await this.__pluginRpc.requestLoadPlugin(pluginId);
     }
 
     async hostQueryPluginResolutions(pluginId: string): Promise<Record<string, string>> {

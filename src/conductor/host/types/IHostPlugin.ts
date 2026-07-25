@@ -14,7 +14,7 @@ export interface IHostPlugin extends IPlugin {
      * Request to load a plugin.
      * @param pluginId The ID of the plugin to request loading.
      */
-    requestLoadPlugin(pluginId: string): void;
+    requestLoadPlugin(pluginId: string): Promise<void>;
 
     /**
      * Queries for plugin resolutions.
