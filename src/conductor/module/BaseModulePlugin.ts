@@ -27,7 +27,7 @@ export abstract class BaseModulePlugin implements IModulePlugin {
                     symbol: name,
                     value: m,
                 });    
-                return;
+                continue;
             }
             
             if (!m.signature || typeof m !== "function" || typeof name !== "string") throw new ConductorInternalError(`'${String(name)}' is not an exportable method`);
