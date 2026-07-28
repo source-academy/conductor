@@ -72,20 +72,31 @@ export class RunnerPlugin implements IRunnerPlugin {
         return out?.message;
     }
 
+    /**
+     * Counts sendOutput/sendResult/sendError calls, stamped onto the next status update as
+     * sentCount (see IStatusMessage) so the host can wait for its own received count to catch up
+     * before treating a terminal STOPPED/ERROR as safe to act on — output/result/error each ride
+     * their own MessagePort with no cross-channel ordering guarantee relative to STATUS.
+     */
+    private __sentCount: number = 0;
+
     sendOutput(message: string): void {
+        this.__sentCount++;
         this.__ioQueue.send({ message });
     }
 
     sendResult(result: any): void {
+        this.__sentCount++;
         this.__resultChannel.send({ result });
     }
 
     sendError(error: ConductorError): void {
+        this.__sentCount++;
         this.__errorChannel.send({ error });
     }
 
     updateStatus(status: RunnerStatus, isActive: boolean): void {
-        this.__statusChannel.send({ status, isActive });
+        this.__statusChannel.send({ status, isActive, sentCount: this.__sentCount });
     }
 
     async hostLoadPlugin(pluginId: string): Promise<void> {
