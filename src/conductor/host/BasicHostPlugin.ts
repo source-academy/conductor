@@ -63,7 +63,7 @@ export abstract class BasicHostPlugin implements IHostPlugin {
         return this.__status.get(status) ?? false;
     }
 
-    receiveStatusUpdate?(status: RunnerStatus, isActive: boolean): void;
+    receiveStatusUpdate?(status: RunnerStatus, isActive: boolean, sentCount: number): void;
 
     receiveResult?(result: any): void;
 
@@ -105,9 +105,9 @@ export abstract class BasicHostPlugin implements IHostPlugin {
         errorChannel.subscribe((errorMessage: IErrorMessage) => this.receiveError?.(errorMessage.error));
 
         statusChannel.subscribe((statusMessage: IStatusMessage) => {
-            const {status, isActive} = statusMessage;
+            const {status, isActive, sentCount} = statusMessage;
             this.__status.set(status, isActive);
-            this.receiveStatusUpdate?.(status, isActive);
+            this.receiveStatusUpdate?.(status, isActive, sentCount);
         });
 
         resultChannel?.subscribe((resultMessage: IResultMessage) => this.receiveResult?.(resultMessage.result));

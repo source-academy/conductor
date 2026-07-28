@@ -25,6 +25,12 @@ export class RunnerPlugin implements IRunnerPlugin {
     private readonly __statusChannel: IChannel<IStatusMessage>;
     private readonly __pluginRpc: Remote<IHostPluginRpc>;
 
+    // Counts only sendOutput/sendResult/sendError - the messages a host actually waits to drain
+    // before tearing the runner down on a terminal status. Input-request messages (on the same
+    // ioQueue as output) aren't counted: they aren't part of that drain, and requestInput already
+    // awaits the host's response directly rather than firing-and-forgetting like sendOutput does.
+    private __sentCount = 0;
+
     // @ts-expect-error TODO: figure proper way to typecheck this
     private readonly __serviceHandlers = new Map<ServiceMessageType, (message: IServiceMessage) => void>([
         [ServiceMessageType.HELLO, function helloServiceHandler(this: RunnerPlugin, message: HelloServiceMessage) {
@@ -74,18 +80,21 @@ export class RunnerPlugin implements IRunnerPlugin {
 
     sendOutput(message: string): void {
         this.__ioQueue.send({ message });
+        this.__sentCount++;
     }
 
     sendResult(result: any): void {
         this.__resultChannel.send({ result });
+        this.__sentCount++;
     }
 
     sendError(error: ConductorError): void {
         this.__errorChannel.send({ error });
+        this.__sentCount++;
     }
 
     updateStatus(status: RunnerStatus, isActive: boolean): void {
-        this.__statusChannel.send({ status, isActive });
+        this.__statusChannel.send({ status, isActive, sentCount: this.__sentCount });
     }
 
     async hostLoadPlugin(pluginId: string): Promise<void> {

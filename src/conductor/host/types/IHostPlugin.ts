@@ -94,8 +94,12 @@ export interface IHostPlugin extends IPlugin {
      * An event handler called when a status update is received.
      * @param message The status update received.
      * @param isActive Is the specified status currently active?
+     * @param sentCount The total number of output/result/error messages the runner has sent so
+     * far, as of this status update. A host can compare this against its own received-message
+     * count to know when it's actually safe to tear the runner down after a terminal status,
+     * instead of guessing with a fixed delay.
      */
-    receiveStatusUpdate?(status: RunnerStatus, isActive: boolean): void;
+    receiveStatusUpdate?(status: RunnerStatus, isActive: boolean, sentCount: number): void;
 
     /**
      * An event handler called when an evaluation result is received.
