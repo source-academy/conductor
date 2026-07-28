@@ -26,13 +26,21 @@ export abstract class BasicEvaluator implements IEvaluator {
      * begins the next (e.g. a timeout rescheduling itself from inside its fired callback), both
      * keep STOPPED withheld correctly - see the re-checking loop in startEvaluator, which is what
      * actually makes the latter ordering safe despite the count briefly touching zero).
+     *
+     * Public (not just usable by the evaluator itself, as set_timeout is): a module can have
+     * exactly the same shape of problem - pix_n_flix's install_filter kicks off a continuous
+     * per-frame video pipeline that, like a scheduled timeout, may still be running well after the
+     * top-level program's own synchronous code has finished. A module reaches its evaluator via
+     * the same IInterfacableEvaluator reference passed into its constructor - see
+     * source-academy/conductor#59.
      */
-    protected beginPendingWork(): void {
+    beginPendingWork(): void {
         this.pendingWork++;
     }
 
-    /** Matches a prior beginPendingWork() call. See its doc comment for nesting semantics. */
-    protected endPendingWork(): void {
+    /** Matches a prior beginPendingWork() call. See its doc comment for nesting semantics - public
+     * for the same reason beginPendingWork() is. */
+    endPendingWork(): void {
         if (this.pendingWork === 0) {
             throw new ConductorInternalError("endPendingWork() called without a matching beginPendingWork()");
         }
