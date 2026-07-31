@@ -71,14 +71,49 @@ export abstract class BasicEvaluator implements IEvaluator {
             this.conductor.updateStatus(RunnerStatus.ERROR, true);
             throw e;
         }
-        // A settled wait only proves pendingWork *touched* 0 at some past instant - a callback
-        // that matches its own pending work and then immediately begins the next unit (e.g.
-        // rescheduling itself) can slip a new beginPendingWork() in before this ever wakes up and
-        // looks again, so re-check rather than trust a single wait.
+        await this.awaitPendingWorkSettled();
+
+        // The entrypoint file is only the first chunk. A host that wants a persistent REPL
+        // session (e.g. so a later chunk can see an earlier chunk's declarations) keeps this
+        // Worker alive after the file finishes and posts further chunks via IHostPlugin.sendChunk
+        // - requestChunk() below is what actually receives them. A host that instead wants a
+        // classic one-shot run simply never calls sendChunk() and tears the Worker down itself
+        // (e.g. Terminate()); there is no separate "give up the session" protocol message, since
+        // killing the Worker already accomplishes that unconditionally.
+        //
+        // A chunk that throws does not end the loop or reach RunnerStatus.STOPPED - a single bad
+        // REPL line (e.g. a typo) must not destroy previously-declared state. evaluateChunk
+        // implementations are expected to catch and report their own errors (e.g. via
+        // conductor.sendError) and resolve normally; the catch below is a safety net for ones
+        // that don't.
+        for (;;) {
+            this.conductor.updateStatus(RunnerStatus.EVAL_READY, true);
+            const chunk = await this.conductor.requestChunk();
+            this.conductor.updateStatus(RunnerStatus.RUNNING, true);
+            try {
+                this.conductor.sendResult(await this.evaluateChunk(chunk));
+            } catch (e) {
+                console.error("Evaluator error:", e);
+                this.conductor.updateStatus(RunnerStatus.ERROR, true);
+            }
+            await this.awaitPendingWorkSettled();
+        }
+    }
+
+    /**
+     * Waits until pendingWork has settled back to 0 (e.g. a chunk's set_timeout callbacks have
+     * all fired) before startEvaluator moves on - once after the initial file, then again after
+     * every chunk the loop below evaluates.
+     *
+     * A settled wait only proves pendingWork *touched* 0 at some past instant - a callback that
+     * matches its own pending work and then immediately begins the next unit (e.g. rescheduling
+     * itself) can slip a new beginPendingWork() in before this ever wakes up and looks again, so
+     * re-check rather than trust a single wait.
+     */
+    private async awaitPendingWorkSettled(): Promise<void> {
         while (this.pendingWork > 0) {
             await this.nextPendingWorkSettled();
         }
-        this.conductor.updateStatus(RunnerStatus.STOPPED, true);
     }
 
     /**
