@@ -22,6 +22,7 @@ export abstract class BaseModulePlugin implements IModulePlugin {
     abstract id: string;
     readonly exports: IModuleExport[] = [];
     readonly exportedNames: readonly (keyof this)[] = [];
+    private __initialisation: Promise<void> | undefined;
 
     readonly evaluator: IDataHandler;
 
@@ -30,7 +31,12 @@ export abstract class BaseModulePlugin implements IModulePlugin {
         this.evaluator = evaluator;
     }
 
-    async initialise() {
+    initialise(): Promise<void> {
+        this.__initialisation ??= this.__initialise();
+        return this.__initialisation;
+    }
+
+    private async __initialise(): Promise<void> {
         for (const name of this.exportedNames) {
             const m = this[name] as SyncCallable<any, any>;
             if (!m.signature || typeof m !== "function" || typeof name !== "string") throw new ConductorInternalError(`'${String(name)}' is not an exportable method`);
